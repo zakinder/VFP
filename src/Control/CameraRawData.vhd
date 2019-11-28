@@ -27,7 +27,6 @@ port (
 end CameraRawData;
 architecture arch_imp of CameraRawData is
     --PIXCLK SIDE
-    signal pData          : std_logic_vector(11 downto 0):= (others => lo);
     signal pLine          : std_logic :=lo;
     signal pFrame         : std_logic :=lo;
     signal pLineSyn       : std_logic :=lo;
@@ -64,7 +63,6 @@ d5mDataSyncP: process(pixclk) begin
         pLine       <= ilval;
 		pLineSyn    <= pLine;
         pFrame      <= ifval;
-        pData       <= idata;
         if (pFrame = hi and pLine = hi) then
             pDataWrAddress  <= pDataWrAddress + one;
         else
@@ -75,9 +73,7 @@ d5mDataSyncP: process(pixclk) begin
         else
             imgWidth  <= imgWidth;
         end if;
-        if (pFrame = hi and pLine = hi) then
-            d5mLine(pDataWrAddress) <= pData;
-        end if;
+        d5mLine(pDataWrAddress) <= idata;
     end if;
 end process d5mDataSyncP;
 -----------------------------------------------------------------------------------------
