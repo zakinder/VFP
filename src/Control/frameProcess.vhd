@@ -26,6 +26,7 @@ port (
     iYccPerCh               : in integer;
     iEdgeType               : in std_logic_vector(b_data_width-1 downto 0);
     iThreshold              : in std_logic_vector(s_data_width-1 downto 0); 
+    iVideoChannel           : in std_logic_vector(b_data_width-1 downto 0);
     --out
     oFrameData              : out fcolors;
     --to cpu
@@ -75,26 +76,26 @@ architecture arch of frameProcess is
     constant F_HSV          : boolean := true;
     constant F_HSL          : boolean := true;
     -------------------------------------------------
-    constant F_CGA_TO_CGA   : boolean := false;
+    constant F_CGA_TO_CGA   : boolean := true;
     constant F_CGA_TO_HSL   : boolean := true;
     constant F_CGA_TO_HSV   : boolean := true;
-    constant F_CGA_TO_YCC   : boolean := false;
+    constant F_CGA_TO_YCC   : boolean := true;
     constant F_CGA_TO_SHP   : boolean := true;
-    constant F_CGA_TO_BLU   : boolean := false;
+    constant F_CGA_TO_BLU   : boolean := true;
     -------------------------------------------------
-    constant F_SHP_TO_SHP   : boolean := false;
-    constant F_SHP_TO_HSL   : boolean := false;
-    constant F_SHP_TO_HSV   : boolean := false;
-    constant F_SHP_TO_YCC   : boolean := false;
-    constant F_SHP_TO_CGA   : boolean := false;
-    constant F_SHP_TO_BLU   : boolean := false;
+    constant F_SHP_TO_SHP   : boolean := true;
+    constant F_SHP_TO_HSL   : boolean := true;
+    constant F_SHP_TO_HSV   : boolean := true;
+    constant F_SHP_TO_YCC   : boolean := true;
+    constant F_SHP_TO_CGA   : boolean := true;
+    constant F_SHP_TO_BLU   : boolean := true;
     -------------------------------------------------
-    constant F_BLU_TO_BLU   : boolean := false;
-    constant F_BLU_TO_HSL   : boolean := false;
-    constant F_BLU_TO_HSV   : boolean := false;
-    constant F_BLU_TO_YCC   : boolean := false;
-    constant F_BLU_TO_CGA   : boolean := false;
-    constant F_BLU_TO_SHP   : boolean := false;
+    constant F_BLU_TO_BLU   : boolean := true;
+    constant F_BLU_TO_HSL   : boolean := true;
+    constant F_BLU_TO_HSV   : boolean := true;
+    constant F_BLU_TO_YCC   : boolean := true;
+    constant F_BLU_TO_CGA   : boolean := true;
+    constant F_BLU_TO_SHP   : boolean := true;
     -------------------------------------------------
     constant MASK_TRUE      : boolean := true;
     constant MASK_FLSE      : boolean := false;
@@ -234,6 +235,8 @@ generic map(
     F_BLU_TO_SHP        =>  F_BLU_TO_SHP,
     img_width           =>  img_width,
     img_height          =>  img_width + 100,
+    adwrWidth           =>  adwrWidth,
+    addrWidth           =>  addrWidth,
     s_data_width        =>  s_data_width,
     i_data_width        =>  i_data_width)
 port map(
@@ -242,9 +245,11 @@ port map(
     txCord              => cord,
     lumThreshold        => lumThreshold,
     iThreshold          => iThreshold,
+	iVideoChannel       => iVideoChannel,
     iRgb                => rgbIn,
     cHsv                => cHsv,
     cYcc                => cYcc,
+	iAls                => iAls,
     iKcoeff             => iKcoeff,
     edgeValid           => edgeValid,
     oRgb                => rgbImageFilters);

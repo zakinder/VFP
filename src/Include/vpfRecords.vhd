@@ -7,6 +7,39 @@ use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constantspackage.all;
 package vpfRecords is
+type ty1sf is record
+    k1               : sfixed(4 downto -3);
+    k2               : sfixed(4 downto -3);
+    k3               : sfixed(4 downto -3);
+    k4               : sfixed(4 downto -3);
+    k5               : sfixed(4 downto -3);
+    k6               : sfixed(4 downto -3);
+    k7               : sfixed(4 downto -3);
+    k8               : sfixed(4 downto -3);
+    k9               : sfixed(4 downto -3);
+end record;
+type ty2sf is record
+    k1               : sfixed(24 downto -3);
+    k2               : sfixed(24 downto -3);
+    k3               : sfixed(24 downto -3);
+    k4               : sfixed(24 downto -3);
+    k5               : sfixed(24 downto -3);
+    k6               : sfixed(24 downto -3);
+    k7               : sfixed(24 downto -3);
+    k8               : sfixed(24 downto -3);
+    k9               : sfixed(24 downto -3);
+end record;
+type ty2sn is record
+    k1               : signed(19 downto 0);
+    k2               : signed(19 downto 0);
+    k3               : signed(19 downto 0);
+    k4               : signed(19 downto 0);
+    k5               : signed(19 downto 0);
+    k6               : signed(19 downto 0);
+    k7               : signed(19 downto 0);
+    k8               : signed(19 downto 0);
+    k9               : signed(19 downto 0);
+end record;
 type ty1sn is record
     k1               : signed(14 downto 0);
     k2               : signed(14 downto 0);
@@ -56,7 +89,25 @@ type ty2std is record
     k8               : sfixed(24 downto -3);
     k9               : sfixed(24 downto -3);
 end record;
+type ccKernel is record
+    ccSf             : ty1sf;
+    ccProdSf         : ty2sf;
+    ccProdToSn       : ty2sn;
+    ccProdTrSn       : ty1sn;
+end record;
+type rgbToSfRecord is record
+    red              : sfixed(9 downto 0);
+    green            : sfixed(9 downto 0);
+    blue             : sfixed(9 downto 0);
+end record;
+type rgbSnSumRecord is record
+    red              : signed(ADD_RESULT_WIDTH-1 downto 0);
+    green            : signed(ADD_RESULT_WIDTH-1 downto 0);
+    blue             : signed(ADD_RESULT_WIDTH-1 downto 0);
+end record;
 type ccRgbRecord is record
+    rgbToSf          : rgbToSfRecord;
+    rgbSnSum         : rgbSnSumRecord;
     rgbSnSumTr       : rgbSnSumTrRecord;
 end record;
 type rgbToFlRecord is record

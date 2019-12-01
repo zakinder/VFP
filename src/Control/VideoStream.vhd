@@ -55,6 +55,7 @@ port map(
     clk                  => m_axis_mm2s_aclk,
     rst_l                => m_axis_mm2s_aresetn,
     iRgbSet              => iRgbSet,
+    iVideoChannel        => videoChannel,
     iEdgeType            => edgeType,
     iPoiRegion           => pRegion,
     iThreshold           => threshold,

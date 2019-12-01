@@ -159,7 +159,7 @@ ycbcrInst: rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
     i_precision          => 12,
-    i_full_range         => FALSE)
+    i_full_range         => TRUE)
 port map(
     clk                  => clk,
     rst_l                => rst_l,

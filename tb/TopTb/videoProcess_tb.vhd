@@ -15,12 +15,15 @@ architecture behavioral of videoProcess_tb is
     signal resetn                        : std_logic := lo;
     signal clk                           : std_logic;
     signal kCoeff                        : kernelCoeff;
+    signal iAls                          : coefficient;
     signal olm                           : rgbConstraint;
     signal edgeValid                     : std_logic;
     constant clk_freq                    : real    := 1000.00e6;
     signal txCord                        : coord;
-    --cgain  ycbcr sobel blur emboss sobelRgb hsv ycbcr_y ycbcr_r hsv_h hsv_s hsv_v
-    constant testFolder                  : string  := "cgain";
+    signal iVideoChannel                 : std_logic_vector(b_data_width-1 downto 0);
+    signal iThreshold                    : std_logic_vector(s_data_width-1 downto 0); 
+	--cgain  ycbcr sobel blur emboss sobelRgb hsv ycbcr_y ycbcr_r hsv_h hsv_s hsv_v
+    constant testFolder                  : string  := "F_BLU_TO_HSL";
     -------------------------------------------------
     constant DUT_FILTERS_TESTENABLED     : boolean := true;
     constant DUT_VFP_ENABLED             : boolean := false;
@@ -50,13 +53,13 @@ architecture behavioral of videoProcess_tb is
     constant F_TRM                       : boolean := false;
     constant F_RGB                       : boolean := false;
     constant F_SHP                       : boolean := false;
-    constant F_BLU                       : boolean := false;
+    constant F_BLU                       : boolean := true;
     constant F_EMB                       : boolean := false;
     constant F_YCC                       : boolean := false;
     constant F_SOB                       : boolean := false;
-    constant F_CGA                       : boolean := true;
+    constant F_CGA                       : boolean := false;
     constant F_HSV                       : boolean := false;
-    constant F_HSL                       : boolean := false;
+    constant F_HSL                       : boolean := true;
     -------------------------------------------------
     constant MASK_TRUE                   : boolean := true;
     constant MASK_FLSE                   : boolean := false;
@@ -85,7 +88,7 @@ architecture behavioral of videoProcess_tb is
     constant F_SHP_TO_BLU                : boolean := false;
     -------------------------------------------------
     constant F_BLU_TO_BLU                : boolean := false;
-    constant F_BLU_TO_HSL                : boolean := false;
+    constant F_BLU_TO_HSL                : boolean := true;
     constant F_BLU_TO_HSV                : boolean := false;
     constant F_BLU_TO_YCC                : boolean := false;
     constant F_BLU_TO_CGA                : boolean := false;
@@ -103,12 +106,15 @@ architecture behavioral of videoProcess_tb is
     signal iHsvPerCh                     : integer := 0;--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
     signal iYccPerCh                     : integer := 0;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
     signal lumThreshold                  : std_logic_vector(7 downto 0);
+    signal vChannelSelect                : integer := 38;
     -------------------------------------------------
 begin
     -------------------------------------------------
+    iAls.config  <= 0;
     lumThreshold          <= std_logic_vector(to_unsigned(iLumTh,8));
     cHsv                  <= std_logic_vector(to_unsigned(iHsvPerCh,3));
     cYcc                  <= std_logic_vector(to_unsigned(iYccPerCh,3));
+    iVideoChannel         <= std_logic_vector(to_unsigned(vChannelSelect,32));
     -------------------------------------------------
     --cHsv <= cHsvV & cHsvS & cHsvH;
     --cYcc <= cYccR & cYccB & cYccY;
@@ -204,11 +210,17 @@ generic map(
     F_BLU_TO_CGA          =>  F_BLU_TO_CGA,
     F_BLU_TO_SHP          =>  F_BLU_TO_SHP,
     img_width             =>  img_width,
-    img_height            =>  img_height,
+    img_height            =>  img_width + 100,
+    adwrWidth             =>  adwrWidth,
+    addrWidth             =>  addrWidth,
+    s_data_width          =>  s_data_width,
     i_data_width          =>  i_data_width)
 port map(
     clk                   => clk,
     rst_l                 => resetn,
+    iThreshold            => iThreshold,
+	iVideoChannel         => iVideoChannel,
+	iAls                  => iAls,
     txCord                => txCord,
     lumThreshold          => lumThreshold,
     iRgb                  => rgbRead,
@@ -217,6 +229,11 @@ port map(
     iKcoeff               => kCoeff,
     edgeValid             => edgeValid,
     oRgb                  => rgbImageFilters);
+	
+
+
+
+	
 M_SOB_CGA_TEST_ENABLED : if (M_SOB_CGA = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelCga.valid = hi);
 ImageWriteCgainToshpSBInst: imageWrite

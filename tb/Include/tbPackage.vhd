@@ -12,13 +12,13 @@ package tbPackage is
     constant saxis_aclk          : real    := 150.00e6;
     constant dataWidth           : integer := 12; 
     constant line_hight          : integer := 5;  
-     constant img_width           : integer := 400;
-     constant img_height          : integer := 300;
+     constant img_width           : integer := 128;
+     constant img_height          : integer := 128;
     --constant img_width           : integer := 128;
     --constant img_height          : integer := 128;
     constant adwrWidth           : integer := 16;
     constant addrWidth           : integer := 12;
-    constant readbmp             : string  := "400_300";
+    constant readbmp             : string  := "128_128";
     --constant readbmp             : string  := "128_128";
     --constant writebmp            : string  := "readbmp";
 function conv_std_logic_vector(ARG : integer; SIZE : integer) return std_logic_vector;

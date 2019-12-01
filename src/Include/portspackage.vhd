@@ -49,6 +49,8 @@ generic (
     F_BLU_TO_SHP          : boolean := false;
     img_width             : integer := 4096;
     img_height            : integer := 4096;
+    adwrWidth             : integer := 16;
+    addrWidth             : integer := 12;
     s_data_width          : integer := 16;
     i_data_width          : integer := 8);
 port (                          
@@ -58,8 +60,10 @@ port (
     lumThreshold          : in  std_logic_vector(7 downto 0);
     iThreshold            : in std_logic_vector(s_data_width-1 downto 0); 
     iRgb                  : in channel;
+    iVideoChannel         : in std_logic_vector(b_data_width-1 downto 0);
     cHsv                  : in std_logic_vector(2 downto 0);
     cYcc                  : in std_logic_vector(2 downto 0);
+    iAls                  : in coefficient;
     iKcoeff               : in kernelCoeff;
     edgeValid             : out std_logic;
     oRgb                  : out frameColors);
@@ -356,8 +360,7 @@ port (
     vTap0x                      : in std_logic_vector(7 downto 0);
     vTap1x                      : in std_logic_vector(7 downto 0);
     vTap2x                      : in std_logic_vector(7 downto 0);
-    kls                         : in coefficient;  
-    endOfFrame                  : in std_logic;     
+    kls                         : in coefficient;      
     DataO                       : out std_logic_vector(7 downto 0));
 end component sharpMac;
 component dataTaps is
@@ -406,6 +409,7 @@ port (
     clk                         : in std_logic;
     rst_l                       : in std_logic;
     iRgbSet                     : in rRgb;
+    iVideoChannel               : in std_logic_vector(b_data_width-1 downto 0);
     iRgbCoord                   : in region;
     iPoiRegion                  : in poi;
     iKls                        : in coefficient;
@@ -439,7 +443,6 @@ port (
     rst_l                       : in std_logic;
     iRgb                        : in channel;
     kls                         : in coefficient;
-    endOfFrame                  : in std_logic;   
     oRgb                        : out channel);
 end component sharpFilter;
 component FrameMask is
@@ -641,7 +644,6 @@ port (
 end component rgb_ycbcr;
 component colorCorrection is
 generic (
-    img_width                   : integer := 4096;
     i_data_width                : integer := 8);
 port (                          
     clk                         : in std_logic;
