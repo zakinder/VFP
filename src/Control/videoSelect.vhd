@@ -28,21 +28,16 @@ architecture Behavioral of videoSelect is
     signal vChannelSelect     : integer;
     signal eChannelSelect     : integer;
     signal ycbcr              : channel;
-    signal channels           : channel;
-    signal kCoeffYcbcr        : kernelCoeff;
+    signal selFilter          : channel;
+    signal location           : cord := (x => 512, y => 512);
+    signal rgbText            : channel;
+    signal channels         : channel;
+    
 begin
-    kCoeffYcbcr.k1    <= x"0101";-- [ 0.257]
-    kCoeffYcbcr.k2    <= x"01F8";-- [ 0.504]
-    kCoeffYcbcr.k3    <= x"0062";-- [ 0.098]
-    kCoeffYcbcr.k4    <= x"FF6C";-- [-0.148]
-    kCoeffYcbcr.k5    <= x"FEDD";-- [-0.291]
-    kCoeffYcbcr.k6    <= x"01B7";-- [ 0.439]
-    kCoeffYcbcr.k7    <= x"01B7";-- [ 0.439]
-    kCoeffYcbcr.k8    <= x"FE90";-- [-0.368]
-    kCoeffYcbcr.k9    <= x"FFB9";-- [-0.071]
-    kCoeffYcbcr.kSet  <= 6;
+
     vChannelSelect    <= to_integer(unsigned(videoChannel));
     eChannelSelect    <= to_integer(unsigned(dChannel));
+    
     oEof              <= iFrameData.pEof;
     oSof              <= iFrameData.pSof;
 ---------------------------------------------------------------------------------
@@ -51,110 +46,115 @@ begin
 videoOutP: process (clk) begin
     if rising_edge(clk) then
         if (vChannelSelect = 0) then
-            channels           <= iFrameData.cgain;
+            selFilter           <= iFrameData.cgain;
         elsif(vChannelSelect = 1)then
-            channels           <= iFrameData.sharp;
+            selFilter           <= iFrameData.sharp;
         elsif(vChannelSelect = 2)then
-            channels           <= iFrameData.blur;
+            selFilter           <= iFrameData.blur;
         elsif(vChannelSelect = 3)then
-            channels           <= iFrameData.hsl;
+            selFilter           <= iFrameData.hsl;
         elsif(vChannelSelect = 4)then
-            channels           <= iFrameData.hsv;
+            selFilter           <= iFrameData.hsv;
         elsif(vChannelSelect = 5)then
-            channels           <= iFrameData.inrgb;
+            selFilter           <= iFrameData.inrgb;
         elsif(vChannelSelect = 6)then
-            channels           <= iFrameData.sobel;
+            selFilter           <= iFrameData.sobel;
         elsif(vChannelSelect = 7)then
-            channels           <= iFrameData.embos;
+            selFilter           <= iFrameData.embos;
         elsif(vChannelSelect = 8)then
-            channels           <= iFrameData.maskSobelLum;
+            selFilter           <= iFrameData.maskSobelLum;
         elsif(vChannelSelect = 9)then
-            channels           <= iFrameData.maskSobelTrm;
+            selFilter           <= iFrameData.maskSobelTrm;
         elsif(vChannelSelect = 10)then
-            channels           <= iFrameData.maskSobelRgb;
+            selFilter           <= iFrameData.maskSobelRgb;
         elsif(vChannelSelect = 11)then
-            channels           <= iFrameData.maskSobelShp;
+            selFilter           <= iFrameData.maskSobelShp;
         elsif(vChannelSelect = 12)then
-            channels           <= iFrameData.maskSobelShp;
+            selFilter           <= iFrameData.maskSobelShp;
         elsif(vChannelSelect = 13)then
-            channels           <= iFrameData.maskSobelBlu;
+            selFilter           <= iFrameData.maskSobelBlu;
         elsif(vChannelSelect = 14)then
-            channels           <= iFrameData.maskSobelYcc;
+            selFilter           <= iFrameData.maskSobelYcc;
         elsif(vChannelSelect = 15)then
-            channels           <= iFrameData.maskSobelHsv;
+            selFilter           <= iFrameData.maskSobelHsv;
         elsif(vChannelSelect = 16)then
-            channels           <= iFrameData.maskSobelHsl;
+            selFilter           <= iFrameData.maskSobelHsl;
         elsif(vChannelSelect = 17)then
-            channels           <= iFrameData.maskSobelCga;
+            selFilter           <= iFrameData.maskSobelCga;
         elsif(vChannelSelect = 18)then
-            channels           <= iFrameData.colorTrm;
+            selFilter           <= iFrameData.colorTrm;
         elsif(vChannelSelect = 19)then
-            channels           <= iFrameData.colorLmp;
+            selFilter           <= iFrameData.colorLmp;
         elsif(vChannelSelect = 20)then
-            channels           <= iFrameData.tPattern;
+            selFilter           <= iFrameData.tPattern;
         elsif(vChannelSelect = 21)then
-            channels           <= iFrameData.cgainToCgain;
+            selFilter           <= iFrameData.cgainToCgain;
         elsif(vChannelSelect = 22)then
-            channels           <= iFrameData.cgainToHsl;
+            selFilter           <= iFrameData.cgainToHsl;
         elsif(vChannelSelect = 23)then
-            channels           <= iFrameData.cgainToHsv;
+            selFilter           <= iFrameData.cgainToHsv;
         elsif(vChannelSelect = 24)then
-            channels           <= iFrameData.cgainToYcbcr;
+            selFilter           <= iFrameData.cgainToYcbcr;
         elsif(vChannelSelect = 25)then
-            channels           <= iFrameData.cgainToShp;
+            selFilter           <= iFrameData.cgainToShp;
         elsif(vChannelSelect = 26)then
-            channels           <= iFrameData.cgainToBlu;
+            selFilter           <= iFrameData.cgainToBlu;
         elsif(vChannelSelect = 27)then
-            channels           <= iFrameData.shpToCgain;
+            selFilter           <= iFrameData.shpToCgain;
         elsif(vChannelSelect = 28)then
-            channels           <= iFrameData.shpToHsl;
+            selFilter           <= iFrameData.shpToHsl;
         elsif(vChannelSelect = 29)then
-            channels           <= iFrameData.shpToHsv;
+            selFilter           <= iFrameData.shpToHsv;
         elsif(vChannelSelect = 30)then
-            channels           <= iFrameData.shpToYcbcr;
+            selFilter           <= iFrameData.shpToYcbcr;
         elsif(vChannelSelect = 31)then
-            channels           <= iFrameData.shpToShp;
+            selFilter           <= iFrameData.shpToShp;
         elsif(vChannelSelect = 32)then
-            channels           <= iFrameData.shpToBlu;
+            selFilter           <= iFrameData.shpToBlu;
         elsif(vChannelSelect = 33)then
-            channels           <= iFrameData.bluToBlu;
+            selFilter           <= iFrameData.bluToBlu;
         elsif(vChannelSelect = 34)then
-            channels           <= iFrameData.bluToCga;
+            selFilter           <= iFrameData.bluToCga;
         elsif(vChannelSelect = 35)then
-            channels           <= iFrameData.bluToShp;
+            selFilter           <= iFrameData.bluToShp;
         elsif(vChannelSelect = 36)then
-            channels           <= iFrameData.bluToYcc;
+            selFilter           <= iFrameData.bluToYcc;
         elsif(vChannelSelect = 37)then
-            channels           <= iFrameData.bluToHsv;
+            selFilter           <= iFrameData.bluToHsv;
         elsif(vChannelSelect = 38)then
-            channels           <= iFrameData.bluToHsl;
+            selFilter           <= iFrameData.bluToHsl;
         elsif(vChannelSelect = 39)then
-            channels           <= iFrameData.bluToCgaShp;
+            selFilter           <= iFrameData.bluToCgaShp;
         elsif(vChannelSelect = 40)then
-            channels           <= iFrameData.bluToCgaShpYcc;
+            selFilter           <= iFrameData.bluToCgaShpYcc;
         elsif(vChannelSelect = 41)then
-            channels           <= iFrameData.bluToCgaShpHsv;
+            selFilter           <= iFrameData.bluToCgaShpHsv;
         elsif(vChannelSelect = 42)then
-            channels           <= iFrameData.bluToShpCga;
+            selFilter           <= iFrameData.bluToShpCga;
         elsif(vChannelSelect = 43)then
-            channels           <= iFrameData.bluToShpCgaYcc;
+            selFilter           <= iFrameData.bluToShpCgaYcc;
         elsif(vChannelSelect = 44)then
-            channels           <= iFrameData.bluToShpCgaHsv;
+            selFilter           <= iFrameData.bluToShpCgaHsv;
         elsif(vChannelSelect = 45)then
-            channels           <= iFrameData.rgbCorrect;
+            selFilter           <= iFrameData.rgbCorrect;
         elsif(vChannelSelect = 46)then
-            channels           <= iFrameData.rgbRemix;
+            selFilter           <= iFrameData.rgbRemix;
         elsif(vChannelSelect = 47)then
-            channels           <= iFrameData.rgbDetect;
+            selFilter           <= iFrameData.rgbDetect;
         elsif(vChannelSelect = 48)then
-            channels           <= iFrameData.rgbPoi;
+            selFilter           <= iFrameData.rgbPoi;
         elsif(vChannelSelect = 49)then
-            channels           <= iFrameData.ycbcr;
+            selFilter           <= iFrameData.ycbcr;
         else
-            channels           <= iFrameData.rgbCorrect;
+            selFilter           <= iFrameData.rgbCorrect;
         end if;
     end if;
 end process videoOutP;
+
+
+
+
+
 ycbcrInst: rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
@@ -163,35 +163,57 @@ generic map(
 port map(
     clk                  => clk,
     rst_l                => rst_l,
-    iRgb                 => channels,
+    iRgb                 => selFilter,
     y                    => ycbcr.red,
     cb                   => ycbcr.green,
     cr                   => ycbcr.blue,
     oValid               => ycbcr.valid);
--- Kernel_Ycbcr_Inst: KernelCore
--- generic map(
-    -- SHARP_FRAME   => false,
-    -- BLURE_FRAME   => false,
-    -- EMBOS_FRAME   => false,
-    -- YCBCR_FRAME   => true,
-    -- SOBEL_FRAME   => false,
-    -- CGAIN_FRAME   => false,
-    -- img_width     => img_width,
-    -- i_data_width  => i_data_width)
--- port map(
-    -- clk            => clk,
-    -- rst_l          => rst_l,
-    -- iRgb           => channels,
-    -- kCoeff         => kCoeffYcbcr,
-    -- oRgb           => ycbcr);
-channelOutP: process (clk) begin
+    
+    
+process (clk) begin
     if rising_edge(clk) then
         oCord <= iFrameData.cod;
+    end if;
+end process;
+
+channelOutP: process (clk) begin
+    if rising_edge(clk) then
         if (eChannelSelect = 0) then
-            oRgb     <= ycbcr;
+            channels   <= ycbcr;
+        elsif(vChannelSelect = 1)then
+            channels   <= selFilter;
+        elsif(vChannelSelect = 2)then
+            channels   <= ycbcr;
         else
-            oRgb     <= channels;
+            channels   <= selFilter; 
         end if;
     end if;
 end process channelOutP;
+
+
+TextGenYcbcrInst: TextGen
+generic map (
+    img_width_bmp   => 1980,
+    img_height_bmp  => 1080,
+    b_data_width    => b_data_width)
+port map(            
+    clk             => clk,
+    rst_l           => rst_l,
+    videoChannel    => videoChannel,
+    txCord          => iFrameData.cod,
+    location        => location,
+    iRgb            => channels,
+    oRgb            => rgbText);
+    
+ChaTextP: process (clk) begin
+    if rising_edge(clk) then
+        if (eChannelSelect = 0) or (eChannelSelect = 1) then
+            oRgb   <= channels;
+        else
+            oRgb   <= rgbText;
+        end if;
+    end if;
+end process ChaTextP;
+
+
 end Behavioral;

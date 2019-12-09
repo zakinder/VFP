@@ -1,8 +1,8 @@
 --05012019 [05-01-2019]
+
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 use work.constantspackage.all;
 use work.vpfRecords.all;
 use work.portspackage.all;
@@ -51,6 +51,7 @@ architecture arch_imp of videoProcess_v1_0_rgb_m_axis is
     signal tx_axis_tdata     : std_logic_vector(s_data_width-1 downto 0);
     type video_io_state is (VIDEO_SET_RESET,VIDEO_SOF_OFF,VIDEO_SOF_ON,VIDEO_END_OF_LINE);
     signal VIDEO_STATES      : video_io_state; 
+    signal nrowdist          : natural range 0 to 4096 := 0;
 begin
 process (m_axis_mm2s_aclk) begin
     if rising_edge(m_axis_mm2s_aclk) then
@@ -64,6 +65,7 @@ process (m_axis_mm2s_aclk) begin
             configReg4R <= aBusSelect;
     end if;
 end process;
+
 process (m_axis_mm2s_aclk) begin
     if (rising_edge (m_axis_mm2s_aclk)) then
         if (m_axis_mm2s_aresetn = lo) then
@@ -76,12 +78,14 @@ process (m_axis_mm2s_aclk) begin
             tx_axis_tvalid <= lo;
             tx_axis_tdata  <= (others => lo);    
             axis_sof       <= lo;
+            nrowdist       <= zero;
         if (iStreamData.sof = '1') then
             VIDEO_STATES <= VIDEO_SOF_OFF;
         else
             VIDEO_STATES <= VIDEO_SET_RESET;
         end if;
         when VIDEO_SOF_OFF =>
+        nrowdist       <= zero;
         if (iStreamData.ycbcr.valid = hi) then
             VIDEO_STATES <= VIDEO_SOF_ON;
             axis_sof     <= hi;
@@ -101,9 +105,21 @@ process (m_axis_mm2s_aclk) begin
                     tx_axis_tdata  <= (mpeg42XCR & iStreamData.ycbcr.red);
                 end if;
             elsif (configReg4R = STREAM_TESTPATTERN1)then
-                tx_axis_tdata  <= iStreamData.cord.x;
+                nrowdist        <= nrowdist + one;
+                tx_axis_tdata   <= std_logic_vector(to_unsigned(nrowdist,s_data_width));
+                --tx_axis_tdata  <= iStreamData.cord.x;
             elsif (configReg4R = STREAM_TESTPATTERN2)then
-                tx_axis_tdata  <= iStreamData.cord.y;
+                nrowdist        <= nrowdist + 2;
+                tx_axis_tdata   <= std_logic_vector(to_unsigned(nrowdist,s_data_width));
+                --tx_axis_tdata  <= iStreamData.cord.y;
+            elsif (configReg4R = STREAM_TESTPATTERN3)then
+                tx_axis_tdata   <= std_logic_vector(to_unsigned(nrowdist,s_data_width));
+            elsif (configReg4R = STREAM_TESTPATTERN4)then
+                tx_axis_tdata <= std_logic_vector(resize(unsigned(iStreamData.ycbcr.green), tx_axis_tdata'length));
+            elsif (configReg4R = STREAM_TESTPATTERN5)then
+                tx_axis_tdata  <= (iStreamData.ycbcr.green & iStreamData.ycbcr.red);
+            elsif (configReg4R = STREAM_TESTPATTERN6)then
+                tx_axis_tdata  <= (mpeg42XCR & iStreamData.ycbcr.red);
             else
                 if(mpeg42XXX =hi)then
                     tx_axis_tdata  <= (iStreamData.ycbcr.green & iStreamData.ycbcr.red);
@@ -121,6 +137,7 @@ process (m_axis_mm2s_aclk) begin
         when VIDEO_END_OF_LINE =>
             tx_axis_tlast  <= lo;
             tx_axis_tvalid <= lo;
+            nrowdist       <= zero;
             if (pEofs1 = hi) then
                 VIDEO_STATES <= VIDEO_SOF_OFF;
 				pEofs1 <= lo;

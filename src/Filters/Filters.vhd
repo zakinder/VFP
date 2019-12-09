@@ -74,6 +74,7 @@ architecture Behavioral of Filters is
     signal fRgb                : frameColors;
     signal sEdgeValid          : std_logic;
     signal vChannelSelect      : integer;
+    signal lThSelect           : integer;
     signal fRgb1               : colors;
     signal fRgb2               : colors;
     signal fRgb3               : colors;
@@ -86,11 +87,84 @@ architecture Behavioral of Filters is
     signal blurIoOut           : channel;
     signal YcbcrIoOut          : channel;
     signal rgbImageKernel_blur : channel;
-	
+    signal ditRgb              : channel;
+    signal blur1vx             : channel;
+    signal blur2vx             : channel;
+    signal blur3vx             : channel;
+    signal rgbSel              : channel;
+    
 begin
+
     edgeValid               <= sEdgeValid;
     oRgb                    <= fRgb;
     vChannelSelect          <= to_integer(unsigned(iVideoChannel));
+    lThSelect               <= to_integer(unsigned(lumThreshold));
+
+
+ditherFilterInst: ditherFilter
+generic map (
+    img_width         => img_width,  
+    img_height        => img_height, 
+    color_width       => 8,          
+    reduced_width     => 6)
+port map (                  
+    clk               => clk,
+    iCord_x           => txCord.x,
+    iRgb              => iRgb,
+    oRgb              => ditRgb);
+    
+blurFilter1xInst: blurFilter
+generic map(
+    iMSB                => blurMsb,
+    iLSB                => blurLsb,
+    i_data_width        => i_data_width,
+    img_width           => img_width,
+    adwrWidth           => adwrWidth,
+    addrWidth           => addrWidth)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => ditRgb,
+    oRgb                => blur1vx);
+
+blurFilter2xInst: blurFilter
+generic map(
+    iMSB                => blurMsb - 1,
+    iLSB                => blurLsb - 1,
+    i_data_width        => i_data_width,
+    img_width           => img_width,
+    adwrWidth           => adwrWidth,
+    addrWidth           => addrWidth)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => blur1vx,
+    oRgb                => blur2vx);
+    
+blurFilter3xInst: blurFilter
+generic map(
+    iMSB                => blurMsb - 1,
+    iLSB                => blurLsb - 1,
+    i_data_width        => i_data_width,
+    img_width           => img_width,
+    adwrWidth           => adwrWidth,
+    addrWidth           => addrWidth)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => blur2vx,
+    oRgb                => blur3vx);
+    
+lThSelectP: process (clk) begin
+    if rising_edge(clk) then
+        if (lThSelect = 0)  then
+            rgbSel     <= iRgb;
+        else
+            rgbSel     <= blur3vx;
+        end if;
+    end if;
+end process lThSelectP;
+
 ImageKernelInst: Kernel
 generic map(
     INRGB_FRAME         => F_RGB,
@@ -99,7 +173,7 @@ generic map(
     SHARP_FRAME         => F_SHP,
     BLURE_FRAME         => F_BLU,
     EMBOS_FRAME         => F_EMB,
-    YCBCR_FRAME         => F_YCC,
+    YCBCR_FRAME         => false,
     SOBEL_FRAME         => F_SOB,
     CGAIN_FRAME         => F_CGA,
     CCGAIN_FRAME        => false,
@@ -115,10 +189,11 @@ port map(
     txCord              => txCord,
     lumThreshold        => lumThreshold,
     iThreshold          => iThreshold,
-    iRgb                => iRgb,
+    iRgb                => rgbSel,
     iKcoeff             => iKcoeff,
     oEdgeValid          => sEdgeValid,
     oRgb                => rgbImageKernel);
+    
 blurFilter0xInst: blurFilter
 generic map(
     iMSB                => blurMsb,
@@ -133,10 +208,7 @@ port map(
     iRgb                => iRgb,
     oRgb                => rgbImageKernel_blur);
 	
--- END_FILTERS_ENABLE: if (F_CGA_TO_YCC = true)  or (F_CGA_TO_SHP = true) or (F_CGA_TO_BLU = true) or (F_CGA_TO_CGA = true) or
--- (F_BLU_TO_YCC = true)  or (F_BLU_TO_SHP = true) or (F_BLU_TO_BLU = true) or (F_BLU_TO_CGA = true) or
--- (F_SHP_TO_YCC = true)  or (F_SHP_TO_SHP = true) or (F_SHP_TO_BLU = true) or (F_SHP_TO_CGA = true) generate
---begin
+
 CgainIoP: process (clk) begin
     if rising_edge(clk) then
         if (vChannelSelect = 27) then
@@ -157,6 +229,8 @@ CgainIoP: process (clk) begin
         end if;
     end if;
 end process CgainIoP;
+
+
 SharpIoP: process (clk) begin
     if rising_edge(clk) then
         if (vChannelSelect = 25) then
@@ -177,6 +251,8 @@ SharpIoP: process (clk) begin
         end if;
     end if;
 end process SharpIoP;
+
+
 BlurIoP: process (clk) begin
     if rising_edge(clk) then
         if (vChannelSelect = 26) then
@@ -200,6 +276,8 @@ BlurIoP: process (clk) begin
         end if;
     end if;
 end process BlurIoP;
+
+
 YcbcrIoP: process (clk) begin
     if rising_edge(clk) then
         if (vChannelSelect = 24) then
@@ -214,6 +292,8 @@ YcbcrIoP: process (clk) begin
         end if;
     end if;
 end process YcbcrIoP;
+
+
     fRgb.cgainToYcbcr   <= fRgb1.ycbcr;--CgainToYcbcr
     fRgb.cgainToShp     <= fRgb1.sharp;--CgainToSharp
     fRgb.cgainToBlu     <= fRgb1.blur; --CgainToBlur
@@ -232,6 +312,8 @@ end process YcbcrIoP;
     fRgb.shpToHsv       <= fRgb2.hsv;  --SharpToHsv  ,HsvToSharp
     fRgb.bluToHsl       <= fRgb3.hsl;  --BlurToHsl   ,HslToBlur
     fRgb.bluToHsv       <= fRgb3.hsv;  --BlurToHsv   ,HsvToBlur
+    
+    
 colorCorrectionInst: colorCorrection
 generic map(
     i_data_width        => i_data_width)
@@ -241,6 +323,7 @@ port map(
     iRgb                => cgainIoIn,
     als                 => iAls,    
     oRgb                => cgainIoOut);
+    
 sharpFilterInst: sharpFilter
 generic map(
     i_data_width        => i_data_width,
@@ -253,7 +336,7 @@ port map(
     iRgb                => sharpIoIn,
     kls                 => iAls,
     oRgb                => sharpIoOut);
-blurFilter1xInst: blurFilter
+blurFilterInst: blurFilter
 generic map(
     iMSB                => blurMsb,
     iLSB                => blurLsb,
@@ -279,26 +362,32 @@ port map(
     cb                   => YcbcrIoOut.green,
     cr                   => YcbcrIoOut.blue,
     oValid               => YcbcrIoOut.valid);
---end generate END_FILTERS_ENABLE;
+
+
+
+
+
+
+
+
+
+
+
+
+
 TEST_FRAME_ENABLE: if (F_TES = true) generate
-    signal ChannelS      : integer := 0;
-    signal rgbSum        : tpRgb;
+    
 begin
-frameTestPatternInst: frameTestPattern
-generic map(
-    s_data_width => s_data_width)
-port map(   
-    clk          => clk,
-    iValid       => iRgb.valid,
-    iCord        => txCord,
-    oRgb         => rgbSum);
+
 TestPatternInst: TestPattern
 port map(
     clk           => clk,
-    ChannelS      => ChannelS,
-    rgbSum        => rgbSum,
+    iValid        => iRgb.valid,
+    iCord         => txCord,
+    tpSelect      => lThSelect,
     oRgb          => fRgb.tPattern);
 end generate TEST_FRAME_ENABLE;
+
 MASK_SOB_CGA_FRAME_ENABLE: if (M_SOB_CGA = true) generate
     signal tp2cgain   : channel;
     signal tp2        : std_logic_vector(23 downto 0) := (others => '0');

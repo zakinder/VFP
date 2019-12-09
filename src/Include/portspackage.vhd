@@ -127,16 +127,17 @@ port (
 end component Kernel; 
 component TextGen is
 generic (
-    img_width        : integer := 4096;
-    img_height       : integer := 4096;
-    displayText      : string  := (others => NUL));
+    img_width_bmp        : integer := 4096;
+    img_height_bmp       : integer := 4096;
+    b_data_width         : integer := 32);
 port (  
-    clk      : in std_logic;
-    rst_l    : in std_logic;
-    txCord   : in coord;
-    location : in cord;
-    iRgb     : in channel;
-    oRgb     : out channel);
+    clk              : in std_logic;
+    rst_l            : in std_logic;
+    videoChannel     : in std_logic_vector(b_data_width-1 downto 0);
+    txCord           : in coord;
+    location         : in cord;
+    iRgb             : in channel;
+    oRgb             : out channel);
 end component TextGen;
 component FontRom is
 port (  
@@ -146,12 +147,16 @@ port (
 end component FontRom;
 component PixelOnDisplay is
 generic (
-    displayText : string := (others => NUL));
-port (  
-    clk         : in std_logic;
-    location    : in cord;
-    grid        : in cord;
-    pixel       : out std_logic);
+    img_width_bmp               : integer := 1920;
+    img_height_bmp              : integer := 1080;
+    b_data_width                : integer := 32);
+port (                
+    clk                         : in std_logic;
+    rst_l                       : in std_logic;
+    location                    : in cord;
+    grid                        : in cord;
+    videoChannel                : in std_logic_vector(b_data_width-1 downto 0);
+    pixel                       : out std_logic);
 end component PixelOnDisplay;
 component ColorTrim is
 generic (
@@ -423,15 +428,7 @@ port (
     oFifoStatus                 : out std_logic_vector(b_data_width-1 downto 0);
     oGridLockData               : out std_logic_vector(b_data_width-1 downto 0));
 end component frameProcess;
-component frameTestPattern is
-generic (
-    s_data_width                : integer := 16);
-port (             
-    clk                         : in std_logic;
-    iValid                      : in std_logic;
-    iCord                       : in coord;
-    oRgb                        : out tpRgb);
-end component frameTestPattern;
+
 component sharpFilter is
 generic (
     i_data_width                : integer := 8;
@@ -456,7 +453,7 @@ port (
     i2Rgb          : in channel;
     oRgb           : out channel);
 end component FrameMask;
-component dither is
+component ditherFilter is
 generic (
     img_width         : integer := 512;
     img_height        : integer := 512;
@@ -464,15 +461,10 @@ generic (
     reduced_width     : integer := 4);
 port (                
     clk               : in  std_logic;
-    enable            : in  std_logic;
-    x                 : in  integer range 0 to img_width-1;
-    din_r             : in  std_logic_vector(color_width-1 downto 0);
-    din_g             : in  std_logic_vector(color_width-1 downto 0);
-    din_b             : in  std_logic_vector(color_width-1 downto 0);
-    dout_r            : out std_logic_vector(color_width-1 downto 0) := (others => '0');
-    dout_g            : out std_logic_vector(color_width-1 downto 0) := (others => '0');
-    dout_b            : out std_logic_vector(color_width-1 downto 0) := (others => '0'));
-end component dither;
+    iCord_x           : in  std_logic_vector(15 downto 0);
+    iRgb              : in  channel;
+    oRgb              : out  channel);
+end component ditherFilter;
 component blurFilter is
 generic (
     iMSB                        : integer := 11;
@@ -499,10 +491,32 @@ end component blurMac;
 component TestPattern is
 port (                
     clk                   : in std_logic;
-    ChannelS              : in integer;
-    rgbSum                : in tpRgb;
+    iValid                : in std_logic;
+    iCord                 : in coord;
+    tpSelect              : in integer;
     oRgb                  : out channel);
 end component TestPattern;
+component FrameTestPattern is
+generic (
+    s_data_width                : integer := 16);
+port (             
+    clk                         : in std_logic;
+    iValid                      : in std_logic;
+    iCord                       : in coord;
+    oRgb                        : out blurchannel);
+end component FrameTestPattern;
+component ResoTestPattern is
+generic (
+    s_data_width                : integer := 16);
+port (             
+    clk                   : in std_logic;
+    iValid                : in std_logic;
+    iCord                 : in coord;
+    oRgbCo                : out channel;
+    oRgbRed               : out channel;
+    oRgbGre               : out channel;
+    oRgbBlu               : out channel);
+end component ResoTestPattern;
 component edgeObjects is
 generic (
     i_data_width                : integer := 8);

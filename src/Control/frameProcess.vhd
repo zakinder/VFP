@@ -64,17 +64,17 @@ architecture arch of frameProcess is
     signal sValid           : std_logic;
     -------------------------------------------------
     constant F_TES          : boolean := true;
-    constant F_LUM          : boolean := false;
-    constant F_TRM          : boolean := false;
     constant F_RGB          : boolean := true;
     constant F_SHP          : boolean := true;
-    constant F_BLU          : boolean := false;
-    constant F_EMB          : boolean := false;
-    constant F_YCC          : boolean := false;
+    constant F_YCC          : boolean := true;
     constant F_SOB          : boolean := true;
     constant F_CGA          : boolean := true;
     constant F_HSV          : boolean := true;
     constant F_HSL          : boolean := true;
+    constant F_LUM          : boolean := false;
+    constant F_TRM          : boolean := false;
+    constant F_BLU          : boolean := false;
+    constant F_EMB          : boolean := false;
     -------------------------------------------------
     constant F_CGA_TO_CGA   : boolean := true;
     constant F_CGA_TO_HSL   : boolean := true;
@@ -109,6 +109,7 @@ architecture arch of frameProcess is
     constant M_SOB_HSV      : boolean := SelFrame(F_SOB,F_HSV,MASK_TRUE);
     constant M_SOB_HSL      : boolean := SelFrame(F_SOB,F_HSL,MASK_TRUE);
 begin
+
     lumThreshold                 <= std_logic_vector(to_unsigned(iLumTh,8));
     cHsv                         <= std_logic_vector(to_unsigned(iHsvPerCh,3));--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
     cYcc                         <= std_logic_vector(to_unsigned(iYccPerCh,3));--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
@@ -281,12 +282,4 @@ port map(
     fifoStatus          => oFifoStatus,
     oGridLocation       => rgbPoiLock,
     oRgb                => rgbPoi);
-frameTestPatternInst: frameTestPattern
-generic map(
-    s_data_width        => s_data_width)
-port map(   
-    clk                 => clk,
-    iValid              => rgbIn.valid,
-    iCord               => cord,
-    oRgb                => rgbSum);
 end architecture;

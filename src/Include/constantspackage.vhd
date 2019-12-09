@@ -84,6 +84,12 @@ package constantspackage is
     -------------------------------------------------------------------------
     constant STREAM_TESTPATTERN1       : std_logic_vector(31 downto 0) := x"00000001";
     constant STREAM_TESTPATTERN2       : std_logic_vector(31 downto 0) := x"00000002";
+    constant STREAM_TESTPATTERN3       : std_logic_vector(31 downto 0) := x"00000003";
+    constant STREAM_TESTPATTERN4       : std_logic_vector(31 downto 0) := x"00000004";
+    constant STREAM_TESTPATTERN5       : std_logic_vector(31 downto 0) := x"00000005";
+    constant STREAM_TESTPATTERN6       : std_logic_vector(31 downto 0) := x"00000006";
+    constant STREAM_TESTPATTERN7       : std_logic_vector(31 downto 0) := x"00000007";
+    constant STREAM_TESTPATTERN8       : std_logic_vector(31 downto 0) := x"00000008";
     constant EXTERNAL_AXIS_STREAM      : std_logic_vector(31 downto 0) := x"00000000";
     -------------------------------------------------------------------------
     constant blurMacKernel_1           : unsigned(i_data_width-1 downto 0) :=x"01";
@@ -111,46 +117,53 @@ package constantspackage is
     constant ROUND_RESULT_WIDTH        : natural := ADD_RESULT_WIDTH - FRAC_BITS_TO_KEEP;
     constant ROUND                     : signed(ADD_RESULT_WIDTH-1 downto 0) := to_signed(0, ADD_RESULT_WIDTH-FRAC_BITS_TO_KEEP)&'1' & to_signed(0, FRAC_BITS_TO_KEEP-1);  
     -------------------------------------------------------------------------
-    function max(L, R: INTEGER) return INTEGER;
-    function min(L, R: INTEGER) return INTEGER;
-    function SelFrame(L, R: BOOLEAN) return BOOLEAN;
-    function SelFrame(L, R, M: BOOLEAN) return BOOLEAN;
+    function iCrdDelta(L, R: integer)   return integer;
+    function max(L, R: integer) return integer;
+    function min(L, R: integer) return integer;
+    function SelFrame(L, R: boolean) return boolean;
+    function SelFrame(L, R, M: boolean) return boolean;
     -------------------------------------------------------------------------
 end package;
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 package body constantspackage is
-    function SelFrame(L, R: BOOLEAN) return BOOLEAN is
+    function SelFrame(L, R: boolean) return boolean is
     begin
-    if (L = TRUE) and (R = TRUE) then 
-        return TRUE;
-    else
-        return FALSE;
-    end if;
+        if (L = TRUE) and (R = TRUE) then 
+            return TRUE;
+        else
+            return FALSE;
+        end if;
     end;
-    function SelFrame(L, R, M: BOOLEAN) return BOOLEAN is
-    begin
-    if (L = TRUE) and (R = TRUE) and (M = TRUE) then 
-        return TRUE;
-    else
-        return FALSE;
-    end if;
+    
+    function SelFrame(L, R, M: boolean) return boolean is
+        begin
+        if (L = TRUE) and (R = TRUE) and (M = TRUE) then 
+            return TRUE;
+        else
+            return FALSE;
+        end if;
     end;
-    function max(L, R: INTEGER) return INTEGER is
-    begin
-    if L > R then
-        return L;
-    else
-        return R;
-    end if;
+    
+    function max(L, R: integer) return integer is
+        begin
+        if L > R then
+            return L;
+        else
+            return R;
+        end if;
     end;
-    function min(L, R: INTEGER) return INTEGER is
-    begin
-    if L < R then
-        return L;
-    else
-        return R;
-    end if;
+    function min(L, R: integer) return integer is
+        begin
+        if L < R then
+            return L;
+        else
+            return R;
+        end if;
+    end;
+    function iCrdDelta(L, R: integer) return integer is
+        begin
+            return (L-R);
     end;
 end package body;
