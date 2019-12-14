@@ -75,28 +75,6 @@ architecture arch of frameProcess is
     constant F_TRM          : boolean := false;
     constant F_BLU          : boolean := false;
     constant F_EMB          : boolean := false;
-    -------------------------------------------------
-    constant F_CGA_TO_CGA   : boolean := true;
-    constant F_CGA_TO_HSL   : boolean := true;
-    constant F_CGA_TO_HSV   : boolean := true;
-    constant F_CGA_TO_YCC   : boolean := true;
-    constant F_CGA_TO_SHP   : boolean := true;
-    constant F_CGA_TO_BLU   : boolean := true;
-    -------------------------------------------------
-    constant F_SHP_TO_SHP   : boolean := true;
-    constant F_SHP_TO_HSL   : boolean := true;
-    constant F_SHP_TO_HSV   : boolean := true;
-    constant F_SHP_TO_YCC   : boolean := true;
-    constant F_SHP_TO_CGA   : boolean := true;
-    constant F_SHP_TO_BLU   : boolean := true;
-    -------------------------------------------------
-    constant F_BLU_TO_BLU   : boolean := true;
-    constant F_BLU_TO_HSL   : boolean := true;
-    constant F_BLU_TO_HSV   : boolean := true;
-    constant F_BLU_TO_YCC   : boolean := true;
-    constant F_BLU_TO_CGA   : boolean := true;
-    constant F_BLU_TO_SHP   : boolean := true;
-    -------------------------------------------------
     constant MASK_TRUE      : boolean := true;
     constant MASK_FLSE      : boolean := false;
     constant M_SOB_LUM      : boolean := SelFrame(F_SOB,F_LUM,MASK_FLSE);
@@ -109,7 +87,6 @@ architecture arch of frameProcess is
     constant M_SOB_HSV      : boolean := SelFrame(F_SOB,F_HSV,MASK_TRUE);
     constant M_SOB_HSL      : boolean := SelFrame(F_SOB,F_HSL,MASK_TRUE);
 begin
-
     lumThreshold                 <= std_logic_vector(to_unsigned(iLumTh,8));
     cHsv                         <= std_logic_vector(to_unsigned(iHsvPerCh,3));--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
     cYcc                         <= std_logic_vector(to_unsigned(iYccPerCh,3));--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
@@ -216,24 +193,6 @@ generic map(
     M_SOB_CGA           =>  M_SOB_CGA,
     M_SOB_HSV           =>  M_SOB_HSV,
     M_SOB_HSL           =>  M_SOB_HSL,
-    F_CGA_TO_CGA        =>  F_CGA_TO_CGA,
-    F_CGA_TO_HSL        =>  F_CGA_TO_HSL,
-    F_CGA_TO_HSV        =>  F_CGA_TO_HSV,
-    F_CGA_TO_YCC        =>  F_CGA_TO_YCC,
-    F_CGA_TO_SHP        =>  F_CGA_TO_SHP,
-    F_CGA_TO_BLU        =>  F_CGA_TO_BLU,
-    F_SHP_TO_SHP        =>  F_SHP_TO_SHP,
-    F_SHP_TO_HSL        =>  F_SHP_TO_HSL,
-    F_SHP_TO_HSV        =>  F_SHP_TO_HSV,
-    F_SHP_TO_YCC        =>  F_SHP_TO_YCC,
-    F_SHP_TO_CGA        =>  F_SHP_TO_CGA,
-    F_SHP_TO_BLU        =>  F_SHP_TO_BLU,
-    F_BLU_TO_BLU        =>  F_BLU_TO_BLU,
-    F_BLU_TO_HSL        =>  F_BLU_TO_HSL,
-    F_BLU_TO_HSV        =>  F_BLU_TO_HSV,
-    F_BLU_TO_YCC        =>  F_BLU_TO_YCC,
-    F_BLU_TO_CGA        =>  F_BLU_TO_CGA,
-    F_BLU_TO_SHP        =>  F_BLU_TO_SHP,
     img_width           =>  img_width,
     img_height          =>  img_width + 100,
     adwrWidth           =>  adwrWidth,
