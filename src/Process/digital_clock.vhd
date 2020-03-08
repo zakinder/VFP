@@ -1,8 +1,19 @@
---02072019 [02-07-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : digital_clock.vhd
+-- Create Date : 02072019 [02-07-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 --source clock 142.857132 instead 150 = half p 71428566 else if 75= 37500000*2

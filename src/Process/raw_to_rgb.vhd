@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : raw_to_rgb.vhd
+-- Create Date : 01162019 [01-16-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity raw_to_rgb is
 port (
     clk             : in std_logic;
@@ -51,33 +64,33 @@ rawToRgbP: process (clk)
         if rst_l = lo then
             rgb.red   <=(others => '0');
             rgb.green <=(others => '0');
-            rgb.blue  <=(others => '0'); 
+            rgb.blue  <=(others => '0');
         else
         loc_addr := iTpData.cord.y(0) & iTpData.cord.x(0);
         case loc_addr IS
-            when b"11" => 
+            when b"11" =>
                 rgb.red   <= tpd1.tp2;
                 rgb.green <= (unsigned(iTpData.taps.tp2) + tpd1.tp1) & lo;
                 rgb.blue  <= unsigned(iTpData.taps.tp1);
-            when b"10" =>     
+            when b"10" =>
                 rgb.red   <= unsigned(iTpData.taps.tp2);
                 rgb.green <= (tpd1.tp2 + unsigned(iTpData.taps.tp3)) & lo;
-                rgb.blue  <= tpd1.tp3;  
-            when b"01" =>     
+                rgb.blue  <= tpd1.tp3;
+            when b"01" =>
                 rgb.red   <= tpd1.tp1;
                 rgb.green <= (unsigned(iTpData.taps.tp1) + tpd1.tp2) & lo;
-                rgb.blue  <= unsigned(iTpData.taps.tp2);    
-            when b"00" =>     
+                rgb.blue  <= unsigned(iTpData.taps.tp2);
+            when b"00" =>
                 rgb.red   <= unsigned(iTpData.taps.tp1);
                 rgb.green <= (tpd1.tp1 + unsigned(iTpData.taps.tp2)) & lo;
-                rgb.blue  <= tpd1.tp2;  
-            when others => 
+                rgb.blue  <= tpd1.tp2;
+            when others =>
                 rgb.red   <= rgb.red;
                 rgb.green <= rgb.green;
                 rgb.blue  <= rgb.blue;
         end case;
         end if;
-        end if; 
+        end if;
 end process rawToRgbP;
     oRgbSet.red    <= std_logic_vector(rgb.red(11 downto 4));
     oRgbSet.green  <= std_logic_vector(rgb.green(12 downto 5));

@@ -1,10 +1,22 @@
---05022019 [05-02-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : point_of_interest.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity point_of_interest is
 generic (
     i_data_width   : integer := 8;
@@ -35,18 +47,18 @@ architecture arch of point_of_interest is
     signal clearData        : std_logic;
     signal wrEn             : std_logic;
     signal wrLstEn          : std_logic;
-    signal emptyO           : std_logic; 
-    signal wrDone           : std_logic; 
-    signal rdDone           : std_logic; 
+    signal emptyO           : std_logic;
+    signal wrDone           : std_logic;
+    signal rdDone           : std_logic;
     signal fullO            : std_logic;
     signal clrStatus        : std_logic;
-    signal wrAddress        : std_logic_vector (FIFO_ADDR_WIDTH-1 downto 0); 
-    signal wrAddr           : std_logic_vector (FIFO_ADDR_WIDTH-1 downto 0); 
-    signal gridEn           : std_logic;    
+    signal wrAddress        : std_logic_vector (FIFO_ADDR_WIDTH-1 downto 0);
+    signal wrAddr           : std_logic_vector (FIFO_ADDR_WIDTH-1 downto 0);
+    signal gridEn           : std_logic;
     signal fifoIsFull       : std_logic;
     signal fifoIsEmpty      : std_logic;
     signal gridContMax      : std_logic_vector (15 downto 0);
-    signal pCont            : cord;    
+    signal pCont            : cord;
 begin
     oGridLocation  <= GlEnable;
     fifoStatus     <= "00000000" & gridContMax & "00000" & fifoIsFull & fifoIsEmpty & fifoIsFull;
@@ -90,14 +102,14 @@ if (rising_edge (clk)) then
             fifoControlState <= fifoFullStatus;
             gridEn           <= lo;
         end if;
-    when fifoFullStatus => 
+    when fifoFullStatus =>
     --CHECK
         fifoIsFull   <= hi;--Full
         fifoIsEmpty  <= lo;
         gridContMax <= std_logic_vector(resize(unsigned(wrAddr), gridContMax'length));
         --ReadDone Pulse
         if (rdDone = hi) then
-            fifoControlState <= fifoEmptyStatus;               
+            fifoControlState <= fifoEmptyStatus;
         end if;
     when fifoEmptyStatus =>
     --RESET
@@ -112,12 +124,12 @@ if (rising_edge (clk)) then
     end case;
     end if;
 end if;
-end process fifoControlP;  
+end process fifoControlP;
 enablePointerP: process (clk)begin
     if rising_edge(clk) then
         wrDataIn  <= (iRgb.red & iRgb.green & iRgb.blue);
         wrAddr    <= wrAddress;
-        if (((pCont.x >= pRegion.pointInterest) and (pCont.x <= pRegion.pointInterest + pInterestWidth)) and ((pCont.y >= pRegion.pointInterest) and (pCont.y <= pRegion.pointInterest + pInterestHight))) 
+        if (((pCont.x >= pRegion.pointInterest) and (pCont.x <= pRegion.pointInterest + pInterestWidth)) and ((pCont.y >= pRegion.pointInterest) and (pCont.y <= pRegion.pointInterest + pInterestHight)))
         and (iRgb.valid = hi) then
             GlEnable     <= hi;
         else

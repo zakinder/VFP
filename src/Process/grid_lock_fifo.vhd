@@ -1,10 +1,22 @@
---04112019 [04-11-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : grid_lock_fifo.vhd
+-- Create Date : 04112019 [04-11-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity grid_lock_fifo is
 generic (
     FIFO_DEPTH       : integer := 24;

@@ -1,12 +1,25 @@
---05062019 [05-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : color_space_limits.vhd
+-- Create Date : 05062019 [05-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.fixed_pkg.all;
 use work.float_pkg.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity color_space_limits is
 generic (
     i_data_width   : integer := 8);
@@ -14,44 +27,50 @@ port (
     clk            : in  std_logic;
     reset          : in  std_logic;
     iRgb           : in channel;
-    --ilm          : in rgbConstraint;
     rgbColors      : out type_RgbArray(0 to i_data_width-1));
 end color_space_limits;
+
 architecture behavioral of color_space_limits is
-signal Rgb1              : channel;
-signal Rgb2              : channel;
-signal int1Rgb           : intChannel;
-signal int2Rgb           : intChannel;
-signal ilm               : rgbConstraint;
-signal rgbMax            : integer;
-signal rgbMin            : integer;
-signal rgbDelta          : integer;
-signal maxMinSum         : integer;
-signal bMin,gMin,rMin    : std_logic;
-signal bMax,gMax,rMax    : std_logic;
-signal R_MinValue        : natural := 255;
-signal G_MinValue        : natural := 255;
-signal B_MinValue        : natural := 255;
-signal R_MinValueRow,rMr,rMrm     : natural := 255;
-signal G_MinValueRow     : natural := 255;
-signal B_MinValueRow     : natural := 255;
-signal R_MinFValue       : natural := 255;
-signal R_MinMFValue      : natural;
-signal G_MinFValue     : natural := 255;
-signal B_MinFValue     : natural := 255;
-signal rgbFedge        : std_logic :=lo;
-signal rgbFedgeSync        : std_logic :=lo;
+    signal Rgb1              : channel;
+    signal Rgb2              : channel;
+    signal int1Rgb           : intChannel;
+    signal int2Rgb           : intChannel;
+    signal ilm               : rgbConstraint;
+    signal rgbMax            : integer;
+    signal rgbMin            : integer;
+    signal rgbDelta          : integer;
+    signal maxMinSum         : integer;
+    signal bMin,gMin,rMin    : std_logic;
+    signal bMax,gMax,rMax    : std_logic;
+    signal R_MinValue        : natural := 255;
+    signal G_MinValue        : natural := 255;
+    signal B_MinValue        : natural := 255;
+    signal R_MinValueRow     : natural := 255;
+    signal rMr               : natural := 255;
+    signal rMrm              : natural := 255;
+    signal G_MinValueRow     : natural := 255;
+    signal B_MinValueRow     : natural := 255;
+    signal R_MinFValue       : natural := 255;
+    signal R_MinMFValue      : natural;
+    signal G_MinFValue       : natural := 255;
+    signal B_MinFValue       : natural := 255;
+    signal rgbFedge          : std_logic :=lo;
+    signal rgbFedgeSync      : std_logic :=lo;
+    
 begin
+
 rgbFedge <= hi when (int1Rgb.valid = hi and iRgb.valid = lo) else lo;
+
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbFedgeSync <= rgbFedge;
     end if;
 end process;
-process (clk) 
+
+process (clk)
 variable MaxRGB : integer;
 begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if ((iRgb.red >= iRgb.green) and (iRgb.red >= iRgb.blue)) then
             MaxRGB := to_integer(unsigned(iRgb.red));
         elsif((iRgb.green >= iRgb.red) and (iRgb.green >= iRgb.blue))then
@@ -62,11 +81,13 @@ begin
             rgbMax <= MaxRGB;
     end if;
 end process;
+
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         int2Rgb <= int1Rgb;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
             Rgb1          <= iRgb;
@@ -82,6 +103,7 @@ process (clk) begin
         -- end if;
   end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         rMr  <= R_MinFValue;
@@ -97,8 +119,10 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 R_MinMFValue <= max(R_MinValueRow,rMrm) when rgbFedgeSync = hi;
 R_MinFValue  <= min(R_MinValueRow,rMr) when rgbFedgeSync = hi;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int1Rgb.green < G_MinValue) and (int1Rgb.red > 90) then
@@ -112,6 +136,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int1Rgb.blue < G_MinValue) and (int1Rgb.red > 90) then
@@ -125,6 +150,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
     ilm.rl <= 80;
     ilm.rh <= 230;
     ilm.gl <= 80;
@@ -142,15 +168,15 @@ process (clk,reset)begin
         int1Rgb.red    <= 0;
         int1Rgb.green  <= 0;
         int1Rgb.blue   <= 0;
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         int1Rgb.red    <= to_integer(unsigned(iRgb.red));
         int1Rgb.green  <= to_integer(unsigned(iRgb.green));
         int1Rgb.blue   <= to_integer(unsigned(iRgb.blue));
         int1Rgb.valid  <= iRgb.valid;
-    end if; 
+    end if;
 end process;
 rgbMinP: process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if ((int1Rgb.red <= int1Rgb.green) and (int1Rgb.red <= int1Rgb.blue)) then
             rgbMin <= int1Rgb.red;
         elsif((int1Rgb.green <= int1Rgb.red) and (int1Rgb.green <= int1Rgb.blue)) then
@@ -161,17 +187,17 @@ rgbMinP: process (clk) begin
     end if;
 end process rgbMinP;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbDelta      <= rgbMax - rgbMin;
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         maxMinSum    <= rgbMax + rgbMin;
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (int2Rgb.red  = rgbMax) and (int2Rgb.red  /= zero)then
             rMax <= hi;
         else
@@ -180,7 +206,7 @@ process (clk) begin
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (int2Rgb.green  = rgbMax) and (int2Rgb.red  /= zero)then
             gMax <= hi;
         else
@@ -189,7 +215,7 @@ process (clk) begin
   end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (int2Rgb.blue  = rgbMax) and (int2Rgb.red  /= zero)then
             bMax <= hi;
         else
@@ -198,7 +224,7 @@ process (clk) begin
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (int2Rgb.red  = rgbMin) and (int2Rgb.red  /= zero)then
             rMin <= hi;
         else
@@ -207,7 +233,7 @@ process (clk) begin
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (int2Rgb.green  = rgbMin) and (int2Rgb.red  /= zero)then
             gMin <= hi;
         else
@@ -216,7 +242,7 @@ process (clk) begin
   end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (int2Rgb.blue  = rgbMin) and (int2Rgb.red  /= zero)then
             bMin <= hi;
         else

@@ -160,13 +160,13 @@ package constants_package is
     constant FONT_WIDTH                         : integer := 8;
     constant FONT_HEIGHT                        : integer := 16;
     -------------------------------------------------------------------------
-    constant C_WHOLE_WIDTH                      : integer := 3;  
+    constant C_WHOLE_WIDTH                      : integer := 3;
     constant DATA_EXT_WIDTH                     : natural := i_data_width + 1;
-    constant FRAC_BITS_TO_KEEP                  : natural := 3;  
+    constant FRAC_BITS_TO_KEEP                  : natural := 3;
     constant MULT_RESULT_WIDTH                  : natural := DATA_EXT_WIDTH + C_WHOLE_WIDTH + FRAC_BITS_TO_KEEP;
     constant ADD_RESULT_WIDTH                   : natural := MULT_RESULT_WIDTH + 1;
     constant ROUND_RESULT_WIDTH                 : natural := ADD_RESULT_WIDTH - FRAC_BITS_TO_KEEP;
-    constant ROUND                              : signed(ADD_RESULT_WIDTH-1 downto 0) := to_signed(0, ADD_RESULT_WIDTH-FRAC_BITS_TO_KEEP)&'1' & to_signed(0, FRAC_BITS_TO_KEEP-1);  
+    constant ROUND                              : signed(ADD_RESULT_WIDTH-1 downto 0) := to_signed(0, ADD_RESULT_WIDTH-FRAC_BITS_TO_KEEP)&'1' & to_signed(0, FRAC_BITS_TO_KEEP-1);
     -------------------------------------------------------------------------
     function iCrdDelta(L, R: integer)   return integer;
     function max(L, R: integer) return integer;
@@ -181,22 +181,22 @@ use ieee.numeric_std.all;
 package body constants_package is
     function SelFrame(L, R: boolean) return boolean is
     begin
-        if (L = TRUE) and (R = TRUE) then 
+        if (L = TRUE) and (R = TRUE) then
             return TRUE;
         else
             return FALSE;
         end if;
     end;
-    
+
     function SelFrame(L, R, M: boolean) return boolean is
         begin
-        if (L = TRUE) and (R = TRUE) and (M = TRUE) then 
+        if (L = TRUE) and (R = TRUE) and (M = TRUE) then
             return TRUE;
         else
             return FALSE;
         end if;
     end;
-    
+
     function max(L, R: integer) return integer is
         begin
         if L > R then

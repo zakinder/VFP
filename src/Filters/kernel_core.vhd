@@ -1,10 +1,24 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : kernel_core.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.fixed_pkg.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity kernel_core is
 generic (
     SHARP_FRAME      : boolean := false;
@@ -124,52 +138,52 @@ FloatToFixedv1TopK1Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k1,
-      oData      => kCoeffProd.k1);   
+      oData      => kCoeffProd.k1);
 FloatToFixedv1TopK2Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k2,
-      oData      => kCoeffProd.k2);  
+      oData      => kCoeffProd.k2);
 FloatToFixedv1TopK3Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k3,
-      oData      => kCoeffProd.k3);  
+      oData      => kCoeffProd.k3);
 FloatToFixedv1TopK4Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k4,
-      oData      => kCoeffProd.k4);   
+      oData      => kCoeffProd.k4);
 FloatToFixedv1TopK5Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k5,
-      oData      => kCoeffProd.k5);  
+      oData      => kCoeffProd.k5);
 FloatToFixedv1TopK6Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k6,
-      oData      => kCoeffProd.k6); 
+      oData      => kCoeffProd.k6);
 FloatToFixedv1TopK7Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k7,
-      oData      => kCoeffProd.k7);   
+      oData      => kCoeffProd.k7);
 FloatToFixedv1TopK8Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k8,
-      oData      => kCoeffProd.k8);  
+      oData      => kCoeffProd.k8);
 FloatToFixedv1TopK9Inst: FloatToFixedv1Top
     port map (
       aclk       => clk,
       iData      => FractLevelProd.k9,
-      oData      => kCoeffProd.k9);  
+      oData      => kCoeffProd.k9);
 -----------------------------------------------------------------------------------------------
 -- STAGE 4
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         cc.fxToSnFxProd.k1 <= to_sfixed((kCoeffProd.k1), cc.fxToSnFxProd.k1);
         cc.fxToSnFxProd.k2 <= to_sfixed((kCoeffProd.k2), cc.fxToSnFxProd.k2);
         cc.fxToSnFxProd.k3 <= to_sfixed((kCoeffProd.k3), cc.fxToSnFxProd.k3);
@@ -185,7 +199,7 @@ end process;
 -- STAGE 5
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         cc.snFxToSnProd.k1 <= to_signed(cc.fxToSnFxProd.k1(19 downto 0), 20);
         cc.snFxToSnProd.k2 <= to_signed(cc.fxToSnFxProd.k2(19 downto 0), 20);
         cc.snFxToSnProd.k3 <= to_signed(cc.fxToSnFxProd.k3(19 downto 0), 20);
@@ -201,7 +215,7 @@ end process;
 -- STAGE 6
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         cc.snToTrimProd.k1 <= cc.snFxToSnProd.k1(19 downto 5);
         cc.snToTrimProd.k2 <= cc.snFxToSnProd.k2(19 downto 5);
         cc.snToTrimProd.k3 <= cc.snFxToSnProd.k3(19 downto 5);
@@ -233,7 +247,7 @@ end process;
 -- STAGE 8
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         cc.snToTrimSum.red    <= cc.snSum.red(cc.snSum.red'left downto FRAC_BITS_TO_KEEP);
         cc.snToTrimSum.green  <= cc.snSum.green(cc.snSum.green'left downto FRAC_BITS_TO_KEEP);
         cc.snToTrimSum.blue   <= cc.snSum.blue(cc.snSum.blue'left downto FRAC_BITS_TO_KEEP);
@@ -244,7 +258,7 @@ end process;
 --FILTERS: SHARP BLURE EMBOS SOBEL
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
-COLOR_DELAYED_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE) 
+COLOR_DELAYED_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE)
                         or (EMBOS_FRAME = TRUE) or (SOBEL_FRAME = TRUE)) generate
 signal cc_rgbSum : std_logic_vector(i_data_width-1 downto 0) := black;
 begin
@@ -271,7 +285,7 @@ end process;
 -- STAGE 9
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         cc.rgbSum  <= (cc.snToTrimSum.red + cc.snToTrimSum.green + cc.snToTrimSum.blue);
         if (cc.rgbSum(ROUND_RESULT_WIDTH-1) = hi) then
             cc_rgbSum <= black;
@@ -405,9 +419,9 @@ end process;
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        if (cc.snToTrimSum.red(ROUND_RESULT_WIDTH-1) = hi) then	
+        if (cc.snToTrimSum.red(ROUND_RESULT_WIDTH-1) = hi) then
             cGain.red <= black;
-        elsif (unsigned(cc.snToTrimSum.red(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then	
+        elsif (unsigned(cc.snToTrimSum.red(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
             cGain.red <= white;
         else
             cGain.red <= std_logic_vector(cc.snToTrimSum.red(i_data_width-1 downto 0));
@@ -464,7 +478,7 @@ process (clk) begin
         rgbSyncValid(13) <= rgbSyncValid(12);
         rgbSyncValid(14) <= rgbSyncValid(13);
         rgbSyncValid(15) <= rgbSyncValid(14);
-    end if; 
+    end if;
 end process;
 -----------------------------------------------------------------------------------------------
 end Behavioral;

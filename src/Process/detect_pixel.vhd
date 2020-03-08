@@ -1,10 +1,22 @@
---05022019 [05-02-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : detect_pixel.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity detect_pixel is
 generic (
     i_data_width   : integer := 8);

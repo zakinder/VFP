@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : segment_colors.vhd
+-- Create Date : 01162019 [01-16-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity segment_colors is
 port (
     clk            : in  std_logic;
@@ -23,7 +36,7 @@ generic map(
     F_DRK              => false,
     F_LUM              => false,
     i_data_width       => i_data_width)
-port map(   
+port map(
     clk                => clk,
     reset              => reset,
     iRgb               => iRgb,
@@ -34,7 +47,7 @@ generic map(
     F_DRK              => true,
     F_LUM              => false,
     i_data_width       => i_data_width)
-port map(   
+port map(
     clk                => clk,
     reset              => reset,
     iRgb               => iRgb,
@@ -45,7 +58,7 @@ generic map(
     F_DRK              => false,
     F_LUM              => true,
     i_data_width       => i_data_width)
-port map(   
+port map(
     clk                => clk,
     reset              => reset,
     iRgb               => iRgb,

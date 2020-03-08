@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : frame_process.vhd
+-- Create Date : 01062019 [01-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation axi4 components.
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity frame_process is
 generic (
     i_data_width            : integer := 8;
@@ -39,7 +52,7 @@ port (
     iHsvPerCh               : in integer;
     iYccPerCh               : in integer;
     iEdgeType               : in std_logic_vector(b_data_width-1 downto 0);
-    iThreshold              : in std_logic_vector(s_data_width-1 downto 0); 
+    iThreshold              : in std_logic_vector(s_data_width-1 downto 0);
     iVideoChannel           : in std_logic_vector(b_data_width-1 downto 0);
     --out
     oFrameData              : out fcolors;
@@ -165,14 +178,14 @@ pipCoordP: process (clk) begin
 end process pipCoordP;
 
     iKcoeff.k1   <= iKls.k1(15 downto 0);
-    iKcoeff.k2   <= iKls.k2(15 downto 0); 
-    iKcoeff.k3   <= iKls.k3(15 downto 0); 
-    iKcoeff.k4   <= iKls.k4(15 downto 0); 
-    iKcoeff.k5   <= iKls.k5(15 downto 0); 
-    iKcoeff.k6   <= iKls.k6(15 downto 0); 
-    iKcoeff.k7   <= iKls.k7(15 downto 0); 
-    iKcoeff.k8   <= iKls.k8(15 downto 0); 
-    iKcoeff.k9   <= iKls.k9(15 downto 0); 
+    iKcoeff.k2   <= iKls.k2(15 downto 0);
+    iKcoeff.k3   <= iKls.k3(15 downto 0);
+    iKcoeff.k4   <= iKls.k4(15 downto 0);
+    iKcoeff.k5   <= iKls.k5(15 downto 0);
+    iKcoeff.k6   <= iKls.k6(15 downto 0);
+    iKcoeff.k7   <= iKls.k7(15 downto 0);
+    iKcoeff.k8   <= iKls.k8(15 downto 0);
+    iKcoeff.k9   <= iKls.k9(15 downto 0);
     iKcoeff.kSet <= iKls.config;
 
 FiltersInst: filters

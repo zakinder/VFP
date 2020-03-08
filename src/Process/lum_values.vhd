@@ -1,12 +1,25 @@
---05062019 [05-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : lum_values.vhd
+-- Create Date : 05062019 [05-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.fixed_pkg.all;
 use work.float_pkg.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity lum_values is
 generic (
     F_LGT          : boolean := false;
@@ -64,12 +77,12 @@ process (clk,reset)begin
         uFl1Rgb.red    <= (others => '0');
         uFl1Rgb.green  <= (others => '0');
         uFl1Rgb.blue   <= (others => '0');
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         uFl1Rgb.red    <= to_float(unsigned(iRgb.red),uFl1Rgb.red);
         uFl1Rgb.green  <= to_float(unsigned(iRgb.green),uFl1Rgb.green);
         uFl1Rgb.blue   <= to_float(unsigned(iRgb.blue),uFl1Rgb.blue);
         uFl1Rgb.valid  <= iRgb.valid;
-    end if; 
+    end if;
 end process;
 -----------------------------------------------------------------------------------------------
 -- STAGE 2 RGB.AVG = R+G+B
@@ -99,7 +112,7 @@ process (clk) begin
     end if;
 end process;
 -----------------------------------------------------------------------------------------------
--- STAGE 5 
+-- STAGE 5
 -- RGB.DELTA.SUM = MAX + MIN
 -- RGB.AVG       = R+G+B/3
 -- RGB.DARK      = [RGB.DELTA.SUM]/[RGB.AVG]
@@ -168,7 +181,7 @@ end process;
 -----------------------------------------------------------------------------------------------
 LUM_FRAME_ENABLE: if (F_LUM = true) and (F_DRK = false) and (F_LGT = false) generate
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         uFl7Rgb.red         <= (uFl6Rgb.red   * rgb2xBright);
         uFl7Rgb.green       <= (uFl6Rgb.green * rgb2xBright);
         uFl7Rgb.blue        <= (uFl6Rgb.blue  * rgb2xBright);
@@ -178,7 +191,7 @@ end process;
 end generate LUM_FRAME_ENABLE;
 LUM_FRAME_DISABLE: if (F_LUM = false) generate
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         uFl7Rgb.red         <= (uFl6Rgb.red   * rgbLum);
         uFl7Rgb.green       <= (uFl6Rgb.green * rgbLum);
         uFl7Rgb.blue        <= (uFl6Rgb.blue  * rgbLum);
@@ -190,7 +203,7 @@ end generate LUM_FRAME_DISABLE;
 -- STAGE 12
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         oRgb.red   <= std_logic_vector(to_unsigned(uFl7Rgb.red,8));
         oRgb.green <= std_logic_vector(to_unsigned(uFl7Rgb.green,8));
         oRgb.blue  <= std_logic_vector(to_unsigned(uFl7Rgb.blue,8));
@@ -201,7 +214,7 @@ end process;
 -- STAGE 3
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbxDeltaValue   <= rgbMax - rgbMin;
     end if;
 end process;
@@ -209,12 +222,12 @@ end process;
 -- STAGE 3
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbxDeltaSum   <= rgbMax + rgbMin;
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         uFl2Rgb <= uFl1Rgb;
         uFl3Rgb <= uFl2Rgb;
         uFs4Rgb <= uFl3Rgb;
@@ -226,7 +239,7 @@ end process;
 -- STAGE 2
 -----------------------------------------------------------------------------------------------
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if ((uFl1Rgb.red >= uFl1Rgb.green) and (uFl1Rgb.red >= uFl1Rgb.blue)) then
             rgbMax <= uFl1Rgb.red;
         elsif((uFl1Rgb.green >= uFl1Rgb.red) and (uFl1Rgb.green >= uFl1Rgb.blue))then

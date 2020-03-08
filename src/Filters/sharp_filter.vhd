@@ -1,10 +1,22 @@
---02092019 [02-09-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : sharp_filter.vhd
+-- Create Date : 02092019 [02-09-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity sharp_filter is
 generic (
     i_data_width  : integer := 8;
@@ -15,7 +27,7 @@ port (
     clk           : in std_logic;
     rst_l         : in std_logic;
     iRgb          : in channel;
-    kls           : in coefficient;  
+    kls           : in coefficient;
     oRgb          : out channel);
 end entity;
 architecture arch of sharp_filter is
@@ -81,7 +93,7 @@ port map(
     vTap0x          => vTapRGB0x(15 downto 8),
     vTap1x          => vTapRGB1x(15 downto 8),
     vTap2x          => vTapRGB2x(15 downto 8),
-    kls             => kls,    
+    kls             => kls,
     DataO           => oRgb.green);
 MACbInst: sharp_mac
 port map(
@@ -90,11 +102,11 @@ port map(
     vTap0x          => vTapRGB0x(i_data_width-1 downto 0),
     vTap1x          => vTapRGB1x(i_data_width-1 downto 0),
     vTap2x          => vTapRGB2x(i_data_width-1 downto 0),
-    kls             => kls,   
+    kls             => kls,
     DataO           => oRgb.blue);
 tapSignedP : process (clk) begin
     if rising_edge(clk) then
-        rgb1x      <= iRgb;  
+        rgb1x      <= iRgb;
         rgb2x      <= rgb1x;
         d2RGB      <= rgb2x.red & rgb2x.green & rgb2x.blue;
         d1en       <= enable;

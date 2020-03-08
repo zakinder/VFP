@@ -1,10 +1,22 @@
---01062019 [01-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : buffer_controller.vhd
+-- Create Date : 01062019 [01-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file generate the 3 taps channels from input data.
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity buffer_controller is
 generic (
     img_width     : integer := 4096;
@@ -100,9 +112,9 @@ begin
             taps1x <= tap0_data;
             taps2x <= tap1_data;
         elsif(wrchx3_io ='1' or w1rchx3_io ='1'  or w2rchx3_io ='1' or w3rchx3_io ='1') then
-            taps0x <= tap0_data; 
-            taps1x <= tap1_data; 
-            taps2x <= tap2_data;		
+            taps0x <= tap0_data;
+            taps1x <= tap1_data;
+            taps2x <= tap2_data;
         else
             taps0x <= (others => '0');
             taps1x <= (others => '0');
@@ -116,11 +128,11 @@ generic map(
     dataWidth    => dataWidth,
     addrWidth    => addrWidth)
 port map(
-    write_clk => aclk, 
+    write_clk => aclk,
     write_enb => wrchx0_io,
     w_address => i_wadd(addrWidth - 1 downto 0),
     idata     => i_data,
-    read_clk  => aclk, 
+    read_clk  => aclk,
     r_address => i_radd(addrWidth - 1 downto 0),
     odata     => tap0_data);
 int_line_d1: tap_buffer
@@ -129,24 +141,24 @@ generic map(
     dataWidth    => dataWidth,
     addrWidth    => addrWidth)
 port map(
-    write_clk => aclk, 
+    write_clk => aclk,
     write_enb => wrchx1_io,
     w_address => i_wadd(addrWidth - 1 downto 0),
     idata     => i_data,
-    read_clk  => aclk, 
+    read_clk  => aclk,
     r_address => i_radd(addrWidth - 1 downto 0),
-    odata     => tap1_data);    
+    odata     => tap1_data);
 int_line_d2: tap_buffer
 generic map(
     img_width    => img_width,
     dataWidth    => dataWidth,
     addrWidth    => addrWidth)
 port map(
-    write_clk  => aclk, 
+    write_clk  => aclk,
     write_enb  => wrchx2_io,
     w_address  => i_wadd(addrWidth - 1 downto 0),
     idata      => i_data,
-    read_clk   => aclk, 
+    read_clk   => aclk,
     r_address  => i_radd(addrWidth - 1 downto 0),
     odata      => tap2_data);
 int_line_d3: tap_buffer
@@ -159,7 +171,7 @@ port map(
     write_enb  => wrchx3_io,
     w_address  => i_wadd(addrWidth - 1 downto 0),
     idata      => i_data,
-    read_clk   => aclk, 
+    read_clk   => aclk,
     r_address  => i_radd(addrWidth - 1 downto 0),
     odata      => tap3_data);
 end architecture;

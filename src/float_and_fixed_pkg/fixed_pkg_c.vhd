@@ -7,7 +7,7 @@
 -- use ieee_proposed.fixed_float_types.all;
 -- use ieee_proposed.fixed_pkg.all;
 --
---  This verison is designed to work with the VHDL-93 compilers 
+--  This verison is designed to work with the VHDL-93 compilers
 --  synthesis tools.  Please note the "%%%" comments.  These are where we
 --  diverge from the VHDL-200X LRM.
 -- --------------------------------------------------------------------
@@ -411,7 +411,7 @@ package fixed_pkg is
   function "<=" (l : NATURAL; r : UNRESOLVED_ufixed) return BOOLEAN;
   function ">"  (l : NATURAL; r : UNRESOLVED_ufixed) return BOOLEAN;
   function "<"  (l : NATURAL; r : UNRESOLVED_ufixed) return BOOLEAN;
-  
+
   function \?=\  (l : UNRESOLVED_ufixed; r : NATURAL) return STD_ULOGIC;
   function \?/=\ (l : UNRESOLVED_ufixed; r : NATURAL) return STD_ULOGIC;
   function \?>=\ (l : UNRESOLVED_ufixed; r : NATURAL) return STD_ULOGIC;
@@ -695,7 +695,7 @@ package fixed_pkg is
   -- In saturate mode, if the number overflows then the largest possible
   -- representable number is returned.  If wrap mode, then the upper bits
   -- of the number are truncated.
-  
+
   function resize (
     arg                     : UNRESOLVED_ufixed;  -- input
     constant left_index     : INTEGER;  -- integer portion
@@ -921,17 +921,17 @@ package fixed_pkg is
                         operation                 : CHARACTER := 'X';
                         left_index2, right_index2 : INTEGER   := 0)
     return INTEGER;
-  
+
   function ufixed_low (left_index, right_index   : INTEGER;
                        operation                 : CHARACTER := 'X';
                        left_index2, right_index2 : INTEGER   := 0)
     return INTEGER;
-  
+
   function sfixed_high (left_index, right_index   : INTEGER;
                         operation                 : CHARACTER := 'X';
                         left_index2, right_index2 : INTEGER   := 0)
     return INTEGER;
-  
+
   function sfixed_low (left_index, right_index   : INTEGER;
                        operation                 : CHARACTER := 'X';
                        left_index2, right_index2 : INTEGER   := 0)
@@ -941,22 +941,22 @@ package fixed_pkg is
   -- signal uf1multuf2 : ufixed (ufixed_high (uf1, '*', uf2) downto
   --                             ufixed_low (uf1, '*', uf2));
   -- uf1multuf2 <= uf1 * uf2;
-  -- 
+  --
   function ufixed_high (size_res  : UNRESOLVED_ufixed;
                         operation : CHARACTER := 'X';
                         size_res2 : UNRESOLVED_ufixed)
     return INTEGER;
-  
+
   function ufixed_low (size_res  : UNRESOLVED_ufixed;
                        operation : CHARACTER := 'X';
                        size_res2 : UNRESOLVED_ufixed)
     return INTEGER;
-  
+
   function sfixed_high (size_res  : UNRESOLVED_sfixed;
                         operation : CHARACTER := 'X';
                         size_res2 : UNRESOLVED_sfixed)
     return INTEGER;
-  
+
   function sfixed_low (size_res  : UNRESOLVED_sfixed;
                        operation : CHARACTER := 'X';
                        size_res2 : UNRESOLVED_sfixed)
@@ -1011,7 +1011,7 @@ package fixed_pkg is
   -- These functions are here so that a std_logic_vector can be
   -- converted to and from sfixed and ufixed.  Note that you can
   -- not convert these vectors because of their negative index.
-  
+
   function to_slv (
     arg : UNRESOLVED_ufixed)            -- fixed point vector
     return STD_LOGIC_VECTOR;
@@ -1095,12 +1095,12 @@ package fixed_pkg is
   -- Where "11" is the width of xxx (xxx'length),
   -- and 3 is the lower bound (abs (xxx'low))
   -- In a pure VHDL environment use "ufixed_high" and "ufixed_low"
-  
+
   function UFix_high (width, fraction   : NATURAL;
                       operation         : CHARACTER := 'X';
                       width2, fraction2 : NATURAL   := 0)
     return INTEGER;
-  
+
   function UFix_low (width, fraction   : NATURAL;
                      operation         : CHARACTER := 'X';
                      width2, fraction2 : NATURAL   := 0)
@@ -1109,12 +1109,12 @@ package fixed_pkg is
   -- Same as above but for signed fixed point.  Note that the width
   -- of a signed fixed point number ignores the sign bit, thus
   -- width = sxxx'length-1
-  
+
   function SFix_high (width, fraction   : NATURAL;
                       operation         : CHARACTER := 'X';
                       width2, fraction2 : NATURAL   := 0)
     return INTEGER;
-  
+
   function SFix_low (width, fraction   : NATURAL;
                      operation         : CHARACTER := 'X';
                      width2, fraction2 : NATURAL   := 0)
@@ -1262,7 +1262,7 @@ package fixed_pkg is
   -- The "." is optional in this syntax, however it exist and is
   -- in the wrong location an error is produced.  Overflow will
   -- result in saturation.
-  
+
   function from_string (
     bstring              : STRING;      -- binary string
     constant left_index  : INTEGER;
@@ -1276,7 +1276,7 @@ package fixed_pkg is
   -- Octal and hex conversions work as follows:
   -- uf1 <= from_hstring ("6.8", 3, -3); -- 6.5 (bottom zeros dropped)
   -- uf1 <= from_ostring ("06.4", 3, -3); -- 6.5 (top zeros dropped)
-  
+
   function from_ostring (
     ostring              : STRING;      -- Octal string
     constant left_index  : INTEGER;
@@ -1371,7 +1371,7 @@ package fixed_pkg is
   --  uf1 <= from_string ("0110.100"); -- 6.5
   -- In this case the "." is not optional, and the size of
   -- the output must match exactly.
-  
+
   function from_string (
     bstring : STRING)                   -- binary string
     return UNRESOLVED_ufixed;
@@ -1382,7 +1382,7 @@ package fixed_pkg is
   -- the string lengths must match.  Example:
   -- signal sf1 := sfixed (5 downto -3);
   -- sf1 <= from_ostring ("71.4") -- -6.5
-  
+
   function from_ostring (
     ostring : STRING)                   -- Octal string
     return UNRESOLVED_ufixed;
@@ -1502,7 +1502,7 @@ package body fixed_pkg is
       return SHIFT_LEFT(arg, -count);
     end if;
   end function "sra";
-  
+
   function or_reduce (arg : STD_ULOGIC_VECTOR)
     return STD_LOGIC is
     variable Upper, Lower : STD_ULOGIC;
@@ -1593,7 +1593,7 @@ package body fixed_pkg is
   type stdlogic_table is array(STD_ULOGIC, STD_ULOGIC) of STD_ULOGIC;
   constant match_logic_table : stdlogic_table := (
     -----------------------------------------------------
-    -- U    X    0    1    Z    W    L    H    -         |   |  
+    -- U    X    0    1    Z    W    L    H    -         |   |
     -----------------------------------------------------
     ('U', 'U', 'U', 'U', 'U', 'U', 'U', 'U', '1'),  -- | U |
     ('U', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '1'),  -- | X |
@@ -1756,7 +1756,7 @@ package body fixed_pkg is
   begin
     return Is_X (STD_LOGIC_VECTOR (s));
   end function Is_X;
-  
+
   function Is_X ( s : SIGNED ) return BOOLEAN is
   begin
     return Is_X (STD_LOGIC_VECTOR (s));
@@ -2398,7 +2398,7 @@ package body fixed_pkg is
   end function "+";
 
   function "+" (
-    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) + sfixed(c downto d) = 
+    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) + sfixed(c downto d) =
     return UNRESOLVED_sfixed is         -- sfixed(max(a,c)+1 downto min(b,d))
     constant left_index       : INTEGER := maximum(l'high, r'high)+1;
     constant right_index      : INTEGER := mine(l'low, r'low);
@@ -2445,7 +2445,7 @@ package body fixed_pkg is
   end function "-";
 
   function "-" (
-    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) - sfixed(c downto d) = 
+    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) - sfixed(c downto d) =
     return UNRESOLVED_sfixed is         -- sfixed(max(a,c)+1 downto min(b,d))
     constant left_index       : INTEGER := maximum(l'high, r'high)+1;
     constant right_index      : INTEGER := mine(l'low, r'low);
@@ -2487,7 +2487,7 @@ package body fixed_pkg is
   end function "*";
 
   function "*" (
-    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) * sfixed(c downto d) = 
+    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) * sfixed(c downto d) =
     return UNRESOLVED_sfixed is         --  sfixed(a+c+1 downto b+d)
     variable lslv       : SIGNED (l'length-1 downto 0);
     variable rslv       : SIGNED (r'length-1 downto 0);
@@ -2507,14 +2507,14 @@ package body fixed_pkg is
   end function "*";
 
   function "/" (
-    l, r : UNRESOLVED_ufixed)    -- ufixed(a downto b) / ufixed(c downto d) = 
+    l, r : UNRESOLVED_ufixed)    -- ufixed(a downto b) / ufixed(c downto d) =
     return UNRESOLVED_ufixed is         --  ufixed(a-d downto b-c-1)
   begin
     return divide (l, r);
   end function "/";
 
   function "/" (
-    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) / sfixed(c downto d) = 
+    l, r : UNRESOLVED_sfixed)    -- sfixed(a downto b) / sfixed(c downto d) =
     return UNRESOLVED_sfixed is         -- sfixed(a-d+1 downto b-c)
   begin
     return divide (l, r);
@@ -2568,7 +2568,7 @@ package body fixed_pkg is
     constant round_style : fixed_round_style_type := fixed_round_style;
     constant guard_bits  : NATURAL                := fixed_guard_bits)
     return UNRESOLVED_sfixed is
-    variable result     : UNRESOLVED_sfixed (l'high - mine(r'low, r'low) + 1 downto 
+    variable result     : UNRESOLVED_sfixed (l'high - mine(r'low, r'low) + 1 downto
                                              mine (l'low, l'low) - r'high);
     variable dresult    : UNRESOLVED_sfixed (result'high downto result'low-guard_bits);
     variable lresize    : UNRESOLVED_sfixed (l'high+1 downto l'high+1 -dresult'length+1);
@@ -4676,7 +4676,7 @@ package body fixed_pkg is
       when others   => return left_index;  -- For abs and default
     end case;
   end function ufixed_high;
-  
+
   function ufixed_low (left_index, right_index   : INTEGER;
                        operation                 : CHARACTER := 'X';
                        left_index2, right_index2 : INTEGER   := 0)
@@ -4692,7 +4692,7 @@ package body fixed_pkg is
       when others   => return right_index;  -- for abs and default
     end case;
   end function ufixed_low;
-  
+
   function sfixed_high (left_index, right_index   : INTEGER;
                         operation                 : CHARACTER := 'X';
                         left_index2, right_index2 : INTEGER   := 0)
@@ -4730,7 +4730,7 @@ package body fixed_pkg is
   -- Same as above, but using the "size_res" input only for their ranges:
   -- signal uf1multuf2 : ufixed (ufixed_high (uf1, '*', uf2) downto
   --                             ufixed_low (uf1, '*', uf2));
-  -- uf1multuf2 <= uf1 * uf2;  
+  -- uf1multuf2 <= uf1 * uf2;
   function ufixed_high (size_res  : UNRESOLVED_ufixed;
                         operation : CHARACTER := 'X';
                         size_res2 : UNRESOLVED_ufixed)
@@ -4980,7 +4980,7 @@ package body fixed_pkg is
                       round_style    => round_style,
                       overflow_style => overflow_style);
   end function to_signed;
-  
+
   function to_real (
     arg : UNRESOLVED_ufixed)            -- ufixed point input
     return REAL is
@@ -5139,7 +5139,7 @@ package body fixed_pkg is
     argslv := to_sulv(arg);
     return Is_X (argslv);
   end function Is_X;
-  
+
   function Is_X (
     arg : UNRESOLVED_sfixed)
     return BOOLEAN is
@@ -5190,7 +5190,7 @@ package body fixed_pkg is
   begin
     return to_sfixed (To_UX01(to_sulv(arg)), arg'high, arg'low);
   end function To_UX01;
-  
+
   function resize (
     arg                     : UNRESOLVED_ufixed;            -- input
     constant left_index     : INTEGER;  -- integer portion
@@ -5497,7 +5497,7 @@ package body fixed_pkg is
       return result;
     end if;
   end function to_ufixed;
-  
+
   function to_sfixed (
     arg                     : SIGNED;  -- signed
     size_res                : UNRESOLVED_sfixed;  -- for size only
@@ -6385,7 +6385,7 @@ package body fixed_pkg is
   begin
     return \?<\ (to_ufixed (l, r'high, r'low), r);
   end function \?<\;
-  
+
   function maximum (
     l : REAL;
     r : UNRESOLVED_ufixed)              -- fixed point input
@@ -6985,7 +6985,7 @@ package body fixed_pkg is
       return result;
     end if;
   end function to_ostring;
-  -------------------------------------------------------------------   
+  -------------------------------------------------------------------
   function to_hstring (value     : STD_ULOGIC_VECTOR) return STRING is
     constant ne     : INTEGER := (value'length+3)/4;
     variable pad    : STD_ULOGIC_VECTOR(0 to (ne*4 - value'length) - 1);
@@ -7031,7 +7031,7 @@ package body fixed_pkg is
 
 
 -- %%% END replicated textio functions
-  
+
   -- purpose: writes fixed point into a line
   procedure write (
     L         : inout LINE;               -- input line
@@ -7387,7 +7387,7 @@ package body fixed_pkg is
           slv (i downto i-2) := nybble;
           i := i - 3;
           lastu := false;
-        end if;     
+        end if;
         if i > 0 then
           read (L, c, xgood);
         end if;
@@ -7600,7 +7600,7 @@ package body fixed_pkg is
     variable lastu  : BOOLEAN := false;       -- last character was an "_"
     variable founddot : BOOLEAN := false;  -- found a dot.
   begin
-    Skip_whitespace (L);   
+    Skip_whitespace (L);
     if slv'length > 0 then
       i := slv'high;
       read (l, c, xgood);
@@ -7644,7 +7644,7 @@ package body fixed_pkg is
           slv (i downto i-3) := nybble;
           i := i - 4;
           lastu := false;
-        end if;     
+        end if;
         if i > 0 then
           read (L, c, xgood);
         end if;
@@ -8073,7 +8073,7 @@ package body fixed_pkg is
       & "from_hstring: Bad string "& hstring severity error;
     return result;
   end function from_hstring;
-  
+
   function from_string (
     bstring              : STRING;      -- binary string
     constant left_index  : INTEGER;

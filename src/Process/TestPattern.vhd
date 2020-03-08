@@ -1,10 +1,22 @@
---01062019 [01-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : testpattern.vhd
+-- Create Date : 01062019 [01-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity testpattern is
 port (
     clk                   : in std_logic;
@@ -24,7 +36,7 @@ begin
 FrameTestPatternInst: frame_testpattern
 generic map(
     s_data_width => 16)
-port map(   
+port map(
     clk          => clk,
     iValid       => iValid,
     iCord        => iCord,
@@ -32,7 +44,7 @@ port map(
 ResoTestPatternInst: ResoTestPattern
 generic map(
     s_data_width => 16)
-port map(   
+port map(
     clk          => clk,
     iValid       => iValid,
     iCord        => iCord,

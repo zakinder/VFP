@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : sync_frames.vhd
+-- Create Date : 01162019 [01-16-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity sync_frames is
 generic (
     pixelDelay     : integer := 8);
@@ -21,15 +34,15 @@ process (clk) begin
     if rising_edge(clk) then
         rgbDelays(0).rgb      <= iRgb;
         rgbDelays(1)          <= rgbDelays(0);
-        rgbDelays(2)          <= rgbDelays(1); 
-        rgbDelays(3)          <= rgbDelays(2); 
-        rgbDelays(4)          <= rgbDelays(3); 
-        rgbDelays(5)          <= rgbDelays(4); 
-        rgbDelays(6)          <= rgbDelays(5); 
-        rgbDelays(7)          <= rgbDelays(6); 
-        rgbDelays(8)          <= rgbDelays(7); 
-        rgbDelays(9)          <= rgbDelays(8); 
-        rgbDelays(10)         <= rgbDelays(9); 
+        rgbDelays(2)          <= rgbDelays(1);
+        rgbDelays(3)          <= rgbDelays(2);
+        rgbDelays(4)          <= rgbDelays(3);
+        rgbDelays(5)          <= rgbDelays(4);
+        rgbDelays(6)          <= rgbDelays(5);
+        rgbDelays(7)          <= rgbDelays(6);
+        rgbDelays(8)          <= rgbDelays(7);
+        rgbDelays(9)          <= rgbDelays(8);
+        rgbDelays(10)         <= rgbDelays(9);
         rgbDelays(11)         <= rgbDelays(10);
         rgbDelays(12)         <= rgbDelays(11);
         rgbDelays(13)         <= rgbDelays(12);

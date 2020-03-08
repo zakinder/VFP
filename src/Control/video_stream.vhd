@@ -150,7 +150,7 @@ generic map (
     b_data_width         => b_data_width,
     s_data_width         => s_data_width)
 port map (
-    clk                  => m_axis_mm2s_aclk,              
+    clk                  => m_axis_mm2s_aclk,
     rst_l                => m_axis_mm2s_aresetn,
     videoChannel         => videoChannel,
     cRgbOsharp           => cRgbOsharp,

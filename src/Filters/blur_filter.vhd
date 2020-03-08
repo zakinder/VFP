@@ -1,10 +1,22 @@
---02092019 [02-09-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : blur_filter.vhd
+-- Create Date : 02092019 [02-09-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity blur_filter is
 generic (
     iMSB          : integer := 11;
@@ -95,7 +107,7 @@ port map(
     DataO           => blurRgb.blue);
 tapSignedP : process (clk) begin
     if rising_edge(clk) then
-        rgb1x         <= iRgb;  
+        rgb1x         <= iRgb;
         rgb2x         <= rgb1x;
         rgb3x         <= rgb2x;
         d3RGB         <= rgb3x.red & rgb3x.green & rgb3x.blue;

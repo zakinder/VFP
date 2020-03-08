@@ -35,7 +35,7 @@ port (
     iStreamData                 : in vStreamData;
     oWrRegs                     : out mRegs;
     iRdRegs                     : in mRegs;
-    --tx channel                
+    --tx channel
     rgb_m_axis_aclk             : in std_logic;
     rgb_m_axis_aresetn          : in std_logic;
     rgb_m_axis_tready           : in std_logic;
@@ -43,7 +43,7 @@ port (
     rgb_m_axis_tlast            : out std_logic;
     rgb_m_axis_tuser            : out std_logic;
     rgb_m_axis_tdata            : out std_logic_vector(C_rgb_m_axis_TDATA_WIDTH-1 downto 0);
-    --rx channel                
+    --rx channel
     rgb_s_axis_aclk             : in std_logic;
     rgb_s_axis_aresetn          : in std_logic;
     rgb_s_axis_tready           : out std_logic;
@@ -51,7 +51,7 @@ port (
     rgb_s_axis_tuser            : in std_logic;
     rgb_s_axis_tlast            : in std_logic;
     rgb_s_axis_tdata            : in std_logic_vector(C_rgb_s_axis_TDATA_WIDTH-1 downto 0);
-    --destination channel       
+    --destination channel
     m_axis_mm2s_aclk            : in std_logic;
     m_axis_mm2s_aresetn         : in std_logic;
     m_axis_mm2s_tready          : in std_logic;
@@ -63,7 +63,7 @@ port (
     m_axis_mm2s_tstrb           : out std_logic_vector(2 downto 0);
     m_axis_mm2s_tid             : out std_logic_vector(0 downto 0);
     m_axis_mm2s_tdest           : out std_logic_vector(0 downto 0);
-    --video configuration       
+    --video configuration
     vfpconfig_aclk              : in std_logic;
     vfpconfig_aresetn           : in std_logic;
     vfpconfig_awaddr            : in std_logic_vector(C_vfpConfig_ADDR_WIDTH-1 downto 0);
@@ -94,7 +94,7 @@ architecture arch_imp of axis_external is
     signal rx_axis_tuser        : std_logic;
     signal rx_axis_tlast        : std_logic;
     signal rx_axis_tdata        : std_logic_vector(m_axis_mm2s_tdata'range);
-    
+
 begin
 
 -- this module convert ycbcr 444 to 422 and also generate basic test patten
@@ -153,15 +153,15 @@ port map(
     m_axis_mm2s_tready   => m_axis_mm2s_tready,
     m_axis_mm2s_tvalid   => m_axis_mm2s_tvalid,
     m_axis_mm2s_tuser    => m_axis_mm2s_tuser,
-    m_axis_mm2s_tlast    => m_axis_mm2s_tlast,    
+    m_axis_mm2s_tlast    => m_axis_mm2s_tlast,
     m_axis_mm2s_tdata    => m_axis_mm2s_tdata);
-    
+
 -- this module encode and decode cpu config data to slave components
 vfpConfigInst: vfp_config
 generic map(
     revision_number      => revision_number,
-    C_S_AXI_DATA_WIDTH   => conf_data_width,
-    C_S_AXI_ADDR_WIDTH   => conf_addr_width)
+    conf_data_width      => conf_data_width,
+    conf_addr_width      => conf_addr_width)
 port map(
     -- config and requested registers
     wrRegsOut            => oWrRegs,

@@ -1,13 +1,26 @@
---05062019 [05-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : color_avg.vhd
+-- Create Date : 05062019 [05-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.fixed_pkg.all;
 use work.float_pkg.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-use work.tbPackage.all;
+use work.tb_package.all;
+
 entity color_avg is
 generic (
     i_data_width   : integer := 8);
@@ -24,10 +37,10 @@ architecture behavioral of color_avg is
     signal int4Rgb          : intChannel;
     signal int5Rgb          : intChannel;
     signal int6Rgb          : intChannel;
-    
-    
-    signal intRg6b          : intChannel;    
-    
+
+
+    signal intRg6b          : intChannel;
+
     signal rgbSyncValid     : std_logic_vector(11 downto 0)  := x"000";
     signal rgbRedMax        : integer;
     signal rgbGreMax        : integer;
@@ -35,29 +48,29 @@ architecture behavioral of color_avg is
     signal rgbRed2xMax      : integer;
     signal rgbGre2xMax      : integer;
     signal rgbBlu2xMax      : integer;
-    
+
     signal rgbRedO2Max      : integer;
     signal rgbGreO2Max      : integer;
     signal rgbBluO2Max      : integer;
-    
+
     signal rgbRedMaxLimit   : integer;
     signal rgbGreMaxLimit   : integer;
     signal rgbBluMaxLimit   : integer;
-    
+
     signal uFs1Rgb          : rgbToUfRecord;
     signal uFs2Rgb          : rgbToUfRecord;
     signal uFs3Rgb          : rgbToUfRecord;
     signal uFs4Rgb          : rgbToUfRecord;
     signal uFs5Rgb          : rgbToUfRecord;
-    
+
     signal rgbRedAvg        : ufixed(7 downto 0)    :=(others => '0');
     signal rgbSumRedAvg     : ufixed(9 downto -10)  :=(others => '0');
     signal rgbSumRed        : ufixed(9 downto 0)    :=(others => '0');
-    
+
     signal rgbGreAvg        : ufixed(7 downto 0)    :=(others => '0');
     signal rgbSumGreAvg     : ufixed(9 downto -10)  :=(others => '0');
     signal rgbSumGre        : ufixed(9 downto 0)    :=(others => '0');
-    
+
     signal rgbBluAvg        : ufixed(7 downto 0)    :=(others => '0');
     signal rgbSumBluAvg     : ufixed(9 downto -10)  :=(others => '0');
     signal rgbSumBlu        : ufixed(9 downto 0)    :=(others => '0');
@@ -70,15 +83,15 @@ process (clk,reset)begin
         int1Rgb.red    <= 0;
         int1Rgb.green  <= 0;
         int1Rgb.blue   <= 0;
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         int1Rgb.red    <= to_integer(unsigned(iRgb.red));
         int1Rgb.green  <= to_integer(unsigned(iRgb.green));
         int1Rgb.blue   <= to_integer(unsigned(iRgb.blue));
         int1Rgb.valid  <= iRgb.valid;
-    end if; 
+    end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         int2Rgb <= int1Rgb;
         int3Rgb <= int2Rgb;
         int4Rgb <= int3Rgb;
@@ -88,7 +101,7 @@ process (clk) begin
 end process;
 
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbRedMax <= max(int1Rgb.red,int3Rgb.red);
         rgbGreMax <= max(int1Rgb.green,int3Rgb.green);
         rgbBluMax <= max(int1Rgb.blue,int3Rgb.blue);
@@ -97,14 +110,14 @@ end process;
 
 
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbRedMaxLimit <= rgbRedMax - int1Rgb.red;
         rgbGreMaxLimit <= rgbGreMax - int1Rgb.green;
         rgbBluMaxLimit <= rgbBluMax - int1Rgb.blue;
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         uFs2Rgb <= uFs1Rgb;
         uFs3Rgb <= uFs2Rgb;
         uFs4Rgb <= uFs3Rgb;
@@ -120,12 +133,12 @@ process (clk,reset)begin
         uFs1Rgb.red    <= (others => '0');
         uFs1Rgb.green  <= (others => '0');
         uFs1Rgb.blue   <= (others => '0');
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         uFs1Rgb.red    <= to_ufixed(iRgb.red,uFs1Rgb.red);
         uFs1Rgb.green  <= to_ufixed(iRgb.green,uFs1Rgb.green);
         uFs1Rgb.blue   <= to_ufixed(iRgb.blue,uFs1Rgb.blue);
         uFs1Rgb.valid  <= iRgb.valid;
-    end if; 
+    end if;
 end process;
 -----------------------------------------------------------------------------------------------
 -- STAGE 2
@@ -186,7 +199,7 @@ end process;
 -- STAGE 6
 -----------------------------------------------------------------------------------------------
 -- process (clk) begin
-    -- if rising_edge(clk) then 
+    -- if rising_edge(clk) then
     -- if (rgbRedMaxLimit <= 40) then
         -- oRgb.red   <= std_logic_vector(to_unsigned(rgbRedMax,8));
     -- else
@@ -219,18 +232,18 @@ process (clk) begin
         rgbSyncValid(9)  <= rgbSyncValid(8);
         rgbSyncValid(10) <= rgbSyncValid(9);
         rgbSyncValid(11) <= rgbSyncValid(10);
-    end if; 
+    end if;
 end process;
 
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbRed2xMax <= rgbRedMax;
         rgbGre2xMax <= rgbGreMax;
         rgbBlu2xMax <= rgbBluMax;
     end if;
 end process;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbRedO2Max <= max(int1Rgb.red,rgbRedMax);
         rgbGreO2Max <= max(int1Rgb.green,rgbGreMax);
         rgbBluO2Max <= max(int1Rgb.blue,rgbBluMax);

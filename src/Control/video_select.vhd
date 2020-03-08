@@ -1,10 +1,22 @@
---02092019 [02-17-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : video_select.vhd
+-- Create Date : 02092019 [02-17-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation axi4 components.
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity video_select is
 generic (
     bmp_width         : integer := 1920;
@@ -170,7 +182,7 @@ generic map (
     img_width_bmp   => 1980,
     img_height_bmp  => 1080,
     b_data_width    => b_data_width)
-port map(            
+port map(
     clk             => clk,
     rst_l           => rst_l,
     videoChannel    => videoChannel,
@@ -190,7 +202,7 @@ channelOutP: process (clk) begin
             oRgb.valid   <= ycbcr.valid;
             oRgb.red     <= ycbcr.red;
             oRgb.green   <= ycbcr.red;
-            oRgb.blue    <= ycbcr.red; 
+            oRgb.blue    <= ycbcr.red;
         elsif(eChannelSelect = 4)then
             oRgb.valid   <= ycbcr.valid;
             oRgb.red     <= ycbcr.green;
@@ -220,7 +232,7 @@ channelOutP: process (clk) begin
             oRgb.valid   <= ycbcr.valid;
             oRgb.red     <= ycbcr.red;
             oRgb.green   <= ycbcr.green;
-            oRgb.blue    <= ycbcr.red; 
+            oRgb.blue    <= ycbcr.red;
         elsif(eChannelSelect = 10)then
             oRgb.valid   <= ycbcr.valid;
             oRgb.red     <= ycbcr.green;

@@ -17,7 +17,7 @@ port(
 end font_rom;
 architecture Behavioral of font_rom is
     -- 2^7 charactors
-    -- + 2^4 row per charactor 
+    -- + 2^4 row per charactor
     -- therefore the total array size is 2^11 = 2048
     type rom_type is array (0 to 2**11-1) of std_logic_vector(FONT_WIDTH-1 downto 0);
     -- ROM definition

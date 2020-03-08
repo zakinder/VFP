@@ -1,13 +1,26 @@
---05012019 [05-01-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : tap_buffer.vhd
+-- Create Date : 05012019 [05-01-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation axi4 components.
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
+use work.ports_package.all;
+
 entity tap_buffer is
 generic (
     img_width    : integer := 4095;
-    dataWidth    : integer := 12; 
+    dataWidth    : integer := 12;
     addrWidth    : integer := 12);
 port (
     write_clk    : in std_logic;
@@ -24,7 +37,7 @@ architecture arch of tap_buffer is
     signal oregister    : std_logic_vector(dataWidth - 1 downto 0);
     signal write1s_enb  : std_logic;
     signal write2s_enb  : std_logic;
-    signal write3s_enb  : std_logic;  
+    signal write3s_enb  : std_logic;
     signal write_or_enb : std_logic;
 begin
 process (write_clk) begin

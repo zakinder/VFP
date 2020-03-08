@@ -266,10 +266,10 @@ type frameColors is record
     bluToHsl          : channel;
     bluToCgaShp       : channel;
     bluToCgaShpYcc    : channel;
-    bluToCgaShpHsv    : channel; 
+    bluToCgaShpHsv    : channel;
     bluToShpCga       : channel;
     bluToShpCgaYcc    : channel;
-    bluToShpCgaHsv    : channel; 
+    bluToShpCgaHsv    : channel;
     cgaBright         : channel;
     cgaDark           : channel;
     cgaBalance        : channel;
@@ -380,7 +380,7 @@ type kernelCoeDWord  is record
     k9               : std_logic_vector(31 downto 0);
     kSet             : integer;
 end record;
-type kCoeffFloat    is record 
+type kCoeffFloat    is record
     k1               : std_logic_vector(27 downto 0);
     k2               : std_logic_vector(27 downto 0);
     k3               : std_logic_vector(27 downto 0);
@@ -432,7 +432,7 @@ type poi is record
     fifoReadAddress  : std_logic_vector(13 downto 0);
     fifoReadEnable   : std_logic;
     clearFifoData    : std_logic;
-end record;  
+end record;
 type rawRgb is record
     red              : unsigned(11 downto 0);
     green            : unsigned(12 downto 0);
@@ -519,7 +519,7 @@ type fcolors is record
     bluToHsl          : channel;
     bluToCgaShp       : channel;
     bluToCgaShpYcc    : channel;
-    bluToCgaShpHsv    : channel; 
+    bluToCgaShpHsv    : channel;
     bluToShpCga       : channel;
     bluToShpCgaYcc    : channel;
     bluToShpCgaHsv    : channel;

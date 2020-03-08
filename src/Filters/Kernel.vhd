@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : kernel.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity kernel is
 generic (
     INRGB_FRAME        : boolean := false;
@@ -26,7 +39,7 @@ port (
     clk                : in std_logic;
     rst_l              : in std_logic;
     lumThreshold       : in  std_logic_vector(i_data_width-1 downto 0);
-    iThreshold         : in std_logic_vector(s_data_width-1 downto 0); 
+    iThreshold         : in std_logic_vector(s_data_width-1 downto 0);
     txCord             : in coord;
     iRgb               : in channel;
     iKcoeff            : in kernelCoeff;
@@ -75,7 +88,7 @@ process (clk) begin
         rgbSyncValid(13) <= rgbSyncValid(12);
         rgbSyncValid(14) <= rgbSyncValid(13);
         rgbSyncValid(15) <= rgbSyncValid(14);
-    end if; 
+    end if;
 end process;
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
@@ -106,12 +119,12 @@ process (clk,rst_l) begin
         rgbMac1.green <= (others => '0');
         rgbMac1.blue  <= (others => '0');
         rgbMac1.valid <= lo;
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         rgbMac1.red   <= tp0(23 downto 16);
         rgbMac1.green <= tp1(23 downto 16);
         rgbMac1.blue  <= tp2(23 downto 16);
         rgbMac1.valid <= tpValid;
-    end if; 
+    end if;
 end process;
 process (clk,rst_l) begin
     if (rst_l = lo) then
@@ -119,12 +132,12 @@ process (clk,rst_l) begin
         rgbMac2.green <= (others => '0');
         rgbMac2.blue  <= (others => '0');
         rgbMac2.valid <= lo;
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         rgbMac2.red   <= tp0(15 downto 8);
         rgbMac2.green <= tp1(15 downto 8);
         rgbMac2.blue  <= tp2(15 downto 8);
         rgbMac2.valid <= tpValid;
-    end if; 
+    end if;
 end process;
 process (clk,rst_l) begin
     if (rst_l = lo) then
@@ -132,12 +145,12 @@ process (clk,rst_l) begin
         rgbMac3.green <= (others => '0');
         rgbMac3.blue  <= (others => '0');
         rgbMac3.valid <= lo;
-    elsif rising_edge(clk) then 
+    elsif rising_edge(clk) then
         rgbMac3.red   <= tp0(7 downto 0);
         rgbMac3.green <= tp1(7 downto 0);
         rgbMac3.blue  <= tp2(7 downto 0);
         rgbMac3.valid <= tpValid;
-    end if; 
+    end if;
 end process;
 end generate TPDATAWIDTH3_ENABLED;
 -----------------------------------------------------------------------------------------------
@@ -155,7 +168,7 @@ process (clk) begin
         if (kCoProd.kCoeffYcbcr.kSet = kCoefYcbcrIndex) then
             kCoeffYcbcr <= kCoProd.kCoeffYcbcr;
         end if;
-    end if; 
+    end if;
 end process;
 Kernel_Ycbcr_Inst: kernel_core
 generic map(
@@ -180,7 +193,7 @@ port map(
 SyncFramesInst: sync_frames
 generic map (
     pixelDelay   => 6)
-port map(            
+port map(
     clk      => clk,
     reset    => rst_l,
     iRgb     => ycbcrSyn,
@@ -205,7 +218,7 @@ kCoeffCgainP:process (clk) begin
         if (kCoProd.kCoeffCgain.kSet = kCoefCgainIndex) then
             kCofC1gain <= kCoProd.kCoeffCgain;
         end if;
-    end if; 
+    end if;
 end process kCoeffCgainP;
 Kernel1CgainInst: kernel_core
 generic map(
@@ -230,7 +243,7 @@ port map(
 SyncFramesInst: sync_frames
 generic map (
     pixelDelay   => 6)
-port map(            
+port map(
     clk      => clk,
     reset    => rst_l,
     iRgb     => cgain1Syn,
@@ -267,7 +280,7 @@ port map(
 SyncFramesInst: sync_frames
 generic map (
     pixelDelay   => 6)
-port map(            
+port map(
     clk      => clk,
     reset    => rst_l,
     iRgb     => cgain2Syn,
@@ -290,7 +303,7 @@ process (clk) begin
         if (kCoProd.kCoeffSharp.kSet = kCoefSharpIndex) then
             kCoeffSharp <= kCoProd.kCoeffSharp;
         end if;
-    end if; 
+    end if;
 end process;
 Kernel_Sharp_Red_Inst: kernel_core
 generic map(
@@ -361,7 +374,7 @@ process (clk) begin
         if (kCoProd.kCoeffBlure.kSet = kCoefBlureIndex) then
             kCoeffBlure <= kCoProd.kCoeffBlure;
         end if;
-    end if; 
+    end if;
 end process;
 Kernel_Blur_Red_Inst: kernel_core
 generic map(
@@ -432,7 +445,7 @@ process (clk) begin
         if (kCoProd.kCoeffEmbos.kSet = kCoefEmbosIndex) then
             kCoeffEmbos <= kCoProd.kCoeffEmbos;
         end if;
-    end if; 
+    end if;
 end process;
 Kernel_Blur_Red_Inst: kernel_core
 generic map(
@@ -542,14 +555,14 @@ process (clk) begin
         if (kCoProd.kCoefXSobel.kSet = kCoefSobeXIndex) then
             kCoefXSobel <= kCoProd.kCoefXSobel;
         end if;
-    end if; 
+    end if;
 end process;
 process (clk) begin
     if (rising_edge (clk)) then
         if (kCoProd.kCoefYSobel.kSet = kCoefSobeYIndex) then
             kCoefYSobel <= kCoProd.kCoefYSobel;
         end if;
-    end if; 
+    end if;
 end process;
 KernelSobelXInst: kernel_core
 generic map(
@@ -645,7 +658,7 @@ begin
 hsvInst: hsv_c
 generic map(
     i_data_width       => i_data_width)
-port map(   
+port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
@@ -666,7 +679,7 @@ begin
 hslInst: hsl_c
 generic map(
     i_data_width       => i_data_width)
-port map(   
+port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
@@ -686,7 +699,7 @@ begin
 ColorTrimInst: color_trim
 generic map(
     i_data_width       => i_data_width)
-port map(   
+port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
@@ -700,7 +713,7 @@ end generate RGBTRIM_FRAME_ENABLE;
 RGBLUMP_FRAME_ENABLE: if (RGBLP_FRAME = true) generate
 begin
 SegmentColorsInst: segment_colors
-port map(   
+port map(
     clk                => clk,
     reset              => rst_l,
     lumThreshold       => lumThreshold,

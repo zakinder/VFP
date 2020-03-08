@@ -1,10 +1,22 @@
---05062019 [05-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : coef_mult.vhd
+-- Create Date : 05062019 [05-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity coef_mult is
 port (
     clk            : in std_logic;
@@ -17,7 +29,7 @@ architecture behavioral of coef_mult is
     constant rgbLevelValue  : std_logic_vector(31 downto 0):= x"43800000";--256
     constant FloatMaxLat    : integer   := 20;
     type kCoefSt is (kCoefCgainState,kCoefSharpState,kCoefBlureState,kCoefYcbcrState,kCoefXSobeState,kCoefYSobeState,kCoefEmbosState,kCoefUpdaterState);
-    signal kCoefStates      : kCoefSt; 
+    signal kCoefStates      : kCoefSt;
     signal kCoefVals        : kCoefFilters;
     signal kCoeffDWord      : kernelCoeDWord;
     signal kCofFrtProd      : kernelCoeDWord;
@@ -106,7 +118,7 @@ begin
         kCoefVals.kCoef1Cgain.k8   <= x"FF06";-- -250   = -0.250
         kCoefVals.kCoef1Cgain.k9   <= x"055F";--  1375  =  1.375
         kCoefVals.kCoef1Cgain.kSet <= kCoefCgai1Index;
-        
+
 FloatMaxLatP: process(clk) begin
     if (rising_edge (clk)) then
         if (rst_l = lo) then
@@ -126,7 +138,7 @@ kCoefStP: process (clk) begin
             kCoefStates <= kCoefYcbcrState;
         else
         case (kCoefStates) is
-        when kCoefYcbcrState =>	
+        when kCoefYcbcrState =>
                 kCof <= kCoefVals.kCoeffYcbcr;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoeffYcbcr <= kCofFrtProd;
@@ -154,21 +166,21 @@ kCoefStP: process (clk) begin
                 oCoeffProd.kCoeffBlure.kSet <= kCoefVals.kCoeffBlure.kSet;
                 kCoefStates <= kCoefXSobeState;
             end if;
-        when kCoefXSobeState =>	
+        when kCoefXSobeState =>
             kCof <= kCoefVals.kCoefXSobel;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoefXSobel <= kCofFrtProd;
                 oCoeffProd.kCoefXSobel.kSet <= kCoefVals.kCoefXSobel.kSet;
                 kCoefStates <= kCoefYSobeState;
             end if;
-        when kCoefYSobeState =>	
+        when kCoefYSobeState =>
             kCof <= kCoefVals.kCoefYSobel;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoefYSobel <= kCofFrtProd;
                 oCoeffProd.kCoefYSobel.kSet <= kCoefVals.kCoefYSobel.kSet;
                 kCoefStates <= kCoefEmbosState;
             end if;
-        when kCoefEmbosState =>	
+        when kCoefEmbosState =>
             kCof <= kCoefVals.kCoeffEmbos;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoeffEmbos <= kCofFrtProd;
@@ -367,5 +379,5 @@ FloatMultiplyTopK9Inst: FloatMultiplyTop
       clk        => clk,
       iAdata     => kCoeffDWord.k9,
       iBdata     => fractLevel,
-      oRdata     => kCofFrtProd.k9); 
+      oRdata     => kCofFrtProd.k9);
 end behavioral;

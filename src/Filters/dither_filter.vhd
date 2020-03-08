@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : dither_filter.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
-use ieee.std_logic_1164.all; 
+use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity dither_filter  is
 generic(
     img_width         : integer := 512;
@@ -55,7 +68,7 @@ image_process:process (clk)
     --
     -------------------------------------------------
     for c in 1 to 3 loop
-        if (intermediate_color(c)(8) = hi) then 
+        if (intermediate_color(c)(8) = hi) then
             intermediate_color(c) := lo & to_unsigned((2**color_width) - 1, color_width);
         end if;
         dither_buffer_next(c)      <= "0" & intermediate_color(c)(dither_bits-1 downto 1);

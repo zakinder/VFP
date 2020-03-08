@@ -1,9 +1,22 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : pixel_on_display.vhd
+-- Create Date : 01162019 [01-16-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity pixel_on_display is
 generic(
     img_width_bmp    : integer := 1920;
@@ -30,7 +43,7 @@ architecture Behavioral of pixel_on_display is
     signal bit_position_enable   : std_logic := lo;
     signal bit_position_sync     : std_logic := lo;
     signal bit_position          : natural range 0 to (FONT_WIDTH-1) := 0;
-    
+
 begin
 
 vChannelSelect    <= to_integer(unsigned(videoChannel));
@@ -87,7 +100,7 @@ port map(
     clk     => clk,
     addr    => fontAddress,
     fontRow => charBitInRow);
-    
+
 pixelOn: process(clk)
     variable inXRange: boolean := false;
     variable inYRange: boolean := false;
@@ -105,7 +118,7 @@ begin
         if inXRange and inYRange then
             if charBitInRow((FONT_WIDTH-1)- bit_position) = hi then
                 pixel <= hi;
-            end if;                    
+            end if;
         end if;
     end if;
 end process;

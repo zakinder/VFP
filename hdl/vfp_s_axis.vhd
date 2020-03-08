@@ -1,12 +1,23 @@
---05012019 [05-01-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : vfp_s_axis.vhd
+-- Create Date : 05012019 [05-01-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation axi4 components.
+--
+-------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-entity vfp_s_axis is 
+
+entity vfp_s_axis is
 generic (
     i_data_width             : integer := 8;
     b_data_width             : integer := 32;
@@ -37,7 +48,9 @@ port (
     rgb_s_axis_tlast         : in std_logic;
     rgb_s_axis_tdata         : in std_logic_vector(s_data_width-1 downto 0));
 end vfp_s_axis;
+
 architecture arch_imp of vfp_s_axis is
+
     signal configReg4R       : std_logic_vector(b_data_width-1 downto 0):= (others => lo);
     signal axis_sof          : std_logic;
     signal mpeg42XCR         : std_logic_vector(i_data_width-1 downto 0);
@@ -50,11 +63,12 @@ architecture arch_imp of vfp_s_axis is
 	signal pEofs1            : std_logic :=lo;
     signal tx_axis_tdata     : std_logic_vector(s_data_width-1 downto 0);
     type video_io_state is (VIDEO_SET_RESET,VIDEO_SOF_OFF,VIDEO_SOF_ON,VIDEO_END_OF_LINE);
-    signal VIDEO_STATES      : video_io_state; 
+    signal VIDEO_STATES      : video_io_state;
     signal nrowdist          : natural range 0 to 4096 := 0;
 
 begin
 
+-- generate the toggle signal to convert from ycbcr 444 to 422(green/red,blue/red)
 process (m_axis_mm2s_aclk) begin
     if rising_edge(m_axis_mm2s_aclk) then
             mpeg42XBR  <= not(mpeg42XBR) and iStreamData.ycbcr.valid;
@@ -62,6 +76,7 @@ process (m_axis_mm2s_aclk) begin
     end if;
 end process;
 
+-- delay the rgb blue pixel to sync it with red channel
 process (m_axis_mm2s_aclk) begin
     if rising_edge(m_axis_mm2s_aclk) then
             mpeg42XCR   <= iStreamData.ycbcr.blue;
@@ -71,7 +86,7 @@ end process;
 
 process (m_axis_mm2s_aclk) begin
     if (rising_edge (m_axis_mm2s_aclk)) then
-    
+
         if (m_axis_mm2s_aresetn = lo) then
             VIDEO_STATES <= VIDEO_SET_RESET;
         else
@@ -80,7 +95,7 @@ process (m_axis_mm2s_aclk) begin
         when VIDEO_SET_RESET =>
             tx_axis_tlast  <= lo;
             tx_axis_tvalid <= lo;
-            tx_axis_tdata  <= (others => lo);    
+            tx_axis_tdata  <= (others => lo);
             axis_sof       <= lo;
             nrowdist       <= zero;
         if (iStreamData.sof = '1') then
@@ -157,17 +172,17 @@ process (m_axis_mm2s_aclk) begin
     end if;
 end process;
 process (m_axis_mm2s_aclk) begin
-    if rising_edge(m_axis_mm2s_aclk) then 
+    if rising_edge(m_axis_mm2s_aclk) then
         if m_axis_mm2s_aresetn = lo then
-                rx_axis_tvalid     <= lo;
-                rx_axis_tuser      <= lo;
-                rx_axis_tlast      <= lo;
-                rx_axis_tdata      <= (others => lo);
-                rgb_m_axis_tvalid  <= lo;
-                rgb_m_axis_tuser   <= lo;
-                rgb_m_axis_tlast   <= lo;
-                rgb_m_axis_tdata   <= (others => lo);
-                tx_axis_tready     <= lo;
+            rx_axis_tvalid     <= lo;
+            rx_axis_tuser      <= lo;
+            rx_axis_tlast      <= lo;
+            rx_axis_tdata      <= (others => lo);
+            rgb_m_axis_tvalid  <= lo;
+            rgb_m_axis_tuser   <= lo;
+            rgb_m_axis_tlast   <= lo;
+            rgb_m_axis_tdata   <= (others => lo);
+            tx_axis_tready     <= lo;
         else
             if (configReg4R = EXTERNAL_AXIS_STREAM)then
                 --external processed(unused) parallel copy of cpuTX delayed

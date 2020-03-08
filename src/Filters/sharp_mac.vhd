@@ -1,10 +1,22 @@
---01162019 [01-16-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : sharp_mac.vhd
+-- Create Date : 01162019 [01-16-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity sharp_mac is
 port (
     clk            : in std_logic;
@@ -12,7 +24,7 @@ port (
     vTap0x         : in std_logic_vector(7 downto 0);
     vTap1x         : in std_logic_vector(7 downto 0);
     vTap2x         : in std_logic_vector(7 downto 0);
-    kls            : in coefficient;    
+    kls            : in coefficient;
     DataO          : out std_logic_vector(7 downto 0));
 end entity;
 architecture arch of sharp_mac is
@@ -72,7 +84,7 @@ end process KUPDATE;
             tpd1.vTap2x    <= (others => '0');
             tpd2.vTap0x    <= (others => '0');
             tpd2.vTap1x    <= (others => '0');
-            tpd2.vTap2x    <= (others => '0'); 
+            tpd2.vTap2x    <= (others => '0');
             tpd3.vTap0x    <= (others => '0');
             tpd3.vTap1x    <= (others => '0');
             tpd3.vTap2x    <= (others => '0');

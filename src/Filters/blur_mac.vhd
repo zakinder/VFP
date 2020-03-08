@@ -1,10 +1,22 @@
---02092019 [02-09-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : blur_mac.vhd
+-- Create Date : 02092019 [02-09-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity blur_mac is
 port (
     clk            : in std_logic;
@@ -47,7 +59,7 @@ begin
         tpd1.vTap2x    <= (others => '0');
         tpd2.vTap0x    <= (others => '0');
         tpd2.vTap1x    <= (others => '0');
-        tpd2.vTap2x    <= (others => '0'); 
+        tpd2.vTap2x    <= (others => '0');
         tpd3.vTap0x    <= (others => '0');
         tpd3.vTap1x    <= (others => '0');
         tpd3.vTap2x    <= (others => '0');

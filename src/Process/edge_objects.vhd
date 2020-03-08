@@ -1,12 +1,25 @@
---04282019 [04-28-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : edge_objects.vhd
+-- Create Date : 04282019 [04-28-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.fixed_pkg.all;
 use work.float_pkg.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity edge_objects is
 generic (
     i_data_width   : integer := 8);
@@ -57,7 +70,7 @@ piplRgbBlurXP : process (clk) begin
     end if;
 end process piplRgbBlurXP;
 rgbMaxP: process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if ((rgb1Int.red >= rgb1Int.green) and (rgb1Int.red >= rgb1Int.blue)) then
             rgbMax <= rgb1Int.red;
         elsif((rgb1Int.green >= rgb1Int.red) and (rgb1Int.green >= rgb1Int.blue))then
@@ -68,7 +81,7 @@ rgbMaxP: process (clk) begin
     end if;
 end process rgbMaxP;
 rgbMinP: process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if ((rgb1Int.red <= rgb1Int.green) and (rgb1Int.red <= rgb1Int.blue)) then
             rgbMin <= rgb1Int.red;
         elsif((rgb1Int.green <= rgb1Int.red) and (rgb1Int.green <= rgb1Int.blue)) then
@@ -79,18 +92,18 @@ rgbMinP: process (clk) begin
     end if;
 end process rgbMinP;
 rgbDeltaP: process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         rgbDelta      <= rgbMax - rgbMin;
     end if;
 end process rgbDeltaP;
 ipRgbMaxUfD1P: process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         maxValue          <= rgbMax;
         minValue          <= rgbMin;
     end if;
 end process ipRgbMaxUfD1P;
 process (clk) begin
-    if rising_edge(clk) then 
+    if rising_edge(clk) then
         if (rgb1Int.red > rgb1Int.green) then
             rgbRInt        <= (rgb1Int.red - rgb1Int.green);
         else
@@ -99,7 +112,7 @@ process (clk) begin
     end if;
 end process;
 hueP: process (clk) begin
-  if rising_edge(clk) then 
+  if rising_edge(clk) then
     if((rgb2Int.red = rgbMax) and (rgb2Int.green > 40 and rgb2Int.green < 150) and (rgb2Int.blue > 40 and rgb2Int.blue< 150)) then
             oRgbRemix.red   <= rgb3b.red;
             oRgbRemix.green <= rgb3b.green;
@@ -107,7 +120,7 @@ hueP: process (clk) begin
     else
             oRgbRemix.red   <= black;
             oRgbRemix.green <= black;
-            oRgbRemix.blue  <= black; 
+            oRgbRemix.blue  <= black;
     end if;
   end if;
 end process hueP;

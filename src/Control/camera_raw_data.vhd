@@ -1,33 +1,38 @@
-----------------------------------------------------------------
---Last Modfied  : 01062019 [01-06-2019]
---Module        : camera_raw_data
---This module read camera input control valids and data signals.
-----------------------------------------------------------------
---camera_raw_data is the first module inside the VFP system which 
---communicate with D5M camera.It receives the data of 12 bits 
---per pixel at each clock cycle from the cmos camera when the 
---frame valid and line valid are asserted high.Pixel clock is 
---used to synchronize 12-bits input idata on the rising edge 
---of the clock.Input valids(ilval and ifval) are used to start 
---loading idata into line data buffer.The d5mLnBuffer line buffer 
---operate on two separate clocks pixclk and m_axis_aclk.It is 
---used to store and synchronize pixel data across clock pixclk 
---and m_axis_aclk domain boundaries.When pLine and pFrame are 
---enabled, the line buffer stores the pWrData at each triggering 
---pixclk clock edge.As long as both valids are active high by 
---the camera, the line buffer stores the pWrData upto maximum 
---supported image width maxImgWidth of plineRam.
---maxImgWidth maximum image width is configured as fixed constant 
---value of img_width which is 3741.calImgWidth Image width values 
---varies which is adjusted by the camera valid signals upto 
---maximum supported value. 
+-------------------------------------------------------------------------------
+--
+-- Filename    : camera_raw_data.vhd
+-- Create Date : 01062019 [01-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This module read camera input control valids and data signals.
+-- camera_raw_data is the first module inside the VFP system which
+-- communicate with D5M camera.It receives the data of 12 bits
+-- per pixel at each clock cycle from the cmos camera when the
+-- frame valid and line valid are asserted high.Pixel clock is
+-- used to synchronize 12-bits input idata on the rising edge
+-- of the clock.Input valids(ilval and ifval) are used to start
+-- loading idata into line data buffer.The d5mLnBuffer line buffer
+-- operate on two separate clocks pixclk and m_axis_aclk.It is
+-- used to store and synchronize pixel data across clock pixclk
+-- and m_axis_aclk domain boundaries.When pLine and pFrame are
+-- enabled, the line buffer stores the pWrData at each triggering
+-- pixclk clock edge.As long as both valids are active high by
+-- the camera, the line buffer stores the pWrData upto maximum
+-- supported image width maxImgWidth of plineRam.
+-- maxImgWidth maximum image width is configured as fixed constant
+-- value of img_width which is 3741.calImgWidth Image width values
+-- varies which is adjusted by the camera valid signals upto
+-- maximum supported value.
 ----------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity camera_raw_data is
 generic (
     img_width         : integer := 8);
@@ -40,6 +45,7 @@ port (
     idata             : in std_logic_vector(11 downto 0);
     oRawData          : out rData);
 end camera_raw_data;
+
 architecture arch_imp of camera_raw_data is
     --PIXCLK SIDE
     signal pLine          : std_logic :=lo;
@@ -62,14 +68,15 @@ architecture arch_imp of camera_raw_data is
     signal pRdData        : std_logic_vector(11 downto 0):= (others => lo);
     signal rLine          : std_logic :=lo;
     type d5mSt is (rLnSt,eolSt,eofSt,sofSt);
-    signal d5mStates      : d5mSt; 
+    signal d5mStates      : d5mSt;
     signal cordx          : integer :=zero;
     signal cordy          : integer :=zero;
 	signal imgWidth       : integer := 3071;
     type pLnRm is array (0 to img_width) of std_logic_vector (11 downto 0);
     signal d5mLnBuffer    : pLnRm := (others => (others => lo));
-    
+
 begin
+
 -----------------------------------------------------------------------------------------
 --pixclk
 -----------------------------------------------------------------------------------------
@@ -92,6 +99,7 @@ d5mDataSyncP: process(pixclk) begin
         d5mLnBuffer(pWrAdr) <= idata;
     end if;
 end process d5mDataSyncP;
+
 -----------------------------------------------------------------------------------------
 cdcSignals: process (m_axis_aclk) begin
     if rising_edge(m_axis_aclk) then
@@ -101,14 +109,17 @@ cdcSignals: process (m_axis_aclk) begin
         iFvalSy2  <= iFvalSy1;
     end if;
 end process cdcSignals;
+
 edgeDetect: process (m_axis_aclk) begin
     if rising_edge(m_axis_aclk) then
         iLvalSy3  <= iLvalSy2;
         iLvalSy4  <= iLvalSy3;
     end if;
 end process edgeDetect;
+
 pSol <= hi when (iLvalSy4 = lo and iLvalSy2 = hi) else lo;--risingEdge Detect
 pEol <= hi when (iLvalSy4 = hi and iLvalSy2 = lo) else lo;--fallingEdge Detect
+
 readLineP: process (m_axis_aclk) begin
     if (rising_edge (m_axis_aclk)) then
         if (m_axis_aresetn = lo) then
@@ -147,7 +158,7 @@ readLineP: process (m_axis_aclk) begin
 			else
                 d5mStates <= eolSt;
             end if;
-        when eofSt =>	
+        when eofSt =>
 			d5mStates <= sofSt;
             pEof      <= hi;
         when others =>
@@ -156,18 +167,20 @@ readLineP: process (m_axis_aclk) begin
         end if;
     end if;
 end process readLineP;
+
 d5mLineRamP: process (m_axis_aclk) begin
     if rising_edge(m_axis_aclk) then
         pRdData <= d5mLnBuffer(cordx);
     end if;
 end process d5mLineRamP;
+
 d5mP: process (m_axis_aclk) begin
     if rising_edge(m_axis_aclk) then
         oRawData.valid  <= rLine;
         oRawData.pEof   <= pEof;
         oRawData.pSof   <= pSof;
-        oRawData.cord.x <= std_logic_vector(to_unsigned(cordx, 16)); 
-        oRawData.cord.y <= std_logic_vector(to_unsigned(cordy, 16)); 
+        oRawData.cord.x <= std_logic_vector(to_unsigned(cordx, 16));
+        oRawData.cord.y <= std_logic_vector(to_unsigned(cordy, 16));
         if (rLine = hi) then
             oRawData.data <= pRdData;
         else
@@ -175,4 +188,5 @@ d5mP: process (m_axis_aclk) begin
         end if;
     end if;
 end process d5mP;
+
 end arch_imp;

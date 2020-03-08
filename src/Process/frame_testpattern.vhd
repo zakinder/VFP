@@ -1,10 +1,22 @@
---01062019 [01-06-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : frame_testpattern.vhd
+-- Create Date : 01062019 [01-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity frame_testpattern is
 generic (
     s_data_width	       : integer := 16);
@@ -37,7 +49,7 @@ tPattenP: Process (clk) begin
                 nrowdist <= rowdist - 480;
             else
                 nrowdist <= 480 - rowdist;
-            end if;	
+            end if;
             if ycounter > 540 then
                 coldist <= ycounter -540;
             else
@@ -106,7 +118,7 @@ bCoP: process(clk) begin
             bCoRed  <= rowdist;
             bCoGre  <= 0;
             bCoBlu  <= 0;
-        elsif(nrowdist = 1) then  
+        elsif(nrowdist = 1) then
             bCoRed  <= 0;
             bCoGre  <= rowdist;
             bCoBlu  <= 0;

@@ -1,10 +1,22 @@
---05022019 [05-02-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : pixel_cord.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity pixel_cord is
 port (
     clk            : in std_logic;
@@ -44,38 +56,38 @@ pixelCordP: process (clk)begin
     if rising_edge(clk) then
         if (iRgb.valid = hi) then
             ------------------------------------
-            if (iPixelEn = hi) then 
+            if (iPixelEn = hi) then
                 ------------------------------------
                 --Left Coordinates
                 ------------------------------------
                 if (iCord.x <= newCord.lft) then
-                    if ( iCord.x >= frameSize.lft) then 
+                    if ( iCord.x >= frameSize.lft) then
                         newCord.lft <= iCord.x - 1;
-                    end if;   
+                    end if;
                 end if;
                 ------------------------------------
                 --Right Coordinates
                 ------------------------------------
                 if (iCord.x >= newCord.rht) then
-                    if ( iCord.x <= frameSize.rht) then 
+                    if ( iCord.x <= frameSize.rht) then
                         newCord.rht <= iCord.x + 1;
-                    end if;   
+                    end if;
                 end if;
                 ------------------------------------
                 --Top Coordinates
                 ------------------------------------
                 if (iCord.y <= newCord.top) then
-                    if ( iCord.y >= frameSize.top) then 
+                    if ( iCord.y >= frameSize.top) then
                         newCord.top <= iCord.y - 1;
-                    end if;   
+                    end if;
                 end if;
                 ------------------------------------
                 --Bottom Coordinates
                 ------------------------------------
                 if (iCord.y >= newCord.bot) then
-                    if ( iCord.y <= frameSize.bot) then 
+                    if ( iCord.y <= frameSize.bot) then
                         newCord.bot <= iCord.y + 1;
-                    end if;   
+                    end if;
                 end if;
             end if;--iPixelEn
             ------------------------------------

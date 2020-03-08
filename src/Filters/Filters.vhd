@@ -1,11 +1,24 @@
+-------------------------------------------------------------------------------
+--
+-- Filename    : filters.vhd
+-- Create Date : 05022019 [05-02-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.fixed_pkg.all;
---use work.float_pkg.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity filters is
 generic (
     F_TES                    : boolean := false;
@@ -41,7 +54,7 @@ port (
     txCord                   : in coord;
     iRgb                     : in channel;
     lumThreshold             : in  std_logic_vector(7 downto 0);
-    iThreshold               : in std_logic_vector(s_data_width-1 downto 0); 
+    iThreshold               : in std_logic_vector(s_data_width-1 downto 0);
     cHsv                     : in std_logic_vector(2 downto 0);
     cYcc                     : in std_logic_vector(2 downto 0);
     iAls                     : in coefficient;
@@ -83,11 +96,11 @@ begin
     lThSelect               <= to_integer(unsigned(lumThreshold));
 ditherFilter1xInst: dither_filter
 generic map (
-    img_width         => img_width,  
-    img_height        => img_height, 
-    color_width       => 8,          
+    img_width         => img_width,
+    img_height        => img_height,
+    color_width       => 8,
     reduced_width     => 6)
-port map (                  
+port map (
     clk               => clk,
     iCord_x           => txCord.x,
     iRgb              => iRgb,
@@ -107,11 +120,11 @@ port map(
     oRgb                => blur1vx);
 ditherFilter2xInst: dither_filter
 generic map (
-    img_width         => img_width,  
-    img_height        => img_height, 
-    color_width       => 8,          
+    img_width         => img_width,
+    img_height        => img_height,
+    color_width       => 8,
     reduced_width     => 6)
-port map (                  
+port map (
     clk               => clk,
     iCord_x           => txCord.x,
     iRgb              => blur1vx,
@@ -131,11 +144,11 @@ port map(
     oRgb                => blur2vx);
 ditherFilter3xInst: dither_filter
 generic map (
-    img_width         => img_width,  
-    img_height        => img_height, 
-    color_width       => 8,          
+    img_width         => img_width,
+    img_height        => img_height,
+    color_width       => 8,
     reduced_width     => 6)
-port map (                  
+port map (
     clk               => clk,
     iCord_x           => txCord.x,
     iRgb              => blur2vx,
@@ -301,11 +314,11 @@ end process YcbcrIoP;
 colorCorrectionInst: color_correction
 generic map(
     i_data_width        => i_data_width)
-port map(           
+port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => cgainIoIn,
-    als                 => iAls,    
+    als                 => iAls,
     oRgb                => cgainIoOut);
 sharpFilterInst: sharp_filter
 generic map(
@@ -313,7 +326,7 @@ generic map(
     img_width           => img_width,
     adwrWidth           => adwrWidth,
     addrWidth           => addrWidth)
-port map(   
+port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => sharpIoIn,
@@ -386,12 +399,12 @@ process (clk,rst_l) begin
         tp2cgain.green <= tp2Green;
         tp2cgain.blue  <= tp2Blue;
         tp2cgain.valid <= tpValid;
-    end if; 
+    end if;
 end process;
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
@@ -404,14 +417,14 @@ begin
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
     i1Rgb       => rgbImageKernel.sobel,
     i2Rgb       => rgbImageKernel.colorTrm,
     oRgb        => fRgb.maskSobelTrm);
-end generate MASK_SOB_TRM_FRAME_ENABLE; 
+end generate MASK_SOB_TRM_FRAME_ENABLE;
 MASK_SOB_HSL_FRAME_ENABLE: if (M_SOB_HSL = true) generate
     signal dSobHsl           : channel;
     constant sobHslPiDelay   : integer := 18;
@@ -427,14 +440,14 @@ port map(
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
     i1Rgb       => rgbImageKernel.sobel,
     i2Rgb       => dSobHsl,
     oRgb        => fRgb.maskSobelHsl);
-end generate MASK_SOB_HSL_FRAME_ENABLE;  
+end generate MASK_SOB_HSL_FRAME_ENABLE;
 MASK_SOB_HSV_FRAME_ENABLE: if (M_SOB_HSV = true) generate
     signal dSobHsv           : channel;
     constant sobHsvPiDelay   : integer := 18;
@@ -450,33 +463,33 @@ port map(
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
     i1Rgb       => rgbImageKernel.sobel,
     i2Rgb       => dSobHsv,
     oRgb        => fRgb.maskSobelHsv);
-end generate MASK_SOB_HSV_FRAME_ENABLE; 
+end generate MASK_SOB_HSV_FRAME_ENABLE;
 MASK_SOB_YCC_FRAME_ENABLE: if (M_SOB_YCC = true) generate
 begin
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
     i1Rgb       => rgbImageKernel.sobel,
     i2Rgb       => YcbcrIoOut,
     oRgb        => fRgb.maskSobelYcc);
-end generate MASK_SOB_YCC_FRAME_ENABLE;   
+end generate MASK_SOB_YCC_FRAME_ENABLE;
 MASK_SOB_SHP_FRAME_ENABLE: if (M_SOB_SHP = true) generate
 begin
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
@@ -517,7 +530,7 @@ process (clk,rst_l) begin
         tp2inrgb.green <= tp2Green;
         tp2inrgb.blue  <= tp2Blue;
         tp2inrgb.valid <= tpValid;
-    end if; 
+    end if;
 end process;
 sobRgbPiDelayInst: sync_frames
 generic map(
@@ -530,7 +543,7 @@ port map(
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
@@ -543,7 +556,7 @@ begin
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
@@ -556,7 +569,7 @@ begin
 FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
-port map(            
+port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
