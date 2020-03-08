@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 use work.tbPackage.all;
-entity imageRead is
+entity image_read is
 generic (
     i_data_width  : integer := 8;
     input_file    : string  := "input_image");
@@ -18,8 +18,8 @@ port (
     oCord         : out coord;
     olm           : out rgbConstraint;
     endOfFrame    : out std_logic);
-end imageRead;
-architecture Behavioral of imageRead is
+end image_read;
+architecture Behavioral of image_read is
     constant readbmp    : string := input_file&".bmp";
     type bit_file is file of bit_vector;
     file read_file      : bit_file open read_mode  is readbmp;

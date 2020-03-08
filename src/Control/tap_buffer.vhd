@@ -2,8 +2,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
+use work.constants_package.all;
+use work.vpf_records.all;
 entity tap_buffer is
 generic (
     img_width    : integer := 4095;

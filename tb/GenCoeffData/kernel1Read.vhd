@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 use work.tbPackage.all;
-entity kernel1Read is
+entity read_kernel1_coefs is
 generic (
     s_data_width  : integer := 16;
     input_file    : string  := "input_image");
@@ -15,8 +15,8 @@ port (
     clk             : in std_logic;
     reset           : in std_logic;
     kSet1Out        : out  coeffData);
-end kernel1Read;
-architecture Behavioral of kernel1Read is
+end read_kernel1_coefs;
+architecture Behavioral of read_kernel1_coefs is
 constant projFold   : string := "Z:/ZEDBOARD/doc";
 constant backSlash  : string := "/";
 file test_vector    : text open read_mode is projFold&backSlash&input_file&".txt";

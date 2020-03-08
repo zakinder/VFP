@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 use work.tbPackage.all;
-entity ReadCoeffFile is
+entity read_kernel2_coefs is
 generic (
     s_data_width  : integer := 16;
     input_file    : string  := "input_image");
@@ -16,8 +16,8 @@ port (
     reset           : in std_logic;
     iCord           : in coord;
     kSet1Out        : out  kernelCoeff);
-end ReadCoeffFile;
-architecture Behavioral of ReadCoeffFile is
+end read_kernel2_coefs;
+architecture Behavioral of read_kernel2_coefs is
 signal Coeffs       : coeffIntegerData;
 constant projFold   : string := "K:/ZEDBOARD/doc/sim/readFiles";
 constant backSlash  : string := "/";

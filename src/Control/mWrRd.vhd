@@ -2,9 +2,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 entity mWrRd is
 generic (
     revision_number  : std_logic_vector(31 downto 0) := x"00000000";

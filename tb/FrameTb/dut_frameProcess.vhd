@@ -3,16 +3,16 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.tbPackage.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 use work.dutPortsPackage.all;
-entity dut_frameProcess is
+entity dut_frame_process is
 port (
     clk            : in std_logic;
     resetn         : in std_logic);
-end dut_frameProcess;
-architecture arch_imp of dut_frameProcess is
+end dut_frame_process;
+architecture arch_imp of dut_frame_process is
     constant FIFO_ADDR_WIDTH : integer := 13;
     signal wrAddress         : std_logic_vector (13 downto 0);
     signal wrAddrsGlCtr      : integer := 0;
@@ -60,7 +60,7 @@ architecture arch_imp of dut_frameProcess is
 begin
 
 
-frameProcessInst: frameProcess
+frameProcessInst: frame_process
 generic map(
     i_data_width         => i_data_width,
     s_data_width         => s_data_width,

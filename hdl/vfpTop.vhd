@@ -1,36 +1,68 @@
---11282019 [11-28-2019]
+-------------------------------------------------------------------------------
+--
+-- Filename    : VFP_v1_0.vhd
+-- Create Date : 05062019 [05-06-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation top level video frame process components.
+--
+-------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 entity VFP_v1_0 is
 generic (
-    revision_number           : std_logic_vector(31 downto 0) := x"11282019";
+    -- System Revision
+    revision_number           : std_logic_vector(31 downto 0) := x"03072020";
+    -- Axi4 Master-Stream Connected to Inner LoopBack
     C_rgb_m_axis_TDATA_WIDTH  : integer := 16;
     C_rgb_m_axis_START_COUNT  : integer := 32;
+    -- Axi4 Slave-Stream Connected to Inner LoopBack
     C_rgb_s_axis_TDATA_WIDTH  : integer := 16;
+    -- Axi4 Master-Stream Connected to VDMA
     C_m_axis_mm2s_TDATA_WIDTH : integer := 16;
     C_m_axis_mm2s_START_COUNT : integer := 32;
+    -- Axi4 Lite
     C_vfpConfig_DATA_WIDTH    : integer := 32;
     C_vfpConfig_ADDR_WIDTH    : integer := 8;
     conf_data_width           : integer := 32;
     conf_addr_width           : integer := 8;
+    -- VFP filters data widths
     i_data_width              : integer := 8;
     s_data_width              : integer := 16;
     b_data_width              : integer := 32;
-    i_precision               : integer := 12;
-    i_full_range              : boolean := FALSE;
-    img_width                 : integer := 4096;
-    dataWidth                 : integer := 12);
+    -- D5m Camera Raw Data Settings
+    d5m_data_width            : integer := 12;
+    d5m_frame_width           : integer := 4096;
+    -- HD Video
+    bmp_width                 : integer := 1920;
+    bmp_height                : integer := 1080;
+    bmp_precision             : integer := 12;
+    -- Set filters
+    F_CGA_FULL_RANGE          : boolean := false;
+    F_TES                     : boolean := true;
+    F_LUM                     : boolean := false;
+    F_TRM                     : boolean := false;
+    F_RGB                     : boolean := true;
+    F_SHP                     : boolean := true;
+    F_BLU                     : boolean := false;
+    F_EMB                     : boolean := false;
+    F_YCC                     : boolean := true;
+    F_SOB                     : boolean := true;
+    F_CGA                     : boolean := true;
+    F_HSV                     : boolean := true;
+    F_HSL                     : boolean := true);
 port (
     -- d5m input
     pixclk                    : in std_logic;
     ifval                     : in std_logic;
     ilval                     : in std_logic;
-    idata                     : in std_logic_vector(dataWidth - 1 downto 0);
-    --tx channel
+    idata                     : in std_logic_vector(d5m_data_width - 1 downto 0);
+    -- tx channel
     rgb_m_axis_aclk           : in std_logic;
     rgb_m_axis_aresetn        : in std_logic;
     rgb_m_axis_tready         : in std_logic;
@@ -38,7 +70,7 @@ port (
     rgb_m_axis_tlast          : out std_logic;
     rgb_m_axis_tuser          : out std_logic;
     rgb_m_axis_tdata          : out std_logic_vector(C_rgb_m_axis_TDATA_WIDTH-1 downto 0);
-    --rx channel
+    -- rx channel
     rgb_s_axis_aclk           : in std_logic;
     rgb_s_axis_aresetn        : in std_logic;
     rgb_s_axis_tready         : out std_logic;
@@ -46,7 +78,7 @@ port (
     rgb_s_axis_tuser          : in std_logic;
     rgb_s_axis_tlast          : in std_logic;
     rgb_s_axis_tdata          : in std_logic_vector(C_rgb_s_axis_TDATA_WIDTH-1 downto 0);
-    --destination channel
+    -- destination channel
     m_axis_mm2s_aclk          : in std_logic;
     m_axis_mm2s_aresetn       : in std_logic;
     m_axis_mm2s_tready        : in std_logic;
@@ -58,7 +90,7 @@ port (
     m_axis_mm2s_tstrb         : out std_logic_vector(2 downto 0);
     m_axis_mm2s_tid           : out std_logic_vector(0 downto 0);
     m_axis_mm2s_tdest         : out std_logic_vector(0 downto 0);
-    --video configuration       
+    -- video configuration
     vfpconfig_aclk            : in std_logic;
     vfpconfig_aresetn         : in std_logic;
     vfpconfig_awaddr          : in std_logic_vector(C_vfpConfig_ADDR_WIDTH-1 downto 0);
@@ -84,16 +116,17 @@ end VFP_v1_0;
 architecture arch_imp of VFP_v1_0 is
     constant adwrWidth        : integer := 16;
     constant addrWidth        : integer := 12;
-    signal aBusSelect         : std_logic_vector(vfpconfig_wdata'range):= (others => '0');
-    signal rgbSet             : rRgb;
-    signal wrRegs             : mRegs;
-    signal rdRegs             : mRegs;
-    signal streamData         : vStreamData;
+    signal end_node_bus       : std_logic_vector(vfpconfig_wdata'range):= (others => '0');
+    signal rgb_set            : rRgb;
+    signal wr_regs            : mRegs;
+    signal rd_regs            : mRegs;
+    signal video_data         : vStreamData;
 begin
-CameraRawToRgbInst: CameraRawToRgb
+-- Convert raw to rgb module
+camera_raw_to_rgb_inst: camera_raw_to_rgb
 generic map(
-    img_width                 => img_width,
-    dataWidth                 => dataWidth,
+    img_width                 => d5m_frame_width,
+    dataWidth                 => d5m_data_width,
     addrWidth                 => addrWidth)
 port map(
     m_axis_mm2s_aclk          => m_axis_mm2s_aclk,
@@ -102,25 +135,41 @@ port map(
     ifval                     => ifval,
     ilval                     => ilval,
     idata                     => idata,
-    oRgbSet                   => rgbSet);
-VideoStreamInst: VideoStream
+    oRgbSet                   => rgb_set);
+-- Filter rgb data module
+video_stream_inst: video_stream
 generic map(
     revision_number           => revision_number,
     i_data_width              => i_data_width,
     s_data_width              => s_data_width,
     b_data_width              => b_data_width,
-    img_width                 => img_width,
+    img_width                 => d5m_frame_width,
     adwrWidth                 => adwrWidth,
-    addrWidth                 => addrWidth)
+    addrWidth                 => addrWidth,
+    bmp_width                 => bmp_width,
+    bmp_height                => bmp_height,
+    F_TES                     => F_TES,
+    F_LUM                     => F_LUM,
+    F_TRM                     => F_TRM,
+    F_RGB                     => F_RGB,
+    F_SHP                     => F_SHP,
+    F_BLU                     => F_BLU,
+    F_EMB                     => F_EMB,
+    F_YCC                     => F_YCC,
+    F_SOB                     => F_SOB,
+    F_CGA                     => F_CGA,
+    F_HSV                     => F_HSV,
+    F_HSL                     => F_HSL)
 port map(
     m_axis_mm2s_aclk          => m_axis_mm2s_aclk,
     m_axis_mm2s_aresetn       => m_axis_mm2s_aresetn,
-    iWrRegs                   => wrRegs,
-    oRdRegs                   => rdRegs,
-    iRgbSet                   => rgbSet,
-    oStreamData               => streamData,
-    oBusSelect                => aBusSelect);
-AxisExternalInst: AxisExternal
+    iWrRegs                   => wr_regs,
+    oRdRegs                   => rd_regs,
+    iRgbSet                   => rgb_set,
+    oStreamData               => video_data,
+    oBusSelect                => end_node_bus);
+-- Transmit filtered video data
+axis_external_inst: axis_external
 generic map(
     revision_number           => revision_number,
     C_rgb_m_axis_TDATA_WIDTH  => C_rgb_m_axis_TDATA_WIDTH,
@@ -134,10 +183,10 @@ generic map(
     s_data_width              => s_data_width,
     b_data_width              => b_data_width)
 port map(
-    iBusSelect                => aBusSelect,
-    iStreamData               => streamData,
-    oWrRegs                   => wrRegs,
-    iRdRegs                   => rdRegs,
+    iBusSelect                => end_node_bus,
+    iStreamData               => video_data,
+    oWrRegs                   => wr_regs,
+    iRdRegs                   => rd_regs,
     --tx channel
     rgb_m_axis_aclk           => rgb_m_axis_aclk,
     rgb_m_axis_aresetn        => rgb_m_axis_aresetn,

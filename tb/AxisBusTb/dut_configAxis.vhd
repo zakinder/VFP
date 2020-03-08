@@ -3,9 +3,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.tbPackage.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-entity dut_configAxis is 
+use work.constants_package.all;
+use work.vpf_records.all;
+entity dut_config_axis is 
 generic (
     aclk_freq                 : real    := 75.00e6;
     C_vfpConfig_DATA_WIDTH    : integer := 32;
@@ -32,8 +32,8 @@ port (
     vfpconfig_rresp           : in std_logic_vector(1 downto 0);
     vfpconfig_rvalid          : in std_logic;
     vfpconfig_rready          : out std_logic);
-end dut_configAxis;
-architecture arch_imp of dut_configAxis is
+end dut_config_axis;
+architecture arch_imp of dut_config_axis is
     -------------------------------------------------------------------------  
     constant configRegister1                      : integer := 0;
     constant configRegister2                      : integer := 4;

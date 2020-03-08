@@ -4,14 +4,14 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_textio.all;
 use std.textio.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 use work.tbPackage.all;
 use work.dutPortsPackage.all;
-entity videoProcess_tb is
-end videoProcess_tb;
-architecture behavioral of videoProcess_tb is
+entity video_process_tb is
+end video_process_tb;
+architecture behavioral of video_process_tb is
     signal resetn                        : std_logic := lo;
     signal clk                           : std_logic;
     signal kCoeff                        : kernelCoeff;
@@ -127,7 +127,7 @@ begin
     end process;
 F_CGA_BRIGHT_FRAME_ENABLE: if (F_CGA_BRIGHT = true) generate
 begin
-kernel1ReadInst: ReadCoeffFile
+kernel1ReadInst: read_kernel2_coefs
 generic map (
     s_data_width    => s_data_width,
     input_file      => "ReadCoeffData")
@@ -139,7 +139,7 @@ port map (
 end generate F_CGA_BRIGHT_FRAME_ENABLE;
 READ_COEFF_DATA_ENABLE: if (F_READ_COEFF_DATA = true) generate
 begin
-kernel1ReadInst: ReadCoeffFile
+kernel1ReadInst: read_kernel2_coefs
 generic map (
     s_data_width    => s_data_width,
     input_file      => "ReadCoeffData")
@@ -157,7 +157,7 @@ FILTERS_TEST_ENABLED: if (DUT_FILTERS_TESTENABLED = true) generate
     signal rgbImageFilters   : frameColors;
 
 begin
-ImageReadInst: imageRead
+ImageReadInst: image_read
 generic map (
     i_data_width          => i_data_width,
     input_file            => readbmp)
@@ -168,7 +168,7 @@ port map (
     oCord                 => txCord,
     endOfFrame            => endOfFrame,
     olm                   => olm);
-FiltersInst: Filters
+FiltersInst: filters
 generic map(
     F_TES                 =>  F_TES,
     F_LUM                 =>  F_LUM,
@@ -236,7 +236,7 @@ port map(
 	
 M_SOB_CGA_TEST_ENABLED : if (M_SOB_CGA = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelCga.valid = hi);
-ImageWriteCgainToshpSBInst: imageWrite
+ImageWriteCgainToshpSBInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -251,7 +251,7 @@ port map (
 end generate M_SOB_CGA_TEST_ENABLED;
 M_SOB_TRM_TEST_ENABLED : if (M_SOB_TRM = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelTrm.valid = hi);
-ImageWriteMaskSobelTrmInst: imageWrite
+ImageWriteMaskSobelTrmInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -266,7 +266,7 @@ port map (
 end generate M_SOB_TRM_TEST_ENABLED;  
 M_SOB_HSL_TEST_ENABLED : if (M_SOB_HSL = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelHsl.valid = hi);
-ImageWriteMaskSobelHslInst: imageWrite
+ImageWriteMaskSobelHslInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -281,7 +281,7 @@ port map (
 end generate M_SOB_HSL_TEST_ENABLED;  
 M_SOB_HSV_TEST_ENABLED : if (M_SOB_HSV = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelHsv.valid = hi);
-ImageWriteMaskSobelHsvInst: imageWrite
+ImageWriteMaskSobelHsvInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -296,7 +296,7 @@ port map (
 end generate M_SOB_HSV_TEST_ENABLED;
 M_SOB_YCC_TEST_ENABLED : if (M_SOB_YCC = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelYcc.valid = hi);
-ImageWriteMaskSobelYccInst: imageWrite
+ImageWriteMaskSobelYccInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -311,7 +311,7 @@ port map (
 end generate M_SOB_YCC_TEST_ENABLED;
 M_SOB_SHP_TEST_ENABLED : if (M_SOB_SHP = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelShp.valid = hi);
-ImageWriteMaskSobelShpInst: imageWrite
+ImageWriteMaskSobelShpInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -326,7 +326,7 @@ port map (
 end generate M_SOB_SHP_TEST_ENABLED;
 M_SOB_RGB_TEST_ENABLED : if (M_SOB_RGB = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelRgb.valid = hi);
-ImageWriteMaskSobelRgbInst: imageWrite
+ImageWriteMaskSobelRgbInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -341,7 +341,7 @@ port map (
 end generate M_SOB_RGB_TEST_ENABLED;
 M_SOB_LUM_TEST_ENABLED : if (M_SOB_LUM = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelLum.valid = hi);
-ImageWriteMaskSobelLumInst: imageWrite
+ImageWriteMaskSobelLumInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -356,7 +356,7 @@ port map (
 end generate M_SOB_LUM_TEST_ENABLED;
 M_SOB_BLU_TEST_ENABLED : if (M_SOB_BLU = true) generate begin
 enableWrite <= hi when (rgbImageFilters.maskSobelBlu.valid = hi);
-ImageWriteMaskSobelBluInst: imageWrite
+ImageWriteMaskSobelBluInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -371,7 +371,7 @@ port map (
 end generate M_SOB_BLU_TEST_ENABLED;
 F_TRM_TEST_ENABLED : if (F_TRM = true) generate begin
 enableWrite <= hi when (rgbImageFilters.colorTrm.valid = hi);
-ImageWriteCgainToshpInst: imageWrite
+ImageWriteCgainToshpInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -386,7 +386,7 @@ port map (
 end generate F_TRM_TEST_ENABLED;    
 F_LUM_TEST_ENABLED : if (F_LUM = true) generate begin
 enableWrite <= hi when (rgbImageFilters.colorLmp.valid = hi);  
-ImageWriteCgainToshpInst: imageWrite
+ImageWriteCgainToshpInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -401,7 +401,7 @@ port map (
 end generate F_LUM_TEST_ENABLED;
 F_CGA_TO_SHP_TEST_ENABLED : if (F_CGA_TO_SHP = true) generate begin
 enableWrite <= hi when (rgbImageFilters.cgainToShp.valid = hi);
-ImageWriteCgainToshpInst: imageWrite
+ImageWriteCgainToshpInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -416,7 +416,7 @@ port map (
 end generate F_CGA_TO_SHP_TEST_ENABLED;
 F_CGA_TO_BLU_TEST_ENABLED : if (F_CGA_TO_BLU = true) generate begin
 enableWrite <= hi when (rgbImageFilters.cgainToBlu.valid = hi); 
-ImageWritcgainTobluInst: imageWrite
+ImageWritcgainTobluInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -431,7 +431,7 @@ port map (
 end generate F_CGA_TO_BLU_TEST_ENABLED;
 F_CGA_TO_YCC_TEST_ENABLED : if (F_CGA_TO_YCC = true) generate begin
 enableWrite <= hi when (rgbImageFilters.cgainToYcbcr.valid = hi); 
-ImageWritaetextRGBInst: imageWrite
+ImageWritaetextRGBInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -446,7 +446,7 @@ port map (
 end generate F_CGA_TO_YCC_TEST_ENABLED;
 F_CGA_TO_HSV_TEST_ENABLED : if (F_CGA_TO_HSV = true) generate begin
 enableWrite <= hi when (rgbImageFilters.cgainToHsv.valid = hi); 
-ImageWriteCgainInst: imageWrite
+ImageWriteCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -461,7 +461,7 @@ port map (
 end generate F_CGA_TO_HSV_TEST_ENABLED;
 F_CGA_TO_HSL_TEST_ENABLED : if (F_CGA_TO_HSL = true) generate begin
 enableWrite <= hi when (rgbImageFilters.cgainToHsl.valid = hi);  
-ImageWriteCgainToHslInst: imageWrite
+ImageWriteCgainToHslInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -476,7 +476,7 @@ port map (
 end generate F_CGA_TO_HSL_TEST_ENABLED;
 F_CGA_TO_CGA_TEST_ENABLED : if (F_CGA_TO_CGA = true) generate begin
 enableWrite <= hi when (rgbImageFilters.cgainToCgain.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -491,7 +491,7 @@ port map (
 end generate F_CGA_TO_CGA_TEST_ENABLED;
 F_SOB_TEST_ENABLED : if (F_SOB = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.sobel.valid = hi); 
-ImageWriteSobelInst: imageWrite
+ImageWriteSobelInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -506,7 +506,7 @@ port map (
 end generate F_SOB_TEST_ENABLED;
 F_TES_TEST_ENABLED : if (F_TES = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.tPattern.valid = hi);
-ImageWritetPatternInst: imageWrite
+ImageWritetPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -521,7 +521,7 @@ port map (
 end generate F_TES_TEST_ENABLED;
 F_RGB_TEST_ENABLED : if (F_RGB = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.inrgb.valid = hi);
-ImageWritesharptPatternInst: imageWrite
+ImageWritesharptPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -536,7 +536,7 @@ port map (
 end generate F_RGB_TEST_ENABLED;
 F_SHP_TEST_ENABLED : if (F_SHP = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.sharp.valid = hi);
-ImageWritesharptPatternInst: imageWrite
+ImageWritesharptPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -551,7 +551,7 @@ port map (
 end generate F_SHP_TEST_ENABLED;
 F_HSV_TEST_ENABLED : if (F_HSV = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.hsv.valid = hi);
-ImageWritehsvInst: imageWrite
+ImageWritehsvInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -566,7 +566,7 @@ port map (
 end generate F_HSV_TEST_ENABLED;
 F_HSL_TEST_ENABLED : if (F_HSL = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.hsl.valid = hi);
-ImageWritehsltPatternInst: imageWrite
+ImageWritehsltPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -581,7 +581,7 @@ port map (
 end generate F_HSL_TEST_ENABLED;
 F_EMB_TEST_ENABLED : if (F_EMB = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.embos.valid = hi);
-ImageWriteembostPatternInst: imageWrite
+ImageWriteembostPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -596,7 +596,7 @@ port map (
 end generate F_EMB_TEST_ENABLED;
 F_BLU_TEST_ENABLED : if (F_BLU = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.blur.valid = hi);
-ImageWriteblurtPatternInst: imageWrite
+ImageWriteblurtPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -611,7 +611,7 @@ port map (
 end generate F_BLU_TEST_ENABLED;
 F_CGA_TEST_ENABLED : if (F_CGA = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.cgain.valid = hi);
-ImageWritecgaintPatternInst: imageWrite
+ImageWritecgaintPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -626,7 +626,7 @@ port map (
 end generate F_CGA_TEST_ENABLED;
 F_YCC_TEST_ENABLED : if (F_YCC = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.ycbcr.valid = hi);
-ImageWriteycbcrtPatternInst: imageWrite
+ImageWriteycbcrtPatternInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -641,7 +641,7 @@ port map (
 end generate F_YCC_TEST_ENABLED;
 F_SHP_TO_SHP_TEST_ENABLED : if (F_SHP_TO_SHP = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.shpToShp.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -656,7 +656,7 @@ port map (
 end generate F_SHP_TO_SHP_TEST_ENABLED;
 F_SHP_TO_HSL_TEST_ENABLED : if (F_SHP_TO_HSL = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.shpToHsl.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -671,7 +671,7 @@ port map (
 end generate F_SHP_TO_HSL_TEST_ENABLED;
 F_SHP_TO_HSV_TEST_ENABLED : if (F_SHP_TO_HSV = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.shpToHsv.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -686,7 +686,7 @@ port map (
 end generate F_SHP_TO_HSV_TEST_ENABLED;
 F_SHP_TO_YCC_TEST_ENABLED : if (F_SHP_TO_YCC = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.shpToYcbcr.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -701,7 +701,7 @@ port map (
 end generate F_SHP_TO_YCC_TEST_ENABLED;
 F_SHP_TO_CGA_TEST_ENABLED : if (F_SHP_TO_CGA = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.shpToCgain.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -716,7 +716,7 @@ port map (
 end generate F_SHP_TO_CGA_TEST_ENABLED;
 F_SHP_TO_BLU_TEST_ENABLED : if (F_SHP_TO_BLU = true) generate begin 
 enableWrite <= hi when (rgbImageFilters.shpToBlu.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -731,7 +731,7 @@ port map (
 end generate F_SHP_TO_BLU_TEST_ENABLED;
 F_BLU_TO_BLU_TEST_ENABLED : if (F_BLU_TO_BLU = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.bluToBlu.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -746,7 +746,7 @@ port map (
 end generate F_BLU_TO_BLU_TEST_ENABLED;
 F_BLU_TO_HSL_TEST_ENABLED : if (F_BLU_TO_HSL = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.bluToHsl.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -761,7 +761,7 @@ port map (
 end generate F_BLU_TO_HSL_TEST_ENABLED;
 F_BLU_TO_HSV_TEST_ENABLED : if (F_BLU_TO_HSV = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.bluToHsv.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -776,7 +776,7 @@ port map (
 end generate F_BLU_TO_HSV_TEST_ENABLED;
 F_BLU_TO_YCC_TEST_ENABLED : if (F_BLU_TO_YCC = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.bluToYcc.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -791,7 +791,7 @@ port map (
 end generate F_BLU_TO_YCC_TEST_ENABLED;
 F_BLU_TO_CGA_TEST_ENABLED : if (F_BLU_TO_CGA = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.bluToCga.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -806,7 +806,7 @@ port map (
 end generate F_BLU_TO_CGA_TEST_ENABLED;
 F_BLU_TO_SHP_TEST_ENABLED : if (F_BLU_TO_SHP = true) generate begin  
 enableWrite <= hi when (rgbImageFilters.bluToShp.valid = hi);
-ImageWriteCgainToCgainInst: imageWrite
+ImageWriteCgainToCgainInst: image_write
 generic map (
     enImageText           => false,
     enImageIndex          => false,
@@ -821,7 +821,7 @@ port map (
 end generate F_BLU_TO_SHP_TEST_ENABLED;
 end generate FILTERS_TEST_ENABLED;
 FRAMEPROCESS_ENABLED : if (DUT_FRAMEPROCESS_ENABLED = true) generate
-frameProcess_test : dut_frameProcess
+frameProcess_test : dut_frame_process
 port map(
     clk          => clk,
     resetn       => resetn);
@@ -913,7 +913,7 @@ port map(
     ifval                       => ifval,
     ilval                       => ilval,
     idata                       => idata);
-dut_configAxis_inst : dut_configAxis
+dut_configAxis_inst : dut_config_axis
 generic map(
     aclk_freq                   => aclk_freq,
     C_vfpConfig_DATA_WIDTH      => C_vfpConfig_DATA_WIDTH,

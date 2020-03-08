@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
 use work.tbPackage.all;
-entity imageReadWrite is
+entity image_wr_interface is
   generic (
     i_data_width  : integer := 8;
     test          : string  := "test1"; 
@@ -33,8 +33,8 @@ entity imageReadWrite is
     address       : out std_logic_vector(15 downto 0);
     endOfFrame    : out std_logic;
     oValid        : out std_logic);
-end imageReadWrite;
-architecture Behavioral of imageReadWrite is
+end image_wr_interface;
+architecture Behavioral of image_wr_interface is
 
     -------------------------------------------------------------------------
 	

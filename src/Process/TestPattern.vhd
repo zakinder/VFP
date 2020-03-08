@@ -2,18 +2,18 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
-entity TestPattern is
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
+entity testpattern is
 port (
     clk                   : in std_logic;
     iValid                : in std_logic;
     iCord                 : in coord;
     tpSelect              : in integer;
     oRgb                  : out channel);
-end TestPattern;
-architecture arch_imp of TestPattern is
+end testpattern;
+architecture arch_imp of testpattern is
 signal fTestPattern        : blurchannel;
 signal rTestPattern        : channel;
 signal rgbCo               : channel;
@@ -21,7 +21,7 @@ signal rgbRed              : channel;
 signal rgbGre              : channel;
 signal rgbBlu              : channel;
 begin
-FrameTestPatternInst: FrameTestPattern
+FrameTestPatternInst: frame_testpattern
 generic map(
     s_data_width => 16)
 port map(   

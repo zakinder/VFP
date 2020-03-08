@@ -3,8 +3,8 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
+use work.constants_package.all;
+use work.vpf_records.all;
 package dutPortsPackage is
 component VFP_v1_0 is
 generic (
@@ -94,7 +94,7 @@ port (
     ilval                       : out std_logic;
     idata                       : out std_logic_vector(dataWidth - 1 downto 0));
 end component dut_d5m;
-component dut_configAxis is
+component dut_config_axis is
 generic (
     aclk_freq                   : real    := 75.00e6;
     C_vfpConfig_DATA_WIDTH      : integer := 32;
@@ -121,13 +121,13 @@ port (
     vfpconfig_rresp             : in std_logic_vector(1 downto 0);
     vfpconfig_rvalid            : in std_logic;
     vfpconfig_rready            : out std_logic);
-end component dut_configAxis;
-component dut_frameProcess is
+end component dut_config_axis;
+component dut_frame_process is
 port (
     clk                         : in std_logic;
     resetn                      : in std_logic);
-end component dut_frameProcess;
-component imageRead is
+end component dut_frame_process;
+component image_read is
 generic (
     i_data_width                : integer := 8;
     input_file                  : string  := "input_image");
@@ -138,8 +138,8 @@ port (
     oCord         : out coord;
     olm           : out rgbConstraint;
     endOfFrame    : out std_logic);
-end component imageRead;
-component imageWrite is
+end component image_read;
+component image_write is
 generic (
     enImageText                 : boolean := false;
     enImageIndex                : boolean := false;
@@ -151,8 +151,8 @@ port (
     pixclk                      : in  std_logic;
     enableWrite                 : in  std_logic;
     iRgb                        : in channel);
-end component imageWrite;
-component kernel1Read is
+end component image_write;
+component read_kernel1_coefs is
 generic (
     s_data_width    : integer := 16;
     input_file      : string  := "input_image");
@@ -160,5 +160,5 @@ port (
     clk             : in std_logic;
     reset           : in std_logic;
     kSet1Out        : out  coeffData);
-end component kernel1Read;
+end component read_kernel1_coefs;
 end package;

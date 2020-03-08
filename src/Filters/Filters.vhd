@@ -3,10 +3,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.fixed_pkg.all;
 --use work.float_pkg.all;
-use work.constantspackage.all;
-use work.vpfrecords.all;
-use work.portspackage.all;
-entity Filters is
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
+entity filters is
 generic (
     F_TES                    : boolean := false;
     F_LUM                    : boolean := false;
@@ -49,8 +49,8 @@ port (
     iVideoChannel            : in std_logic_vector(b_data_width-1 downto 0);
     edgeValid                : out std_logic;
     oRgb                     : out frameColors);
-end Filters;
-architecture Behavioral of Filters is
+end filters;
+architecture Behavioral of filters is
     signal rgbImageKernel      : colors;
     constant init_channel      : channel := (valid => lo, red => black, green => black, blue => black);
     signal fRgb                : frameColors;
@@ -81,7 +81,7 @@ begin
     oRgb                    <= fRgb;
     vChannelSelect          <= to_integer(unsigned(iVideoChannel));
     lThSelect               <= to_integer(unsigned(lumThreshold));
-ditherFilter1xInst: ditherFilter
+ditherFilter1xInst: dither_filter
 generic map (
     img_width         => img_width,  
     img_height        => img_height, 
@@ -92,7 +92,7 @@ port map (
     iCord_x           => txCord.x,
     iRgb              => iRgb,
     oRgb              => ditRgb1vx);
-blurFilter1xInst: blurFilter
+blurFilter1xInst: blur_filter
 generic map(
     iMSB                => blurMsb,
     iLSB                => blurLsb,
@@ -105,7 +105,7 @@ port map(
     rst_l               => rst_l,
     iRgb                => ditRgb1vx,
     oRgb                => blur1vx);
-ditherFilter2xInst: ditherFilter
+ditherFilter2xInst: dither_filter
 generic map (
     img_width         => img_width,  
     img_height        => img_height, 
@@ -116,7 +116,7 @@ port map (
     iCord_x           => txCord.x,
     iRgb              => blur1vx,
     oRgb              => ditRgb2vx);
-blurFilter2xInst: blurFilter
+blurFilter2xInst: blur_filter
 generic map(
     iMSB                => blurMsb - 1,
     iLSB                => blurLsb - 1,
@@ -129,7 +129,7 @@ port map(
     rst_l               => rst_l,
     iRgb                => ditRgb2vx,
     oRgb                => blur2vx);
-ditherFilter3xInst: ditherFilter
+ditherFilter3xInst: dither_filter
 generic map (
     img_width         => img_width,  
     img_height        => img_height, 
@@ -140,7 +140,7 @@ port map (
     iCord_x           => txCord.x,
     iRgb              => blur2vx,
     oRgb              => ditRgb3vx);
-blurFilter3xInst: blurFilter
+blurFilter3xInst: blur_filter
 generic map(
     iMSB                => blurMsb - 1,
     iLSB                => blurLsb - 1,
@@ -162,7 +162,7 @@ lThSelectP: process (clk) begin
         end if;
     end if;
 end process lThSelectP;
-ImageKernelInst: Kernel
+ImageKernelInst: kernel
 generic map(
     INRGB_FRAME         => F_RGB,
     RGBLP_FRAME         => F_LUM,
@@ -190,7 +190,7 @@ port map(
     iKcoeff             => iKcoeff,
     oEdgeValid          => sEdgeValid,
     oRgb                => rgbImageKernel);
-blurFilter0xInst: blurFilter
+blurFilter0xInst: blur_filter
 generic map(
     iMSB                => blurMsb,
     iLSB                => blurLsb,
@@ -205,16 +205,16 @@ port map(
     oRgb                => rgbImageKernel_blur);
 CgainIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = 27) then
+        if (vChannelSelect = FILTER_SHP_TO_CGA) then
             cgainIoIn           <= rgbImageKernel.sharp;--SharpToCgain
             fRgb2.cgain         <= cgainIoOut;
-        elsif(vChannelSelect = 22)then
+        elsif(vChannelSelect = FILTER_CGA_TO_HSL)then
             cgainIoIn           <= rgbImageKernel.hsl;  --CgainToHsl  ,HslToCgain
             fRgb1.hsl           <= cgainIoOut;
-        elsif(vChannelSelect = 23)then
+        elsif(vChannelSelect = FILTER_CGA_TO_HSV)then
             cgainIoIn           <= rgbImageKernel.hsv;  --CgainToHsv  ,HsvToCgain
             fRgb1.hsv           <= cgainIoOut;
-        elsif(vChannelSelect = 34)then
+        elsif(vChannelSelect = FILTER_BLU_TO_CGA)then
             cgainIoIn           <= rgbImageKernel_blur; --BlurToCgain
             fRgb3.cgain         <= cgainIoOut;
         else
@@ -225,16 +225,16 @@ CgainIoP: process (clk) begin
 end process CgainIoP;
 SharpIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = 25) then
+        if (vChannelSelect = FILTER_CGA_TO_SHP) then
             sharpIoIn           <= rgbImageKernel.cgain;--CgainToSharp
             fRgb1.sharp         <= sharpIoOut;
-        elsif(vChannelSelect = 28)then
+        elsif(vChannelSelect = FILTER_SHP_TO_HSL)then
             sharpIoIn           <= rgbImageKernel.hsl;  --SharpToHsl  ,HslToSharp
             fRgb2.hsl           <= sharpIoOut;
-        elsif(vChannelSelect = 29)then
+        elsif(vChannelSelect = FILTER_SHP_TO_HSV)then
             sharpIoIn           <= rgbImageKernel.hsv;  --SharpToHsv  ,HsvToSharp
             fRgb2.hsv           <= sharpIoOut;
-        elsif(vChannelSelect = 35)then
+        elsif(vChannelSelect = FILTER_BLU_TO_SHP)then
             sharpIoIn           <= rgbImageKernel_blur; --BlurToSharp
             fRgb3.sharp         <= sharpIoOut;
         else
@@ -245,19 +245,19 @@ SharpIoP: process (clk) begin
 end process SharpIoP;
 BlurIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = 26) then
+        if (vChannelSelect = FILTER_CGA_TO_BLU) then
             blurIoIn            <= rgbImageKernel.cgain; --CgainToBlur
             fRgb1.blur          <= blurIoOut;
-        elsif(vChannelSelect = 32)then
+        elsif(vChannelSelect = FILTER_SHP_TO_BLU)then
             blurIoIn            <= rgbImageKernel.sharp; --SharpToBlur
             fRgb2.blur          <= blurIoOut;
-        elsif(vChannelSelect = 33)then
+        elsif(vChannelSelect = FILTER_BLU_TO_BLU)then
             blurIoIn            <= rgbImageKernel_blur;   --BlurToHsl   ,HslToBlur
             fRgb3.blur          <= blurIoOut;
-        elsif(vChannelSelect = 37)then
+        elsif(vChannelSelect = FILTER_BLU_TO_HSV)then
             blurIoIn            <= rgbImageKernel.hsv;   --BlurToHsv   ,HsvToBlur
             fRgb3.hsv           <= blurIoOut;
-        elsif(vChannelSelect = 38)then
+        elsif(vChannelSelect = FILTER_BLU_TO_HSL)then
             blurIoIn            <= rgbImageKernel.hsl;   --BlurToHsl   ,HslToBlur
             fRgb3.hsl           <= blurIoOut;
         else
@@ -268,10 +268,10 @@ BlurIoP: process (clk) begin
 end process BlurIoP;
 YcbcrIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = 24) then
+        if (vChannelSelect = FILTER_CGA_TO_YCC) then
             YcbcrIoIn           <= rgbImageKernel.cgain; --CgainToYcbcr
             fRgb1.ycbcr         <= YcbcrIoOut;
-        elsif(vChannelSelect = 36)then
+        elsif(vChannelSelect = FILTER_BLU_TO_YCC)then
             YcbcrIoIn           <= rgbImageKernel_blur;  --BlurToYcbcr
             fRgb3.ycbcr         <= YcbcrIoOut;
         else
@@ -298,7 +298,7 @@ end process YcbcrIoP;
     fRgb.shpToHsv       <= fRgb2.hsv;  --SharpToHsv  ,HsvToSharp
     fRgb.bluToHsl       <= fRgb3.hsl;  --BlurToHsl   ,HslToBlur
     fRgb.bluToHsv       <= fRgb3.hsv;  --BlurToHsv   ,HsvToBlur
-colorCorrectionInst: colorCorrection
+colorCorrectionInst: color_correction
 generic map(
     i_data_width        => i_data_width)
 port map(           
@@ -307,7 +307,7 @@ port map(
     iRgb                => cgainIoIn,
     als                 => iAls,    
     oRgb                => cgainIoOut);
-sharpFilterInst: sharpFilter
+sharpFilterInst: sharp_filter
 generic map(
     i_data_width        => i_data_width,
     img_width           => img_width,
@@ -319,7 +319,7 @@ port map(
     iRgb                => sharpIoIn,
     kls                 => iAls,
     oRgb                => sharpIoOut);
-blurFilterInst: blurFilter
+blurFilterInst: blur_filter
 generic map(
     iMSB                => blurMsb,
     iLSB                => blurLsb,
@@ -347,7 +347,7 @@ port map(
     oValid               => YcbcrIoOut.valid);
 TEST_FRAME_ENABLE: if (F_TES = true) generate
 begin
-TestPatternInst: TestPattern
+TestPatternInst: testpattern
 port map(
     clk           => clk,
     iValid        => iRgb.valid,
@@ -363,7 +363,7 @@ MASK_SOB_CGA_FRAME_ENABLE: if (M_SOB_CGA = true) generate
     alias tp2Blue     : std_logic_vector(7 downto 0) is tp2(7 downto 0);
     signal tpValid    : std_logic  := lo;
 begin
-TapsControllerSobCgaInst: TapsController
+TapsControllerSobCgaInst: taps_controller
 generic map(
     img_width    => img_width,
     tpDataWidth  => 24)
@@ -388,7 +388,7 @@ process (clk,rst_l) begin
         tp2cgain.valid <= tpValid;
     end if; 
 end process;
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -401,7 +401,7 @@ port map(
 end generate MASK_SOB_CGA_FRAME_ENABLE;
 MASK_SOB_TRM_FRAME_ENABLE: if (M_SOB_TRM = true) generate
 begin
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -416,7 +416,7 @@ MASK_SOB_HSL_FRAME_ENABLE: if (M_SOB_HSL = true) generate
     signal dSobHsl           : channel;
     constant sobHslPiDelay   : integer := 18;
 begin
-dSobHsvPiDelayInst: SyncFrames
+dSobHsvPiDelayInst: sync_frames
 generic map(
     pixelDelay => sobHslPiDelay)
 port map(
@@ -424,7 +424,7 @@ port map(
     reset      => rst_l,
     iRgb       => rgbImageKernel.hsl,
     oRgb       => dSobHsl);
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -439,7 +439,7 @@ MASK_SOB_HSV_FRAME_ENABLE: if (M_SOB_HSV = true) generate
     signal dSobHsv           : channel;
     constant sobHsvPiDelay   : integer := 18;
 begin
-dSobHsvPiDelayInst: SyncFrames
+dSobHsvPiDelayInst: sync_frames
 generic map(
     pixelDelay => sobHsvPiDelay)
 port map(
@@ -447,7 +447,7 @@ port map(
     reset      => rst_l,
     iRgb       => rgbImageKernel.hsv,
     oRgb       => dSobHsv);
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -460,7 +460,7 @@ port map(
 end generate MASK_SOB_HSV_FRAME_ENABLE; 
 MASK_SOB_YCC_FRAME_ENABLE: if (M_SOB_YCC = true) generate
 begin
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -473,7 +473,7 @@ port map(
 end generate MASK_SOB_YCC_FRAME_ENABLE;   
 MASK_SOB_SHP_FRAME_ENABLE: if (M_SOB_SHP = true) generate
 begin
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -494,7 +494,7 @@ MASK_SOB_RGB_FRAME_ENABLE: if (M_SOB_RGB = true) generate
     signal tpValid         : std_logic  := lo;
     signal d1Rgb           : channel;
 begin
-TapsControllerSobCgaInst: TapsController
+TapsControllerSobCgaInst: taps_controller
 generic map(
     img_width    => img_width,
     tpDataWidth  => 24)
@@ -519,7 +519,7 @@ process (clk,rst_l) begin
         tp2inrgb.valid <= tpValid;
     end if; 
 end process;
-sobRgbPiDelayInst: SyncFrames
+sobRgbPiDelayInst: sync_frames
 generic map(
     pixelDelay => sobRgbPiDelay)
 port map(
@@ -527,7 +527,7 @@ port map(
     reset      => rst_l,
     iRgb       => tp2inrgb,
     oRgb       => d1Rgb);
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -540,7 +540,7 @@ port map(
 end generate MASK_SOB_RGB_FRAME_ENABLE;
 MASK_SOB_LUM_FRAME_ENABLE: if (M_SOB_LUM = true) generate
 begin
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            
@@ -553,7 +553,7 @@ port map(
 end generate MASK_SOB_LUM_FRAME_ENABLE;
 MASK_SOB_BLU_FRAME_ENABLE: if (M_SOB_BLU = true) generate
 begin
-FrameMaskInst: FrameMask
+FrameMaskInst: frame_mask
 generic map (
     eBlack       => true)
 port map(            

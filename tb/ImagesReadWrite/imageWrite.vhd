@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
-use work.constantspackage.all;
-use work.vpfRecords.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
 use work.tbPackage.all;
-entity imageWrite is
+entity image_write is
 generic (
     enImageText   : boolean := false;
     enImageIndex  : boolean := false;
@@ -19,11 +19,10 @@ port (
     pixclk        : in  std_logic;
     enableWrite   : in  std_logic;
     iRgb          : in channel);
-end imageWrite;
-architecture Behavioral of imageWrite is
+end image_write;
+architecture Behavioral of image_write is
     constant outPutPath1a  : string := "K:/ZEDBOARD/doc/sim/w_images";
     constant outPutPath1b  : string := "K:/ZEDBOARD/doc/sim/imagesLogs";
-    constant outPutPath2   : string := "K:/ZEDBOARD/doc/ipManager/ip_user_files/VFP_1.0/tb";
     constant backSlash     : string := "\";
     constant wrBmp         : string := outPutPath1a&backSlash&test&backSlash&output_file&".bmp";
     constant wrBmpLog      : string := outPutPath1a&backSlash&test&backSlash&output_file&".txt";

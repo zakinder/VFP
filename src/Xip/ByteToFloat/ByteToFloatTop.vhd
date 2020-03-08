@@ -1,8 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.portspackage.all;
+use work.constants_package.all;
+use work.ports_package.all;
 entity ByteToFloatTop is
 port (
     aclk           : in std_logic;

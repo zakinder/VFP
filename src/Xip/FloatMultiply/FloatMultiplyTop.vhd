@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.portspackage.all;
+use work.ports_package.all;
 entity FloatMultiplyTop is
 port (
     clk            : in std_logic;

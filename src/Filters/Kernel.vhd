@@ -1,10 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.constantspackage.all;
-use work.vpfrecords.all;
-use work.portspackage.all;
-entity Kernel is
+use work.constants_package.all;
+use work.vpf_records.all;
+use work.ports_package.all;
+entity kernel is
 generic (
     INRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
@@ -32,8 +32,8 @@ port (
     iKcoeff            : in kernelCoeff;
     oEdgeValid         : out std_logic;
     oRgb               : out colors);
-end Kernel;
-architecture Behavioral of Kernel is
+end kernel;
+architecture Behavioral of kernel is
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal rgbMac1         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbMac2         : channel := (valid => lo, red => black, green => black, blue => black);
@@ -43,10 +43,10 @@ architecture Behavioral of Kernel is
 begin
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
---CoefMult
+--coef_mult
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
-CoefMultInst: CoefMult
+CoefMultInst: coef_mult
 port map (
     clk            => clk,
     rst_l          => rst_l,
@@ -79,7 +79,7 @@ process (clk) begin
 end process;
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
---TapsController
+--taps_controller
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 TPDATAWIDTH3_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE) or (EMBOS_FRAME = TRUE)) generate
@@ -88,7 +88,7 @@ TPDATAWIDTH3_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE) or (EMBOS
     signal tp2        : std_logic_vector(23 downto 0) := (others => '0');
     signal tpValid    : std_logic  := lo;
 begin
-TapsControllerInst: TapsController
+TapsControllerInst: taps_controller
 generic map(
     img_width    => img_width,
     tpDataWidth  => 24)
@@ -157,7 +157,7 @@ process (clk) begin
         end if;
     end if; 
 end process;
-Kernel_Ycbcr_Inst: KernelCore
+Kernel_Ycbcr_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -177,7 +177,7 @@ port map(
     ycbcrSyn.blue    <=  ycbcr.blue;
     ycbcrSyn.green   <=  ycbcr.green;
     ycbcrSyn.valid   <=  rgbSyncValid(9);
-SyncFramesInst: SyncFrames
+SyncFramesInst: sync_frames
 generic map (
     pixelDelay   => 6)
 port map(            
@@ -207,7 +207,7 @@ kCoeffCgainP:process (clk) begin
         end if;
     end if; 
 end process kCoeffCgainP;
-Kernel1CgainInst: KernelCore
+Kernel1CgainInst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -227,7 +227,7 @@ port map(
     cgain1Syn.blue  <=  c1gain.blue;
     cgain1Syn.green <=  c1gain.green;
     cgain1Syn.valid <=  rgbSyncValid(9);
-SyncFramesInst: SyncFrames
+SyncFramesInst: sync_frames
 generic map (
     pixelDelay   => 6)
 port map(            
@@ -244,7 +244,7 @@ kCoeffCcgainP:process (clk) begin
         end if;
     end if;
 end process kCoeffCcgainP;
-Kernel2CgainInst: KernelCore
+Kernel2CgainInst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -264,7 +264,7 @@ port map(
     cgain2Syn.blue  <=  c2gain.blue;
     cgain2Syn.green <=  c2gain.green;
     cgain2Syn.valid <=  rgbSyncValid(9);
-SyncFramesInst: SyncFrames
+SyncFramesInst: sync_frames
 generic map (
     pixelDelay   => 6)
 port map(            
@@ -292,7 +292,7 @@ process (clk) begin
         end if;
     end if; 
 end process;
-Kernel_Sharp_Red_Inst: KernelCore
+Kernel_Sharp_Red_Inst: kernel_core
 generic map(
     SHARP_FRAME   => SHARP_FRAME,
     BLURE_FRAME   => false,
@@ -308,7 +308,7 @@ port map(
     iRgb           => rgbMac1,
     kCoeff         => kCoeffSharp,
     oRgb           => oRed);
-Kernel_Sharp_Green_Inst: KernelCore
+Kernel_Sharp_Green_Inst: kernel_core
 generic map(
     SHARP_FRAME   => SHARP_FRAME,
     BLURE_FRAME   => false,
@@ -324,7 +324,7 @@ port map(
     iRgb           => rgbMac2,
     kCoeff         => kCoeffSharp,
     oRgb           => oGreen);
-Kernel_Sharp_Blue_Inst: KernelCore
+Kernel_Sharp_Blue_Inst: kernel_core
 generic map(
     SHARP_FRAME   => SHARP_FRAME,
     BLURE_FRAME   => false,
@@ -363,7 +363,7 @@ process (clk) begin
         end if;
     end if; 
 end process;
-Kernel_Blur_Red_Inst: KernelCore
+Kernel_Blur_Red_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => BLURE_FRAME,
@@ -379,7 +379,7 @@ port map(
     iRgb           => rgbMac1,
     kCoeff         => kCoeffBlure,
     oRgb           => oRed);
-Kernel_Blur_Green_Inst: KernelCore
+Kernel_Blur_Green_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => BLURE_FRAME,
@@ -395,7 +395,7 @@ port map(
     iRgb           => rgbMac2,
     kCoeff         => kCoeffBlure,
     oRgb           => oGreen);
-Kernel_Blur_Blue_Inst: KernelCore
+Kernel_Blur_Blue_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => BLURE_FRAME,
@@ -434,7 +434,7 @@ process (clk) begin
         end if;
     end if; 
 end process;
-Kernel_Blur_Red_Inst: KernelCore
+Kernel_Blur_Red_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -450,7 +450,7 @@ port map(
     iRgb           => rgbMac1,
     kCoeff         => kCoeffEmbos,
     oRgb           => oRed);
-Kernel_Blur_Green_Inst: KernelCore
+Kernel_Blur_Green_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -466,7 +466,7 @@ port map(
     iRgb           => rgbMac2,
     kCoeff         => kCoeffEmbos,
     oRgb           => oGreen);
-Kernel_Blur_Blue_Inst: KernelCore
+Kernel_Blur_Blue_Inst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -513,9 +513,9 @@ signal tpValid        : std_logic := lo;
 signal ovalid         : std_logic := lo;
 begin
 -----------------------------------------------------------------------------------------------
--- TapsController
+-- taps_controller
 -----------------------------------------------------------------------------------------------
-TapsControllerInst: TapsController
+TapsControllerInst: taps_controller
 generic map(
     img_width    => img_width,
     tpDataWidth  => 8)
@@ -551,7 +551,7 @@ process (clk) begin
         end if;
     end if; 
 end process;
-KernelSobelXInst: KernelCore
+KernelSobelXInst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -567,7 +567,7 @@ port map(
     iRgb           => sobel,
     kCoeff         => kCoefXSobel,
     oRgb           => osobelX);
-KernelSobelYInst: KernelCore
+KernelSobelYInst: kernel_core
 generic map(
     SHARP_FRAME   => false,
     BLURE_FRAME   => false,
@@ -683,7 +683,7 @@ end generate HSL_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 RGBTRIM_FRAME_ENABLE: if (RGBTR_FRAME = true) generate
 begin
-ColorTrimInst: ColorTrim
+ColorTrimInst: color_trim
 generic map(
     i_data_width       => i_data_width)
 port map(   
@@ -699,7 +699,7 @@ end generate RGBTRIM_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 RGBLUMP_FRAME_ENABLE: if (RGBLP_FRAME = true) generate
 begin
-SegmentColorsInst: SegmentColors
+SegmentColorsInst: segment_colors
 port map(   
     clk                => clk,
     reset              => rst_l,
