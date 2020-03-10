@@ -38,21 +38,25 @@ generic (
 port (
     clk                : in std_logic;
     rst_l              : in std_logic;
-    lumThreshold       : in  std_logic_vector(i_data_width-1 downto 0);
-    iThreshold         : in std_logic_vector(s_data_width-1 downto 0);
+    iLumTh             : in integer;
+    iSobelTh           : in integer;
     txCord             : in coord;
     iRgb               : in channel;
     iKcoeff            : in kernelCoeff;
+    iFilterId          : in integer;
+    oKcoeff            : out kernelCoeff;
     oEdgeValid         : out std_logic;
     oRgb               : out colors);
 end kernel;
 architecture Behavioral of kernel is
+
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal rgbMac1         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbMac2         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbMac3         : channel := (valid => lo, red => black, green => black, blue => black);
     constant init_channel  : channel := (valid => lo, red => black, green => black, blue => black);
     signal kCoProd         : kCoefFiltFloat;
+
 begin
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
@@ -64,7 +68,10 @@ port map (
     clk            => clk,
     rst_l          => rst_l,
     iKcoeff        => iKcoeff,
+    iFilterId      => iFilterId,
+    oKcoeff        => oKcoeff,
     oCoeffProd     => kCoProd);
+
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 --rgbSync
@@ -517,8 +524,7 @@ signal my             : unsigned(15 downto 0)         := (others => '0');
 signal sxy            : unsigned(15 downto 0)         := (others => '0');
 signal sqr            : std_logic_vector(31 downto 0) := (others => '0');
 signal sbof           : std_logic_vector(31 downto 0) := (others => '0');
-signal sobelThreshSet : std_logic_vector(15 downto 0) :=x"006E"; --006E
-signal sobelThreshold : unsigned(15 downto 0)         :=x"0000";
+signal sobelThreshold : integer :=0;
 signal tp0            : std_logic_vector(7 downto 0)  := (others => '0');
 signal tp1            : std_logic_vector(7 downto 0)  := (others => '0');
 signal tp2            : std_logic_vector(7 downto 0)  := (others => '0');
@@ -619,11 +625,11 @@ port map(
     idata      => sqr,
     ovalid     => ovalid,
     odata      => sbof);
-    sobelThreshold <= unsigned(std_logic_vector(sbof(15 downto 0)));
-    sobelThreshSet <= iThreshold;
+sobelThreshold          <= to_integer(unsigned(sbof(15 downto 0)));
+
 sobelOutP:process (clk) begin
     if rising_edge(clk) then
-        if (sobelThreshold > unsigned(sobelThreshSet)) then
+        if (sobelThreshold > iSobelTh) then -- > Hex 006E dEC 110
             oEdgeValid       <= hi;
             oRgb.sobel.red   <= black;
             oRgb.sobel.green <= black;
@@ -716,7 +722,7 @@ SegmentColorsInst: segment_colors
 port map(
     clk                => clk,
     reset              => rst_l,
-    lumThreshold       => lumThreshold,
+    iLumTh             => iLumTh,
     iRgb               => iRgb,
     oRgb               => oRgb.colorLmp);
 end generate RGBLUMP_FRAME_ENABLE;

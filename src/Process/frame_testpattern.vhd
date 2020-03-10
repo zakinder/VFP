@@ -19,7 +19,7 @@ use work.ports_package.all;
 
 entity frame_testpattern is
 generic (
-    s_data_width	       : integer := 16);
+    s_data_width           : integer := 16);
 port (
     clk                   : in std_logic;
     iValid                : in std_logic;
@@ -81,7 +81,7 @@ use work.vpf_records.all;
 use work.ports_package.all;
 entity ResoTestPattern is
 generic (
-    s_data_width	       : integer := 16);
+    s_data_width           : integer := 16);
 port (
     clk                   : in std_logic;
     iValid                : in std_logic;

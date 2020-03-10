@@ -8,15 +8,12 @@
 -- This file instantiation axi4 components.
 --
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-
 entity vfp_s_axis is
 generic (
     i_data_width             : integer := 8;
@@ -27,7 +24,7 @@ port (
     m_axis_mm2s_aclk         : in std_logic;
     m_axis_mm2s_aresetn      : in std_logic;
     --config
-    aBusSelect               : in std_logic_vector(b_data_width-1 downto 0);
+    iMmAxi                   : in integer;
     iStreamData              : in vStreamData;
     --stream to master out
     rx_axis_tready_o         : in std_logic;
@@ -48,10 +45,8 @@ port (
     rgb_s_axis_tlast         : in std_logic;
     rgb_s_axis_tdata         : in std_logic_vector(s_data_width-1 downto 0));
 end vfp_s_axis;
-
 architecture arch_imp of vfp_s_axis is
-
-    signal configReg4R       : std_logic_vector(b_data_width-1 downto 0):= (others => lo);
+    signal sMmAxi            : integer;
     signal axis_sof          : std_logic;
     signal mpeg42XCR         : std_logic_vector(i_data_width-1 downto 0);
     signal mpeg42XBR         : std_logic :=lo;
@@ -65,9 +60,7 @@ architecture arch_imp of vfp_s_axis is
     type video_io_state is (VIDEO_SET_RESET,VIDEO_SOF_OFF,VIDEO_SOF_ON,VIDEO_END_OF_LINE);
     signal VIDEO_STATES      : video_io_state;
     signal nrowdist          : natural range 0 to 4096 := 0;
-
 begin
-
 -- generate the toggle signal to convert from ycbcr 444 to 422(green/red,blue/red)
 process (m_axis_mm2s_aclk) begin
     if rising_edge(m_axis_mm2s_aclk) then
@@ -75,22 +68,19 @@ process (m_axis_mm2s_aclk) begin
             mpeg42XXX  <= not(mpeg42XBR);
     end if;
 end process;
-
 -- delay the rgb blue pixel to sync it with red channel
 process (m_axis_mm2s_aclk) begin
     if rising_edge(m_axis_mm2s_aclk) then
             mpeg42XCR   <= iStreamData.ycbcr.blue;
-            configReg4R <= aBusSelect;
     end if;
 end process;
-
 process (m_axis_mm2s_aclk) begin
     if (rising_edge (m_axis_mm2s_aclk)) then
-
+        sMmAxi <= iMmAxi;
         if (m_axis_mm2s_aresetn = lo) then
             VIDEO_STATES <= VIDEO_SET_RESET;
         else
-        tx_axis_tuser <=axis_sof;
+            tx_axis_tuser <=axis_sof;
         case (VIDEO_STATES) is
         when VIDEO_SET_RESET =>
             tx_axis_tlast  <= lo;
@@ -117,27 +107,27 @@ process (m_axis_mm2s_aclk) begin
             if(iStreamData.eof = hi) then
                 pEofs1 <= hi;
             end if;
-            if (configReg4R = EXTERNAL_AXIS_STREAM)then
+            if (sMmAxi = EXTERNAL_AXIS_STREAM)then
                 if(mpeg42XXX =hi)then
                     tx_axis_tdata  <= (iStreamData.ycbcr.green & iStreamData.ycbcr.red);
                 else
                     tx_axis_tdata  <= (mpeg42XCR & iStreamData.ycbcr.red);
                 end if;
-            elsif (configReg4R = STREAM_TESTPATTERN1)then
+            elsif (sMmAxi = STREAM_TESTPATTERN1)then
                 nrowdist        <= nrowdist + one;
                 tx_axis_tdata   <= std_logic_vector(to_unsigned(nrowdist,s_data_width));
                 --tx_axis_tdata  <= iStreamData.cord.x;
-            elsif (configReg4R = STREAM_TESTPATTERN2)then
+            elsif (sMmAxi = STREAM_TESTPATTERN2)then
                 nrowdist        <= nrowdist + 2;
                 tx_axis_tdata   <= std_logic_vector(to_unsigned(nrowdist,s_data_width));
                 --tx_axis_tdata  <= iStreamData.cord.y;
-            elsif (configReg4R = STREAM_TESTPATTERN3)then
+            elsif (sMmAxi = STREAM_TESTPATTERN3)then
                 tx_axis_tdata   <= std_logic_vector(to_unsigned(nrowdist,s_data_width));
-            elsif (configReg4R = STREAM_TESTPATTERN4)then
+            elsif (sMmAxi = STREAM_TESTPATTERN4)then
                 tx_axis_tdata <= std_logic_vector(resize(unsigned(iStreamData.ycbcr.green), tx_axis_tdata'length));
-            elsif (configReg4R = STREAM_TESTPATTERN5)then
+            elsif (sMmAxi = STREAM_TESTPATTERN5)then
                 tx_axis_tdata  <= (iStreamData.ycbcr.green & iStreamData.ycbcr.red);
-            elsif (configReg4R = STREAM_TESTPATTERN6)then
+            elsif (sMmAxi = STREAM_TESTPATTERN6)then
                 tx_axis_tdata  <= (mpeg42XCR & iStreamData.ycbcr.red);
             else
                 if(mpeg42XXX =hi)then
@@ -184,7 +174,7 @@ process (m_axis_mm2s_aclk) begin
             rgb_m_axis_tdata   <= (others => lo);
             tx_axis_tready     <= lo;
         else
-            if (configReg4R = EXTERNAL_AXIS_STREAM)then
+            if (sMmAxi = EXTERNAL_AXIS_STREAM)then
                 --external processed(unused) parallel copy of cpuTX delayed
                 rgb_s_axis_tready  <= rx_axis_tready_o;
                 rx_axis_tvalid     <= rgb_s_axis_tvalid;

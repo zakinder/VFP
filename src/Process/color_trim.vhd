@@ -29,6 +29,7 @@ port (
     iRgb           : in channel;
     oRgb           : out channel);
 end color_trim;
+
 architecture behavioral of color_trim is
     signal uF1Rgb           : tpToFloatRecord;
     signal uF2Rgb           : tpToFloatRecord;
@@ -38,10 +39,13 @@ architecture behavioral of color_trim is
     signal rgbFpoints       : float32;
     signal rgbFupdate       : float32;
     signal rgbTrimValue     : ufixed(7 downto 0)    :=(others => '0');
+
 begin
+
     rgbFpoints   <= to_float(0.001,rgbFpoints);
     rgbFupdate   <= to_float(100.0,rgbFupdate);
     rgbTrimValue <= to_ufixed(10,rgbTrimValue);
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 1
 -----------------------------------------------------------------------------------------------
@@ -57,6 +61,7 @@ process (clk,reset) begin
         uF1Rgb.valid <= iRgb.valid;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 2
 -----------------------------------------------------------------------------------------------
@@ -68,6 +73,7 @@ process (clk) begin
         uF2Rgb.valid <= uF1Rgb.valid;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 3
 -----------------------------------------------------------------------------------------------
@@ -79,6 +85,7 @@ process (clk) begin
         uF3Rgb.valid <= uF2Rgb.valid;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 4
 -----------------------------------------------------------------------------------------------
@@ -90,6 +97,7 @@ process (clk) begin
         uF4Rgb.valid  <= uF3Rgb.valid;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 5
 -----------------------------------------------------------------------------------------------
@@ -101,6 +109,7 @@ process (clk) begin
         uF5Rgb.valid  <= uF4Rgb.valid;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 6
 -----------------------------------------------------------------------------------------------
@@ -112,4 +121,5 @@ process (clk) begin
         oRgb.valid <= uF5Rgb.valid;
     end if;
 end process;
+
 end behavioral;

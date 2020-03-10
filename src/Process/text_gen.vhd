@@ -25,18 +25,22 @@ generic(
 port (
     clk              : in std_logic;
     rst_l            : in std_logic;
-    videoChannel     : in std_logic_vector(b_data_width-1 downto 0);
+    iViChannel       : in integer;
     txCord           : in coord;
     location         : in cord;
     iRgb             : in channel;
     oRgb             : out channel);
 end text_gen;
 architecture Behavioral of text_gen is
+
     signal grid  :  cord;
     signal pixOn : std_logic := '0';
+
 begin
+
 grid.x <= to_integer(unsigned(txCord.x(11 downto 0)));
 grid.y <= (img_height_bmp-1) - (to_integer(unsigned(txCord.y(11 downto 0))));
+
 textElement2: pixel_on_display
 generic map (
     img_width_bmp  => img_width_bmp,
@@ -45,10 +49,11 @@ generic map (
 port map(
     clk          => clk,
     rst_l        => rst_l,
-    videoChannel => videoChannel,
+    iViChannel   => iViChannel,
     location     => location,
     grid         => grid,
     pixel        => pixOn);
+
 process (clk) begin
     if rising_edge(clk) then
     if (rst_l = lo) then

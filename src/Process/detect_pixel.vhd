@@ -30,11 +30,15 @@ port (
     endOfFrame     : in std_logic;
     pDetect        : out std_logic);
 end entity;
+
 architecture arch of detect_pixel is
     signal pEnable         : std_logic;
     signal pCont           : cord;
+
 begin
+
 pDetect        <= pEnable;
+
 pixelRangeP: process (clk)begin
 if rising_edge(clk) then
     if((iRgb.red>rgbCoord.rl and iRgb.red<rgbCoord.rh) and (iRgb.green>rgbCoord.gl and iRgb.green<rgbCoord.gh) and (iRgb.blue>rgbCoord.bl and iRgb.blue<rgbCoord.bh))then
@@ -44,12 +48,14 @@ if rising_edge(clk) then
     end if;
 end if;
 end process pixelRangeP;
+
 pipCordP: process (clk)begin
     if rising_edge(clk) then
         pCont.x      <= to_integer((unsigned(iCord.x)));
         pCont.y      <= to_integer((unsigned(iCord.y)));
     end if;
 end process pipCordP;
+
 pixelCordInt : pixel_cord
 port map(
     clk      => clk,
@@ -58,4 +64,5 @@ port map(
     iEof     => endOfFrame,
     iCord    => pCont,
     oRgb     => oRgb);
+
 end architecture;

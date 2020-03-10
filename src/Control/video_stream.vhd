@@ -8,7 +8,6 @@
 -- This file instantiation axi4 components.
 --
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -41,35 +40,43 @@ generic (
     F_HSV                : boolean := false;
     F_HSL                : boolean := false);
 port (
-    m_axis_mm2s_aclk     : in std_logic;
-    m_axis_mm2s_aresetn  : in std_logic;
+    clk                  : in std_logic;
+    rst_l                : in std_logic;
     iWrRegs              : in mRegs;
     oRdRegs              : out mRegs;
     iRgbSet              : in rRgb;
-    oStreamData          : out vStreamData;
-    oBusSelect           : out std_logic_vector(b_data_width-1 downto 0));
+    oVideoData           : out vStreamData;
+    oMmAxi               : out integer);
 end video_stream;
+
 architecture arch_imp of video_stream is
-    signal seconds       : std_logic_vector(i_data_width-3 downto 0);
-    signal minutes       : std_logic_vector(i_data_width-3 downto 0);
-    signal hours         : std_logic_vector(i_data_width/2 downto 0);
-    signal threshold     : std_logic_vector(s_data_width-1 downto 0);
-    signal videoChannel  : std_logic_vector(b_data_width-1 downto 0):= (others => '0');
-    signal edgeType      : std_logic_vector(b_data_width-1 downto 0):= (others => '0');
-    signal cRgbOsharp    : std_logic_vector(b_data_width-1 downto 0):= (others => '0');
-    signal dChannel      : std_logic_vector(b_data_width-1 downto 0):= (others => '0');
-    signal cChannel      : std_logic_vector(b_data_width-1 downto 0):= (others => '0');
-    signal fifoStatus    : std_logic_vector(b_data_width-1 downto 0);
-    signal gridLockDatao : std_logic_vector(b_data_width-1 downto 0);
-    signal rgbCoord      : region;
-    signal pRegion       : poi;
-    signal frameData     : fcolors;
-    signal kls           : coefficient;
-    signal als           : coefficient;
-    signal oLumTh        : integer;
-    signal oHsvPerCh     : integer;
-    signal oYccPerCh     : integer;
+
+    signal sSec          : std_logic_vector(i_data_width-3 downto 0);
+    signal sMin          : std_logic_vector(i_data_width-3 downto 0);
+    signal sHou          : std_logic_vector(i_data_width/2 downto 0);
+
+
+    signal sFifoStatus   : std_logic_vector(b_data_width-1 downto 0);
+    signal sGridLockData : std_logic_vector(b_data_width-1 downto 0);
+    
+    signal sRgbRoiLimits : region;
+    signal sRoi          : poi;
+    signal sFrameData    : fcolors;
+    signal sKls          : coefficient;
+    signal sAls          : coefficient;
+    signal sKcoeff       : kernelCoeff;
+
+    signal sSobelThresh  : integer;
+    signal sViChannel    : integer;
+    signal sRgbSelect    : integer;
+    signal sFilterId     : integer;
+    signal sLumTh        : integer;
+    signal sHsvPerCh     : integer;
+    signal sYccPerCh     : integer;
+    
 begin
+
+
 frameProcessInst: frame_process
 generic map(
     i_data_width         => i_data_width,
@@ -93,55 +100,58 @@ generic map(
     F_HSV                => F_HSV,
     F_HSL                => F_HSL)
 port map(
-    clk                  => m_axis_mm2s_aclk,
-    rst_l                => m_axis_mm2s_aresetn,
+    clk                  => clk,
+    rst_l                => rst_l,
     iRgbSet              => iRgbSet,
-    iVideoChannel        => videoChannel,
-    iEdgeType            => edgeType,
-    iPoiRegion           => pRegion,
-    iThreshold           => threshold,
-    iKls                 => kls,
-    iAls                 => als,
-    iLumTh               => oLumTh,
-    iHsvPerCh            => oHsvPerCh,
-    iYccPerCh            => oYccPerCh,
-    iRgbCoord            => rgbCoord,
-    oFifoStatus          => fifoStatus,
-    oGridLockData        => gridLockDatao,
-    oFrameData           => frameData);
+    iVideoChannel        => sViChannel,
+    iRoi                 => sRoi,
+    iSobelTh             => sSobelThresh,
+    iKls                 => sKls,
+    iAls                 => sAls,
+    iLumTh               => sLumTh,
+    iHsvPerCh            => sHsvPerCh,
+    iYccPerCh            => sYccPerCh,
+    iRgbCoord            => sRgbRoiLimits,
+    iFilterId            => sFilterId,
+    oKcoeff              => sKcoeff,
+    oFifoStatus          => sFifoStatus,
+    oGridLockData        => sGridLockData,
+    oFrameData           => sFrameData);
+
 digiClkInst: digital_clock
 port map(
-    clk1                 => m_axis_mm2s_aclk,
-    seconds              => seconds,
-    minutes              => minutes,
-    hours                => hours);
+    clk                  => clk,
+    oSec                 => sSec,
+    oMin                 => sMin,
+    oHou                 => sHou);
+
 mWrRdInst: mWrRd
 generic map(
     revision_number      => revision_number,
     s_data_width         => s_data_width,
     b_data_width         => b_data_width)
 port map(
-    seconds              => seconds,
-    minutes              => minutes,
-    hours                => hours,
-    rgbCoord             => rgbCoord,
-    aBusSelect           => oBusSelect,
-    threshold            => threshold,
-    videoChannel         => videoChannel,
-    dChannel             => dChannel,
-    cChannel             => cChannel,
-    oRgbOsharp           => cRgbOsharp,
-    oEdgeType            => edgeType,
-    pRegion              => pRegion,
-    als                  => als,
-    kls                  => kls,
-    oLumTh               => oLumTh,
-    oHsvPerCh            => oHsvPerCh,
-    oYccPerCh            => oYccPerCh,
-    fifoStatus           => fifoStatus,
-    gridLockDatao        => gridLockDatao,
-    wrRegsIn             => iWrRegs,
-    rdRegsOut            => oRdRegs);
+    iWrRegs              => iWrRegs,
+    oReRegs              => oRdRegs,
+    iSeconds             => sSec,
+    iMinutes             => sMin,
+    iHours               => sHou,
+    iFifoStatus          => sFifoStatus,
+    iGridLockData        => sGridLockData,
+    iKcoeff              => sKcoeff,
+    oAls                 => sAls,
+    oKls                 => sKls,
+    oLumTh               => sLumTh,
+    oHsvPerCh            => sHsvPerCh,
+    oYccPerCh            => sYccPerCh,
+    oRgbRoiLimits        => sRgbRoiLimits,
+    oFilterId            => sFilterId,
+    oMmAxi               => oMmAxi,
+    oSobelThresh         => sSobelThresh,
+    oVideoChannel        => sViChannel,
+    oRgbSelect           => sRgbSelect,
+    oRoi                 => sRoi);
+
 videoSelectInst: video_select
 generic map (
     bmp_width            => bmp_width,
@@ -150,15 +160,10 @@ generic map (
     b_data_width         => b_data_width,
     s_data_width         => s_data_width)
 port map (
-    clk                  => m_axis_mm2s_aclk,
-    rst_l                => m_axis_mm2s_aresetn,
-    videoChannel         => videoChannel,
-    cRgbOsharp           => cRgbOsharp,
-    dChannel             => dChannel,
-    cChannel             => cChannel,
-    iFrameData           => frameData,
-    oRgb                 => oStreamData.ycbcr,
-    oEof                 => oStreamData.eof,
-    oSof                 => oStreamData.sof,
-    oCord                => oStreamData.cord);
+    clk                  => clk,
+    rst_l                => rst_l,
+    iViChannel           => sViChannel,
+    iRgbSelect           => sRgbSelect,
+    iFrameData           => sFrameData,
+    oVideoData           => oVideoData);
 end arch_imp;

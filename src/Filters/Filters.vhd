@@ -53,13 +53,15 @@ port (
     rst_l                    : in std_logic;
     txCord                   : in coord;
     iRgb                     : in channel;
-    lumThreshold             : in  std_logic_vector(7 downto 0);
-    iThreshold               : in std_logic_vector(s_data_width-1 downto 0);
-    cHsv                     : in std_logic_vector(2 downto 0);
-    cYcc                     : in std_logic_vector(2 downto 0);
+    iLumTh                   : in integer;
+    iSobelTh                 : in integer;
+    iVideoChannel            : in integer;
+    iFilterId                : in integer;
+    iHsvPerCh                : in integer;
+    iYccPerCh                : in integer;
     iAls                     : in coefficient;
     iKcoeff                  : in kernelCoeff;
-    iVideoChannel            : in std_logic_vector(b_data_width-1 downto 0);
+    oKcoeff                  : out kernelCoeff;
     edgeValid                : out std_logic;
     oRgb                     : out frameColors);
 end filters;
@@ -68,8 +70,6 @@ architecture Behavioral of filters is
     constant init_channel      : channel := (valid => lo, red => black, green => black, blue => black);
     signal fRgb                : frameColors;
     signal sEdgeValid          : std_logic;
-    signal vChannelSelect      : integer;
-    signal lThSelect           : integer;
     signal fRgb1               : colors;
     signal fRgb2               : colors;
     signal fRgb3               : colors;
@@ -92,8 +92,6 @@ architecture Behavioral of filters is
 begin
     edgeValid               <= sEdgeValid;
     oRgb                    <= fRgb;
-    vChannelSelect          <= to_integer(unsigned(iVideoChannel));
-    lThSelect               <= to_integer(unsigned(lumThreshold));
 ditherFilter1xInst: dither_filter
 generic map (
     img_width         => img_width,
@@ -168,7 +166,7 @@ port map(
     oRgb                => blur3vx);
 lThSelectP: process (clk) begin
     if rising_edge(clk) then
-        if (lThSelect = 0)  then
+        if (iLumTh = 0)  then
             rgbSel     <= iRgb;
         else
             rgbSel     <= blur3vx;
@@ -197,12 +195,15 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     txCord              => txCord,
-    lumThreshold        => lumThreshold,
-    iThreshold          => iThreshold,
+    iLumTh              => iLumTh,
+    iSobelTh            => iSobelTh,
     iRgb                => rgbSel,
     iKcoeff             => iKcoeff,
+    iFilterId           => iFilterId,
+    oKcoeff             => oKcoeff,
     oEdgeValid          => sEdgeValid,
     oRgb                => rgbImageKernel);
+
 blurFilter0xInst: blur_filter
 generic map(
     iMSB                => blurMsb,
@@ -218,16 +219,16 @@ port map(
     oRgb                => rgbImageKernel_blur);
 CgainIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = FILTER_SHP_TO_CGA) then
+        if (iVideoChannel = FILTER_SHP_TO_CGA) then
             cgainIoIn           <= rgbImageKernel.sharp;--SharpToCgain
             fRgb2.cgain         <= cgainIoOut;
-        elsif(vChannelSelect = FILTER_CGA_TO_HSL)then
+        elsif(iVideoChannel = FILTER_CGA_TO_HSL)then
             cgainIoIn           <= rgbImageKernel.hsl;  --CgainToHsl  ,HslToCgain
             fRgb1.hsl           <= cgainIoOut;
-        elsif(vChannelSelect = FILTER_CGA_TO_HSV)then
+        elsif(iVideoChannel = FILTER_CGA_TO_HSV)then
             cgainIoIn           <= rgbImageKernel.hsv;  --CgainToHsv  ,HsvToCgain
             fRgb1.hsv           <= cgainIoOut;
-        elsif(vChannelSelect = FILTER_BLU_TO_CGA)then
+        elsif(iVideoChannel = FILTER_BLU_TO_CGA)then
             cgainIoIn           <= rgbImageKernel_blur; --BlurToCgain
             fRgb3.cgain         <= cgainIoOut;
         else
@@ -238,16 +239,16 @@ CgainIoP: process (clk) begin
 end process CgainIoP;
 SharpIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = FILTER_CGA_TO_SHP) then
+        if (iVideoChannel = FILTER_CGA_TO_SHP) then
             sharpIoIn           <= rgbImageKernel.cgain;--CgainToSharp
             fRgb1.sharp         <= sharpIoOut;
-        elsif(vChannelSelect = FILTER_SHP_TO_HSL)then
+        elsif(iVideoChannel = FILTER_SHP_TO_HSL)then
             sharpIoIn           <= rgbImageKernel.hsl;  --SharpToHsl  ,HslToSharp
             fRgb2.hsl           <= sharpIoOut;
-        elsif(vChannelSelect = FILTER_SHP_TO_HSV)then
+        elsif(iVideoChannel = FILTER_SHP_TO_HSV)then
             sharpIoIn           <= rgbImageKernel.hsv;  --SharpToHsv  ,HsvToSharp
             fRgb2.hsv           <= sharpIoOut;
-        elsif(vChannelSelect = FILTER_BLU_TO_SHP)then
+        elsif(iVideoChannel = FILTER_BLU_TO_SHP)then
             sharpIoIn           <= rgbImageKernel_blur; --BlurToSharp
             fRgb3.sharp         <= sharpIoOut;
         else
@@ -258,19 +259,19 @@ SharpIoP: process (clk) begin
 end process SharpIoP;
 BlurIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = FILTER_CGA_TO_BLU) then
+        if (iVideoChannel = FILTER_CGA_TO_BLU) then
             blurIoIn            <= rgbImageKernel.cgain; --CgainToBlur
             fRgb1.blur          <= blurIoOut;
-        elsif(vChannelSelect = FILTER_SHP_TO_BLU)then
+        elsif(iVideoChannel = FILTER_SHP_TO_BLU)then
             blurIoIn            <= rgbImageKernel.sharp; --SharpToBlur
             fRgb2.blur          <= blurIoOut;
-        elsif(vChannelSelect = FILTER_BLU_TO_BLU)then
+        elsif(iVideoChannel = FILTER_BLU_TO_BLU)then
             blurIoIn            <= rgbImageKernel_blur;   --BlurToHsl   ,HslToBlur
             fRgb3.blur          <= blurIoOut;
-        elsif(vChannelSelect = FILTER_BLU_TO_HSV)then
+        elsif(iVideoChannel = FILTER_BLU_TO_HSV)then
             blurIoIn            <= rgbImageKernel.hsv;   --BlurToHsv   ,HsvToBlur
             fRgb3.hsv           <= blurIoOut;
-        elsif(vChannelSelect = FILTER_BLU_TO_HSL)then
+        elsif(iVideoChannel = FILTER_BLU_TO_HSL)then
             blurIoIn            <= rgbImageKernel.hsl;   --BlurToHsl   ,HslToBlur
             fRgb3.hsl           <= blurIoOut;
         else
@@ -281,10 +282,10 @@ BlurIoP: process (clk) begin
 end process BlurIoP;
 YcbcrIoP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = FILTER_CGA_TO_YCC) then
+        if (iVideoChannel = FILTER_CGA_TO_YCC) then
             YcbcrIoIn           <= rgbImageKernel.cgain; --CgainToYcbcr
             fRgb1.ycbcr         <= YcbcrIoOut;
-        elsif(vChannelSelect = FILTER_BLU_TO_YCC)then
+        elsif(iVideoChannel = FILTER_BLU_TO_YCC)then
             YcbcrIoIn           <= rgbImageKernel_blur;  --BlurToYcbcr
             fRgb3.ycbcr         <= YcbcrIoOut;
         else
@@ -365,7 +366,7 @@ port map(
     clk           => clk,
     iValid        => iRgb.valid,
     iCord         => txCord,
-    tpSelect      => lThSelect,
+    tpSelect      => iLumTh,
     oRgb          => fRgb.tPattern);
 end generate TEST_FRAME_ENABLE;
 MASK_SOB_CGA_FRAME_ENABLE: if (M_SOB_CGA = true) generate
@@ -586,17 +587,17 @@ begin
 rgbYcbcr <= YcbcrIoOut;
 process (clk) begin
     if rising_edge(clk) then
-        if(cYcc = "001")then
+        if(iYccPerCh = 1)then
             fRgb.ycbcr.red       <= rgbYcbcr.red;
             fRgb.ycbcr.green     <= rgbYcbcr.red;
             fRgb.ycbcr.blue      <= rgbYcbcr.red;
             fRgb.ycbcr.valid     <= rgbYcbcr.valid;
-        elsif(cYcc = "010")then
+        elsif(iYccPerCh = 2)then
             fRgb.ycbcr.red       <= rgbYcbcr.green;
             fRgb.ycbcr.green     <= rgbYcbcr.green;
             fRgb.ycbcr.blue      <= rgbYcbcr.green;
             fRgb.ycbcr.valid     <= rgbYcbcr.valid;
-        elsif(cYcc = "100")then
+        elsif(iYccPerCh = 3)then
             fRgb.ycbcr.red       <= rgbYcbcr.blue;
             fRgb.ycbcr.green     <= rgbYcbcr.blue;
             fRgb.ycbcr.blue      <= rgbYcbcr.blue;
@@ -634,17 +635,17 @@ begin
 rgbHsv <= rgbImageKernel.hsv;
 process (clk) begin
     if rising_edge(clk) then
-        if(cHsv = "001")then
+        if(iHsvPerCh = 1)then
             fRgb.hsv.red       <= rgbHsv.red;
             fRgb.hsv.green     <= rgbHsv.red;
             fRgb.hsv.blue      <= rgbHsv.red;
             fRgb.hsv.valid     <= rgbHsv.valid;
-        elsif(cHsv = "010")then
+        elsif(iHsvPerCh = 2)then
             fRgb.hsv.red       <= rgbHsv.green;
             fRgb.hsv.green     <= rgbHsv.green;
             fRgb.hsv.blue      <= rgbHsv.green;
             fRgb.hsv.valid     <= rgbHsv.valid;
-        elsif(cHsv = "100")then
+        elsif(iHsvPerCh = 3)then
             fRgb.hsv.red       <= rgbHsv.blue;
             fRgb.hsv.green     <= rgbHsv.blue;
             fRgb.hsv.blue      <= rgbHsv.blue;

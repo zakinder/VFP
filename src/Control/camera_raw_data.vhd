@@ -71,7 +71,7 @@ architecture arch_imp of camera_raw_data is
     signal d5mStates      : d5mSt;
     signal cordx          : integer :=zero;
     signal cordy          : integer :=zero;
-	signal imgWidth       : integer := 3071;
+    signal imgWidth       : integer := 3071;
     type pLnRm is array (0 to img_width) of std_logic_vector (11 downto 0);
     signal d5mLnBuffer    : pLnRm := (others => (others => lo));
 
@@ -84,7 +84,7 @@ pEolBufferFull <= hi when (pLnSy = hi and ilval = lo) else lo;
 d5mDataSyncP: process(pixclk) begin
     if rising_edge(pixclk) then
         pLine       <= ilval;
-		pLnSy       <= pLine;
+        pLnSy       <= pLine;
         pFrame      <= ifval;
         if (pFrame = hi and pLine = hi) then
             pWrAdr  <= pWrAdr + one;
@@ -105,7 +105,7 @@ cdcSignals: process (m_axis_aclk) begin
     if rising_edge(m_axis_aclk) then
         iLvalSy1  <= ilval;
         iLvalSy2  <= iLvalSy1;
-		iFvalSy1  <= ifval;
+        iFvalSy1  <= ifval;
         iFvalSy2  <= iFvalSy1;
     end if;
 end process cdcSignals;
@@ -124,11 +124,11 @@ readLineP: process (m_axis_aclk) begin
     if (rising_edge (m_axis_aclk)) then
         if (m_axis_aresetn = lo) then
             d5mStates <= sofSt;
-			pSof      <= lo;
-			pEof      <= lo;
-			rLine     <= lo;
-			cordx     <= zero;
-			cordy     <= zero;
+            pSof      <= lo;
+            pEof      <= lo;
+            rLine     <= lo;
+            cordx     <= zero;
+            cordy     <= zero;
         else
         case (d5mStates) is
         when sofSt =>
@@ -142,24 +142,24 @@ readLineP: process (m_axis_aclk) begin
                 rLine         <= lo;
                 d5mStates     <= eolSt;
                 cordx         <= zero;
-			else
+            else
                 cordx         <= cordx + one;--start reading
-				rLine         <= hi;
-				pSof          <= lo;
-				d5mStates     <= rLnSt;
+                rLine         <= hi;
+                pSof          <= lo;
+                d5mStates     <= rLnSt;
             end if;
         when eolSt =>
             if (iFvalSy2 = lo)  then --pEolBufferFull and Sof
                 cordy     <= zero;
                 d5mStates <= eofSt;
-		    elsif(pEol = hi) then
+            elsif(pEol = hi) then
                 d5mStates <= rLnSt;
                 cordy     <= cordy + one;
-			else
+            else
                 d5mStates <= eolSt;
             end if;
         when eofSt =>
-			d5mStates <= sofSt;
+            d5mStates <= sofSt;
             pEof      <= hi;
         when others =>
             d5mStates <= sofSt;

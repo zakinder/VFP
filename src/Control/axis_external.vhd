@@ -31,7 +31,7 @@ generic (
     s_data_width                : integer := 16;
     b_data_width                : integer := 32);
 port (
-    iBusSelect                  : in std_logic_vector(b_data_width-1 downto 0);
+    iMmAxi                      : in integer;
     iStreamData                 : in vStreamData;
     oWrRegs                     : out mRegs;
     iRdRegs                     : in mRegs;
@@ -109,7 +109,7 @@ port map (
     m_axis_mm2s_aclk     =>  rgb_s_axis_aclk,
     m_axis_mm2s_aresetn  =>  rgb_s_axis_aresetn,
     -- config video stream according to bus select
-    aBusSelect           =>  iBusSelect,
+    iMmAxi               =>  iMmAxi,
     -- filtered video stream data
     iStreamData          =>  iStreamData,
     -- stream to master

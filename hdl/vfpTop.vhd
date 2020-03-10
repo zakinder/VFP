@@ -116,7 +116,7 @@ end VFP_v1_0;
 architecture arch_imp of VFP_v1_0 is
     constant adwrWidth        : integer := 16;
     constant addrWidth        : integer := 12;
-    signal end_node_bus       : std_logic_vector(vfpconfig_wdata'range):= (others => '0');
+    signal sMmAxi             : integer := 0;
     signal rgb_set            : rRgb;
     signal wr_regs            : mRegs;
     signal rd_regs            : mRegs;
@@ -161,13 +161,14 @@ generic map(
     F_HSV                     => F_HSV,
     F_HSL                     => F_HSL)
 port map(
-    m_axis_mm2s_aclk          => m_axis_mm2s_aclk,
-    m_axis_mm2s_aresetn       => m_axis_mm2s_aresetn,
+    clk                       => m_axis_mm2s_aclk,
+    rst_l                     => m_axis_mm2s_aresetn,
     iWrRegs                   => wr_regs,
     oRdRegs                   => rd_regs,
     iRgbSet                   => rgb_set,
-    oStreamData               => video_data,
-    oBusSelect                => end_node_bus);
+    oVideoData                => video_data,
+    oMmAxi                    => sMmAxi);
+
 -- Transmit filtered video data
 axis_external_inst: axis_external
 generic map(
@@ -183,7 +184,7 @@ generic map(
     s_data_width              => s_data_width,
     b_data_width              => b_data_width)
 port map(
-    iBusSelect                => end_node_bus,
+    iMmAxi                    => sMmAxi,
     iStreamData               => video_data,
     oWrRegs                   => wr_regs,
     iRdRegs                   => rd_regs,

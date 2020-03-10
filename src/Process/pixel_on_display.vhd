@@ -27,14 +27,14 @@ port (
     rst_l        : in std_logic;
     location     : in cord;
     grid         : in cord;
-    videoChannel : in std_logic_vector(b_data_width-1 downto 0);
+    iViChannel   : in integer;
     pixel        : out std_logic);
 end pixel_on_display;
 
 architecture Behavioral of pixel_on_display is
+
     constant NU_MRGB_TYPES       : natural := 40;
     signal displayText           : string(1 to 5):= "INRGB";
-    signal vChannelSelect        : integer;
     signal fontAddress           : integer := 0;
     signal charBitInRow          : std_logic_vector(FONT_WIDTH-1 downto 0) := (others => '0');
     signal charCode              : natural := 0;
@@ -46,31 +46,31 @@ architecture Behavioral of pixel_on_display is
 
 begin
 
-vChannelSelect    <= to_integer(unsigned(videoChannel));
+
 
 videoOutP: process (clk) begin
     if rising_edge(clk) then
-        if (vChannelSelect = 0) then
+        if (iViChannel = 0) then
             displayText      <= "CGAIN";
-        elsif(vChannelSelect = 1)then
+        elsif(iViChannel = 1)then
             displayText      <= "SHARP";
-        elsif(vChannelSelect = 2)then
+        elsif(iViChannel = 2)then
             displayText      <= "BLURE";
-        elsif(vChannelSelect = 3)then
+        elsif(iViChannel = 3)then
             displayText      <= "INHSL";
-        elsif(vChannelSelect = 4)then
+        elsif(iViChannel = 4)then
             displayText      <= "INHSV";
-        elsif(vChannelSelect = 5)then
+        elsif(iViChannel = 5)then
             displayText      <= "INRGB";
-        elsif(vChannelSelect = 6)then
+        elsif(iViChannel = 6)then
             displayText      <= "SOBEL";
-        elsif(vChannelSelect = 7)then
+        elsif(iViChannel = 7)then
             displayText      <= "EMBOS";
-        elsif(vChannelSelect = 22)then
+        elsif(iViChannel = 22)then
             displayText      <= "CGHSL";
-        elsif(vChannelSelect = 25)then
+        elsif(iViChannel = 25)then
             displayText      <= "CGSHP";
-        elsif(vChannelSelect = 27)then
+        elsif(iViChannel = 27)then
             displayText      <= "SHPCG";
         else
             displayText      <= "YCBCR";

@@ -1,12 +1,25 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.all;
+-------------------------------------------------------------------------------
+--
+-- Filename    : image_read.vhd
+-- Create Date : 01162019 [01-16-2019]
+-- Author      : Zakinder
+--
+-- Description:
+-- This file instantiation
+--
+-------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-use work.tbPackage.all;
+use work.tbpackage.all;
+
 entity image_read is
 generic (
     i_data_width  : integer := 8;

@@ -33,6 +33,7 @@ port (
 end camera_raw_to_rgb;
 
 architecture arch_imp of camera_raw_to_rgb is
+
     signal rawTp            : rTp;
     signal rawData          : rData;
 

@@ -31,11 +31,14 @@ entity color_correction is
     oRgb      : out channel);
 end color_correction;
 architecture Behavioral of color_correction is
+
   signal cc                   : ccKernel;
   signal ccRgb                : ccRgbRecord;
   signal threshold            : sfixed(9 downto 0) := "0100000000";
   signal rgbSyncValid         : std_logic_vector(7 downto 0) := x"00";
+
 begin
+
 rgbToSf_P: process (clk,rst_l)begin
     if rst_l = '0' then
         ccRgb.rgbToSf.red    <= (others => '0');

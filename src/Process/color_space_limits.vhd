@@ -31,6 +31,7 @@ port (
 end color_space_limits;
 
 architecture behavioral of color_space_limits is
+
     signal Rgb1              : channel;
     signal Rgb2              : channel;
     signal int1Rgb           : intChannel;
@@ -56,7 +57,7 @@ architecture behavioral of color_space_limits is
     signal B_MinFValue       : natural := 255;
     signal rgbFedge          : std_logic :=lo;
     signal rgbFedgeSync      : std_logic :=lo;
-    
+
 begin
 
 rgbFedge <= hi when (int1Rgb.valid = hi and iRgb.valid = lo) else lo;
@@ -175,6 +176,7 @@ process (clk,reset)begin
         int1Rgb.valid  <= iRgb.valid;
     end if;
 end process;
+
 rgbMinP: process (clk) begin
     if rising_edge(clk) then
         if ((int1Rgb.red <= int1Rgb.green) and (int1Rgb.red <= int1Rgb.blue)) then
@@ -186,16 +188,19 @@ rgbMinP: process (clk) begin
         end if;
     end if;
 end process rgbMinP;
+
 process (clk) begin
     if rising_edge(clk) then
         rgbDelta      <= rgbMax - rgbMin;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         maxMinSum    <= rgbMax + rgbMin;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int2Rgb.red  = rgbMax) and (int2Rgb.red  /= zero)then
@@ -205,6 +210,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int2Rgb.green  = rgbMax) and (int2Rgb.red  /= zero)then
@@ -214,6 +220,7 @@ process (clk) begin
         end if;
   end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int2Rgb.blue  = rgbMax) and (int2Rgb.red  /= zero)then
@@ -223,6 +230,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int2Rgb.red  = rgbMin) and (int2Rgb.red  /= zero)then
@@ -232,6 +240,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int2Rgb.green  = rgbMin) and (int2Rgb.red  /= zero)then
@@ -241,6 +250,7 @@ process (clk) begin
         end if;
   end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         if (int2Rgb.blue  = rgbMin) and (int2Rgb.red  /= zero)then
@@ -250,6 +260,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(0).valid    <=  Rgb1.valid;
@@ -264,6 +275,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(1).valid    <=  Rgb1.valid;
@@ -278,6 +290,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(2).valid    <=  Rgb1.valid;
@@ -292,6 +305,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 -- process (clk) begin
   -- if rising_edge(clk) then
         -- rgbColors(1).valid    <=  Rgb1.valid;
@@ -332,6 +346,7 @@ end process;
     -- end if;
   -- end if;
 -- end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(3).valid     <=  Rgb2.valid;
@@ -352,6 +367,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(4).valid   <=  Rgb2.valid;
@@ -372,6 +388,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(5).valid     <=  Rgb2.valid;
@@ -392,6 +409,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(6).valid     <=  Rgb2.valid;
@@ -412,6 +430,7 @@ process (clk) begin
     end if;
   end if;
 end process;
+
 process (clk) begin
   if rising_edge(clk) then
         rgbColors(7).valid    <=  Rgb2.valid;
@@ -420,4 +439,5 @@ process (clk) begin
         rgbColors(7).blue     <=  Rgb2.blue;
   end if;
 end process;
+
 end behavioral;

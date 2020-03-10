@@ -26,13 +26,16 @@ port (
     oRgb                  : out channel);
 end testpattern;
 architecture arch_imp of testpattern is
-signal fTestPattern        : blurchannel;
-signal rTestPattern        : channel;
-signal rgbCo               : channel;
-signal rgbRed              : channel;
-signal rgbGre              : channel;
-signal rgbBlu              : channel;
+
+    signal fTestPattern        : blurchannel;
+    signal rTestPattern        : channel;
+    signal rgbCo               : channel;
+    signal rgbRed              : channel;
+    signal rgbGre              : channel;
+    signal rgbBlu              : channel;
+
 begin
+
 FrameTestPatternInst: frame_testpattern
 generic map(
     s_data_width => 16)

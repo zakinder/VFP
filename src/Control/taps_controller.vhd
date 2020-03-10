@@ -25,7 +25,7 @@ port (
     clk         : in std_logic;
     rst_l       : in std_logic;
     iRgb        : in channel;
-	tpValid     : out std_logic;
+    tpValid     : out std_logic;
     tp0         : out std_logic_vector(tpDataWidth - 1 downto 0);
     tp1         : out std_logic_vector(tpDataWidth - 1 downto 0);
     tp2         : out std_logic_vector(tpDataWidth - 1 downto 0));

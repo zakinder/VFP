@@ -21,15 +21,22 @@ entity segment_colors is
 port (
     clk            : in  std_logic;
     reset          : in  std_logic;
-    lumThreshold   : in  std_logic_vector(7 downto 0);
+    iLumTh         : in  integer;
     iRgb           : in channel;
     oRgb           : out channel);
 end segment_colors;
+
 architecture behavioral of segment_colors is
-    signal rgbLgt     : channel;
-    signal rgbDrk     : channel;
-    signal rgbLum     : channel;
+
+    signal rgbLgt         : channel;
+    signal rgbDrk         : channel;
+    signal rgbLum         : channel;
+    signal thresh         : std_logic_vector(7 downto 0);
+
 begin
+
+thresh      <= std_logic_vector(to_unsigned(iLumTh,thresh'length));
+
 rgbLgtInst: lum_values
 generic map(
     F_LGT              => true,
@@ -65,7 +72,7 @@ port map(
     oRgb               => rgbLum);
 process (clk) begin
     if rising_edge(clk) then
-        if (rgbLum.red > lumThreshold) and (rgbLum.green > lumThreshold) and (rgbLum.blue > lumThreshold)  then
+        if (rgbLum.red > thresh) and (rgbLum.green > thresh) and (rgbLum.blue > thresh)  then
             oRgb       <= rgbLgt;
         else
             oRgb       <= rgbDrk;

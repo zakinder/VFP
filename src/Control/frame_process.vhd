@@ -45,15 +45,16 @@ port (
     iRgbSet                 : in rRgb;
     --cpu side in
     iRgbCoord               : in region;
-    iPoiRegion              : in poi;
+    iRoi                    : in poi;
     iKls                    : in coefficient;
     iAls                    : in coefficient;
     iLumTh                  : in integer;
     iHsvPerCh               : in integer;
     iYccPerCh               : in integer;
-    iEdgeType               : in std_logic_vector(b_data_width-1 downto 0);
-    iThreshold              : in std_logic_vector(s_data_width-1 downto 0);
-    iVideoChannel           : in std_logic_vector(b_data_width-1 downto 0);
+    iSobelTh                : in integer;
+    iVideoChannel           : in integer;
+    iFilterId               : in integer;
+    oKcoeff                 : out kernelCoeff;
     --out
     oFrameData              : out fcolors;
     --to cpu
@@ -95,19 +96,15 @@ architecture arch of frame_process is
     signal rgbImageKernelv5 : colors;
     signal iKcoeff          : kernelCoeff;
     signal rgbImageFilters  : frameColors;
-    signal lumThreshold     : std_logic_vector(7 downto 0);
-    signal cHsv             : std_logic_vector(2 downto 0);
-    signal cYcc             : std_logic_vector(2 downto 0);
+
+
+
     signal edgeValid        : std_logic;
     signal rgbDetectLock    : std_logic;
     signal rgbPoiLock       : std_logic;
     signal sValid           : std_logic;
 
 begin
-
-    lumThreshold                 <= std_logic_vector(to_unsigned(iLumTh,8));
-    cHsv                         <= std_logic_vector(to_unsigned(iHsvPerCh,3));--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
-    cYcc                         <= std_logic_vector(to_unsigned(iYccPerCh,3));--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
 
     oFrameData.sobel             <= rgbImageFilters.sobel;
     oFrameData.embos             <= rgbImageFilters.embos;
@@ -221,16 +218,19 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     txCord              => cord,
-    lumThreshold        => lumThreshold,
-    iThreshold          => iThreshold,
-	iVideoChannel       => iVideoChannel,
+    iLumTh              => iLumTh,
+    iSobelTh            => iSobelTh,
+    iVideoChannel       => iVideoChannel,
     iRgb                => rgbIn,
-    cHsv                => cHsv,
-    cYcc                => cYcc,
-	iAls                => iAls,
+    iHsvPerCh           => iHsvPerCh,
+    iYccPerCh           => iYccPerCh,
+    iAls                => iAls,
     iKcoeff             => iKcoeff,
+    iFilterId           => iFilterId,
+    oKcoeff             => oKcoeff,
     edgeValid           => edgeValid,
     oRgb                => rgbImageFilters);
+
 detectInst: detect_pixel
 generic map(
     i_data_width        => i_data_width)
@@ -255,7 +255,7 @@ port map(
     iCord               => cord,
     endOfFrame          => iRgbSet.pEof,
     gridLockDatao       => oGridLockData,
-    pRegion             => iPoiRegion,
+    iRoi                => iRoi,
     fifoStatus          => oFifoStatus,
     oGridLocation       => rgbPoiLock,
     oRgb                => rgbPoi);

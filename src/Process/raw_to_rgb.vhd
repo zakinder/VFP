@@ -24,14 +24,18 @@ port (
     iTpData         : in rTp;
     oRgbSet         : out rRgb);
 end entity;
+
 architecture arch of raw_to_rgb is
+
     signal rgb      : rawRgb;
     signal tpd1     : uTp;
     signal r1Valid  : std_logic := lo;
     signal r2Valid  : std_logic := lo;
     signal d1TpData : rTp;
     signal d2TpData : rTp;
+
 begin
+
 validSyncP: process(clk) begin
     if rising_edge(clk) then
         r1Valid       <= iTpData.valid;
@@ -44,6 +48,7 @@ validSyncP: process(clk) begin
         oRgbSet.cord  <= d2TpData.cord;
     end if;
 end process validSyncP;
+
 syncDataP: process (clk) begin
     if rising_edge(clk) then
         if rst_l = '0' then

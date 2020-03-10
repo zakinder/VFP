@@ -32,10 +32,10 @@ architecture arch of data_taps is
 
     signal d1RawData    :  rData;
     signal d2RawData    :  rData;
-	signal wChx0Valid   : std_logic_vector(3 downto 0) := (others => lo);
-	signal wChx1Valid   : std_logic_vector(3 downto 0) := (others => lo);
-	signal wChx2Valid   : std_logic_vector(3 downto 0) := (others => lo);
-	signal wChx3Valid   : std_logic_vector(3 downto 0) := (others => lo);
+    signal wChx0Valid   : std_logic_vector(3 downto 0) := (others => lo);
+    signal wChx1Valid   : std_logic_vector(3 downto 0) := (others => lo);
+    signal wChx2Valid   : std_logic_vector(3 downto 0) := (others => lo);
+    signal wChx3Valid   : std_logic_vector(3 downto 0) := (others => lo);
     signal write_chs    : integer range 0 to 3;
     signal write_s      : std_logic;
     signal write_p      : std_logic;

@@ -30,7 +30,9 @@ port (
     iRgb           : in channel;
     oRgb           : out channel);
 end color_avg;
+
 architecture behavioral of color_avg is
+
     signal int1Rgb          : intChannel;
     signal int2Rgb          : intChannel;
     signal int3Rgb          : intChannel;
@@ -74,7 +76,9 @@ architecture behavioral of color_avg is
     signal rgbBluAvg        : ufixed(7 downto 0)    :=(others => '0');
     signal rgbSumBluAvg     : ufixed(9 downto -10)  :=(others => '0');
     signal rgbSumBlu        : ufixed(9 downto 0)    :=(others => '0');
+
 begin
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 1
 -----------------------------------------------------------------------------------------------
@@ -90,6 +94,7 @@ process (clk,reset)begin
         int1Rgb.valid  <= iRgb.valid;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         int2Rgb <= int1Rgb;
@@ -116,6 +121,7 @@ process (clk) begin
         rgbBluMaxLimit <= rgbBluMax - int1Rgb.blue;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         uFs2Rgb <= uFs1Rgb;
@@ -140,6 +146,7 @@ process (clk,reset)begin
         uFs1Rgb.valid  <= iRgb.valid;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 2
 -----------------------------------------------------------------------------------------------
@@ -150,6 +157,7 @@ process (clk) begin
         rgbSumBlu         <= uFs1Rgb.blue + uFs2Rgb.blue + uFs3Rgb.blue;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 3
 -----------------------------------------------------------------------------------------------
@@ -166,6 +174,7 @@ process (clk) begin
         end if;
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 4
 -----------------------------------------------------------------------------------------------
@@ -176,6 +185,7 @@ process (clk) begin
         rgbBluAvg         <= resize(rgbSumBluAvg,rgbBluAvg);
     end if;
 end process;
+
 -----------------------------------------------------------------------------------------------
 -- STAGE 5
 -----------------------------------------------------------------------------------------------
@@ -218,6 +228,7 @@ end process;
         -- oRgb.valid <= int5Rgb.valid;
     -- end if;
 -- end process;
+
 process (clk) begin
     if rising_edge(clk) then
         rgbSyncValid(0)  <= iRgb.valid;
@@ -242,6 +253,7 @@ process (clk) begin
         rgbBlu2xMax <= rgbBluMax;
     end if;
 end process;
+
 process (clk) begin
     if rising_edge(clk) then
         rgbRedO2Max <= max(int1Rgb.red,rgbRedMax);
@@ -249,4 +261,5 @@ process (clk) begin
         rgbBluO2Max <= max(int1Rgb.blue,rgbBluMax);
     end if;
 end process;
+
 end behavioral;

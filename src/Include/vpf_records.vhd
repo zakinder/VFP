@@ -477,6 +477,28 @@ type rRgb is record
     blue             : std_logic_vector(7 downto 0);
     cord             : coord;
 end record;
+type w_pixels is record
+    pix1 : unsigned(i_data_width downto 0);
+    pix2 : unsigned(i_data_width downto 0);
+    pix3 : unsigned(i_data_width downto 0);
+    pix4 : unsigned(i_data_width downto 0);
+    pix5 : unsigned(i_data_width downto 0);
+    pix6 : unsigned(i_data_width downto 0);
+    pix7 : unsigned(i_data_width downto 0);
+    pix8 : unsigned(i_data_width downto 0);
+    pix9 : unsigned(i_data_width downto 0);
+end record;
+type itaps is record
+    iTap1  : unsigned(i_data_width downto 0);
+    iTap2  : unsigned(i_data_width downto 0);
+    iTap3  : unsigned(i_data_width downto 0);
+end record;
+type unsig_pixel_mac is record
+    m1      : unsigned (16 downto 0);
+    m2      : unsigned (16 downto 0);
+    m3      : unsigned (16 downto 0);
+    mac     : unsigned (i_data_width+3 downto 0);
+end record;
 type fcolors is record
     sobel             : channel;
     embos             : channel;

@@ -29,7 +29,7 @@ port (
     i_data      : in std_logic_vector(dataWidth - 1 downto 0);
     i_wadd      : in std_logic_vector(adwrWidth - 1 downto 0);
     i_radd      : in std_logic_vector(adwrWidth - 1 downto 0);
-	en_datao    : out std_logic;
+    en_datao    : out std_logic;
     taps0x      : out std_logic_vector(dataWidth - 1 downto 0);
     taps1x      : out std_logic_vector(dataWidth - 1 downto 0);
     taps2x      : out std_logic_vector(dataWidth - 1 downto 0));

@@ -29,28 +29,30 @@ port (
     iRgb           : in channel;
     oRgbRemix      : out channel);
 end entity;
+
 architecture arch of edge_objects is
-signal rMax             : std_logic_vector(i_data_width-1 downto 0);
-signal rMin             : std_logic_vector(i_data_width-1 downto 0);
-signal gMax             : std_logic_vector(i_data_width-1 downto 0);
-signal gMin             : std_logic_vector(i_data_width-1 downto 0);
-signal bMax             : std_logic_vector(i_data_width-1 downto 0);
-signal bMin             : std_logic_vector(i_data_width-1 downto 0);
-signal dGrid            : std_logic;
-signal rgb1Int          : intChannel;
-signal rgb2Int          : intChannel;
-signal rgb3Int          : intChannel;
-signal rgb4Int          : intChannel;
-signal rgb1b            : channel;
-signal rgb2b            : channel;
-signal rgb3b            : channel;
-signal rgb4b            : channel;
-signal rgbMax           : integer;
-signal rgbMin           : integer;
-signal rgbDelta         : integer;
-signal minValue           : integer;
-signal maxValue         : integer;
-signal rgbRInt          : integer;
+
+    signal rMax             : std_logic_vector(i_data_width-1 downto 0);
+    signal rMin             : std_logic_vector(i_data_width-1 downto 0);
+    signal gMax             : std_logic_vector(i_data_width-1 downto 0);
+    signal gMin             : std_logic_vector(i_data_width-1 downto 0);
+    signal bMax             : std_logic_vector(i_data_width-1 downto 0);
+    signal bMin             : std_logic_vector(i_data_width-1 downto 0);
+    signal dGrid            : std_logic;
+    signal rgb1Int          : intChannel;
+    signal rgb2Int          : intChannel;
+    signal rgb3Int          : intChannel;
+    signal rgb4Int          : intChannel;
+    signal rgb1b            : channel;
+    signal rgb2b            : channel;
+    signal rgb3b            : channel;
+    signal rgb4b            : channel;
+    signal rgbMax           : integer;
+    signal rgbMin           : integer;
+    signal rgbDelta         : integer;
+    signal minValue         : integer;
+    signal maxValue         : integer;
+    signal rgbRInt          : integer;
 
 begin
 

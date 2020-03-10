@@ -133,15 +133,15 @@ package constants_package is
     constant pInterestWidth                     : integer := 127;
     constant pInterestHight                     : integer := 127;
     -------------------------------------------------------------------------
-    constant STREAM_TESTPATTERN1                : std_logic_vector(31 downto 0) := x"00000001";
-    constant STREAM_TESTPATTERN2                : std_logic_vector(31 downto 0) := x"00000002";
-    constant STREAM_TESTPATTERN3                : std_logic_vector(31 downto 0) := x"00000003";
-    constant STREAM_TESTPATTERN4                : std_logic_vector(31 downto 0) := x"00000004";
-    constant STREAM_TESTPATTERN5                : std_logic_vector(31 downto 0) := x"00000005";
-    constant STREAM_TESTPATTERN6                : std_logic_vector(31 downto 0) := x"00000006";
-    constant STREAM_TESTPATTERN7                : std_logic_vector(31 downto 0) := x"00000007";
-    constant STREAM_TESTPATTERN8                : std_logic_vector(31 downto 0) := x"00000008";
-    constant EXTERNAL_AXIS_STREAM               : std_logic_vector(31 downto 0) := x"00000000";
+    constant EXTERNAL_AXIS_STREAM               : integer :=0;
+    constant STREAM_TESTPATTERN1                : integer :=1;
+    constant STREAM_TESTPATTERN2                : integer :=2;
+    constant STREAM_TESTPATTERN3                : integer :=3;
+    constant STREAM_TESTPATTERN4                : integer :=4;
+    constant STREAM_TESTPATTERN5                : integer :=5;
+    constant STREAM_TESTPATTERN6                : integer :=6;
+    constant STREAM_TESTPATTERN7                : integer :=7;
+    constant STREAM_TESTPATTERN8                : integer :=8;
     -------------------------------------------------------------------------
     constant blurMacKernel_1                    : unsigned(i_data_width-1 downto 0) :=x"01";
     constant blurMacKernel_2                    : unsigned(i_data_width-1 downto 0) :=x"01";

@@ -27,7 +27,7 @@ port (
     rst_l          : in std_logic;
     iCord          : in coord;
     endOfFrame     : in std_logic;
-    pRegion        : in poi;
+    iRoi           : in poi;
     iRgb           : in channel;
     oRgb           : out channel;
     gridLockDatao  : out std_logic_vector(b_data_width-1 downto 0);
@@ -80,7 +80,7 @@ if (rising_edge (clk)) then
         fifoIsEmpty  <= hi;
         clrStatus    <= lo;
         --Enable
-        if (pRegion.cpuWgridLock = hi) then
+        if (iRoi.cpuWgridLock = hi) then
             fifoControlState <= waitForNewFrame;
         end if;
     when waitForNewFrame =>
@@ -115,7 +115,7 @@ if (rising_edge (clk)) then
     --RESET
         fifoIsFull   <= lo;
         fifoIsEmpty  <= hi;
-        if (pRegion.cpuAckGoAgain = hi) then
+        if (iRoi.cpuAckGoAgain = hi) then
             fifoControlState <= idle;
             clrStatus        <= hi;
         end if;
@@ -129,7 +129,7 @@ enablePointerP: process (clk)begin
     if rising_edge(clk) then
         wrDataIn  <= (iRgb.red & iRgb.green & iRgb.blue);
         wrAddr    <= wrAddress;
-        if (((pCont.x >= pRegion.pointInterest) and (pCont.x <= pRegion.pointInterest + pInterestWidth)) and ((pCont.y >= pRegion.pointInterest) and (pCont.y <= pRegion.pointInterest + pInterestHight)))
+        if (((pCont.x >= iRoi.pointInterest) and (pCont.x <= iRoi.pointInterest + pInterestWidth)) and ((pCont.y >= iRoi.pointInterest) and (pCont.y <= iRoi.pointInterest + pInterestHight)))
         and (iRgb.valid = hi) then
             GlEnable     <= hi;
         else
@@ -156,8 +156,8 @@ generic map(
 port map(
     clk             => clk,
     clrStatus       => clrStatus,
-    rdEn            => pRegion.fifoReadEnable,
-    rdAddress       => pRegion.fifoReadAddress(FIFO_ADDR_WIDTH-1 downto 0),
+    rdEn            => iRoi.fifoReadEnable,
+    rdAddress       => iRoi.fifoReadAddress(FIFO_ADDR_WIDTH-1 downto 0),
     dataO           => rdData,
     wrEn            => wrEn,
     wrAddress       => wrAddr,
