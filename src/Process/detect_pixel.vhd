@@ -32,6 +32,7 @@ port (
 end entity;
 
 architecture arch of detect_pixel is
+
     signal pEnable         : std_logic;
     signal pCont           : cord;
 
@@ -56,7 +57,7 @@ pipCordP: process (clk)begin
     end if;
 end process pipCordP;
 
-pixelCordInt : pixel_cord
+pixel_cord_int: pixel_cord
 port map(
     clk      => clk,
     iRgb     => iRgb,

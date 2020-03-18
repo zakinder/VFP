@@ -160,7 +160,7 @@ videoOutP: process (clk) begin
     end if;
 end process videoOutP;
 
-ycbcrInst: rgb_ycbcr
+rgb_ycbcr_inst: rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
     i_precision          => 12,
@@ -180,7 +180,7 @@ process (clk) begin
     end if;
 end process;
 
-TextGenYcbcrInst: text_gen
+text_gen_inst: text_gen
 generic map (
     img_width_bmp   => bmp_width,
     img_height_bmp  => bmp_height,

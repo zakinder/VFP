@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : kernel.vhd
+-- Filename    : kernel_filter.vhd
 -- Create Date : 05022019 [05-02-2019]
 -- Author      : Zakinder
 --
@@ -17,7 +17,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
-entity kernel is
+entity kernel_filter is
 generic (
     INRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
@@ -47,8 +47,8 @@ port (
     oKcoeff            : out kernelCoeff;
     oEdgeValid         : out std_logic;
     oRgb               : out colors);
-end kernel;
-architecture Behavioral of kernel is
+end kernel_filter;
+architecture Behavioral of kernel_filter is
 
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal rgbMac1         : channel := (valid => lo, red => black, green => black, blue => black);
@@ -63,7 +63,7 @@ begin
 --coef_mult
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
-CoefMultInst: coef_mult
+coef_mult_inst: coef_mult
 port map (
     clk            => clk,
     rst_l          => rst_l,
@@ -99,7 +99,7 @@ process (clk) begin
 end process;
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
---taps_controller
+--rgb_taps
 -----------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 TPDATAWIDTH3_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE) or (EMBOS_FRAME = TRUE)) generate
@@ -108,7 +108,7 @@ TPDATAWIDTH3_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE) or (EMBOS
     signal tp2        : std_logic_vector(23 downto 0) := (others => '0');
     signal tpValid    : std_logic  := lo;
 begin
-TapsControllerInst: taps_controller
+TapsControllerInst: rgb_taps
 generic map(
     img_width    => img_width,
     tpDataWidth  => 24)
@@ -197,7 +197,7 @@ port map(
     ycbcrSyn.blue    <=  ycbcr.blue;
     ycbcrSyn.green   <=  ycbcr.green;
     ycbcrSyn.valid   <=  rgbSyncValid(9);
-SyncFramesInst: sync_frames
+sync_frames_inst: sync_frames
 generic map (
     pixelDelay   => 6)
 port map(
@@ -247,7 +247,7 @@ port map(
     cgain1Syn.blue  <=  c1gain.blue;
     cgain1Syn.green <=  c1gain.green;
     cgain1Syn.valid <=  rgbSyncValid(9);
-SyncFramesInst: sync_frames
+sync_frames_inst: sync_frames
 generic map (
     pixelDelay   => 6)
 port map(
@@ -284,7 +284,7 @@ port map(
     cgain2Syn.blue  <=  c2gain.blue;
     cgain2Syn.green <=  c2gain.green;
     cgain2Syn.valid <=  rgbSyncValid(9);
-SyncFramesInst: sync_frames
+sync_frames_inst: sync_frames
 generic map (
     pixelDelay   => 6)
 port map(
@@ -532,9 +532,9 @@ signal tpValid        : std_logic := lo;
 signal ovalid         : std_logic := lo;
 begin
 -----------------------------------------------------------------------------------------------
--- taps_controller
+-- rgb_taps
 -----------------------------------------------------------------------------------------------
-TapsControllerInst: taps_controller
+TapsControllerInst: rgb_taps
 generic map(
     img_width    => img_width,
     tpDataWidth  => 8)

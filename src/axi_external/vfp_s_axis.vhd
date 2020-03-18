@@ -11,9 +11,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+
 entity vfp_s_axis is
 generic (
     i_data_width             : integer := 8;

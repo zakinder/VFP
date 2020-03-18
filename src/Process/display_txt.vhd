@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : pixel_on_display.vhd
+-- Filename    : display_txt.vhd
 -- Create Date : 01162019 [01-16-2019]
 -- Author      : Zakinder
 --
@@ -17,7 +17,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
-entity pixel_on_display is
+entity display_txt is 
 generic(
     img_width_bmp    : integer := 1920;
     img_height_bmp   : integer := 1080;
@@ -29,9 +29,9 @@ port (
     grid         : in cord;
     iViChannel   : in integer;
     pixel        : out std_logic);
-end pixel_on_display;
+end display_txt;
 
-architecture Behavioral of pixel_on_display is
+architecture Behavioral of display_txt is
 
     constant NU_MRGB_TYPES       : natural := 40;
     signal displayText           : string(1 to 5):= "INRGB";
@@ -95,7 +95,7 @@ dSyncP: process(clk) begin
     end if;
 end process dSyncP;
 
-FontRomInst: font_rom
+font_rom_inst: font_rom
 port map(
     clk     => clk,
     addr    => fontAddress,

@@ -110,7 +110,7 @@ tap1ReadOutP: process(aclk) begin
     end if;
 end process tap1ReadOutP;
 
-lineD0Inst: tap_buffer
+tap1_buffer_inst: tap_buffer
 generic map(
     img_width    => img_width,
     dataWidth    => dataWidth,
@@ -123,7 +123,7 @@ port map(
     read_clk  => aclk,
     r_address => iRawData.cord.x(addrWidth -1 downto 0),
     odata     => tap0_data);
-lineD1Inst: tap_buffer
+tap2_buffer_inst: tap_buffer
 generic map(
     img_width    => img_width,
     dataWidth    => dataWidth,
@@ -136,7 +136,7 @@ port map(
     read_clk  => aclk,
     r_address => iRawData.cord.x(addrWidth -1 downto 0),
     odata     => tap1_data);
-lineD2Inst: tap_buffer
+tap3_buffer_inst: tap_buffer
 generic map(
     img_width    => img_width,
     dataWidth    => dataWidth,
@@ -149,7 +149,7 @@ port map(
     read_clk   => aclk,
     r_address  => iRawData.cord.x(addrWidth -1 downto 0),
     odata      => tap2_data);
-lineD3Inst: tap_buffer
+tap4_buffer_inst: tap_buffer
 generic map(
     img_width    => img_width,
     dataWidth    => dataWidth,

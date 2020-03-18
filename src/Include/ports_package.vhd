@@ -79,7 +79,7 @@ port (
     iGreen         : in  std_logic_vector(7 downto 0);
     iBlue          : in  std_logic_vector(7 downto 0));
 end component rgbAssertion;
-component kernel is
+component kernel_filter is
 generic (
     inRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
@@ -109,7 +109,7 @@ port (
     oKcoeff            : out kernelCoeff;
     oEdgeValid         : out std_logic;
     oRgb               : out colors);
-end component kernel;
+end component kernel_filter;
 component text_gen is
 generic (
     img_width_bmp        : integer := 4096;
@@ -130,7 +130,7 @@ port (
     addr    : in integer;
     fontRow : out std_logic_vector(FONT_WIDTH-1 downto 0));
 end component font_rom;
-component pixel_on_display is
+component display_txt is
 generic (
     img_width_bmp               : integer := 1920;
     img_height_bmp              : integer := 1080;
@@ -142,7 +142,7 @@ port (
     grid         : in cord;
     iViChannel   : in integer;
     pixel        : out std_logic);
-end component pixel_on_display;
+end component display_txt;
 component color_trim is
 generic (
     i_data_width  : integer := 8);
@@ -227,7 +227,7 @@ port (
     m_axis_mm2s_tlast           : out std_logic;
     m_axis_mm2s_tdata           : out std_logic_vector(s_data_width-1 downto 0));
 end component vfp_m_axis;
-component camera_raw_data is
+component bayer_data is
 generic (
     img_width                   : integer:= 0);
 port (
@@ -238,21 +238,20 @@ port (
     ilval                       : in std_logic;
     idata                       : in std_logic_vector(11 downto 0);
     oRawData                    : out rData);
-end component camera_raw_data;
-component camera_raw_to_rgb is
+end component bayer_data;
+component bayer_to_rgb is
 generic (
     img_width                   : integer := 8;
-    dataWidth                   : integer := 12;
-    addrWidth                   : integer := 12);
+    dataWidth                   : integer := 12);
 port (
-    m_axis_mm2s_aclk            : in std_logic;
-    m_axis_mm2s_aresetn         : in std_logic;
+    clk                         : in std_logic;
+    rst_l                       : in std_logic;
     pixclk                      : in std_logic;
     ifval                       : in std_logic;
     ilval                       : in std_logic;
     idata                       : in std_logic_vector(dataWidth-1 downto 0);
     oRgbSet                     : out rRgb);
-end component camera_raw_to_rgb;
+end component bayer_to_rgb;
 component video_stream is
 generic (
     revision_number             : std_logic_vector(31 downto 0) := x"00000000";
@@ -315,7 +314,7 @@ port (
     S_AXI_RVALID                : out std_logic;
     S_AXI_RREADY                : in std_logic);
 end component vfp_config;
-component buffer_controller is
+component buffer_taps is
 generic (
     img_width                   : integer := 4096;
     adwrWidth                   : integer := 16;
@@ -331,8 +330,8 @@ port (
     taps0x                      : out std_logic_vector(dataWidth - 1 downto 0);
     taps1x                      : out std_logic_vector(dataWidth - 1 downto 0);
     taps2x                      : out std_logic_vector(dataWidth - 1 downto 0));
-end component buffer_controller;
-component taps_controller is
+end component buffer_taps;
+component rgb_taps is
 generic (
     img_width     : integer := 4096;
     tpDataWidth   : integer := 8);
@@ -344,8 +343,8 @@ port (
     tp0         : out std_logic_vector(tpDataWidth - 1 downto 0);
     tp1         : out std_logic_vector(tpDataWidth - 1 downto 0);
     tp2         : out std_logic_vector(tpDataWidth - 1 downto 0));
-end component taps_controller;
-component tapLine is
+end component rgb_taps;
+component tap_line is
 generic (
     img_width    : integer := 4095;
     tpDataWidth  : integer := 12);
@@ -355,7 +354,7 @@ port (
     valid        : in std_logic;
     idata        : in std_logic_vector(tpDataWidth - 1 downto 0);
     odata        : out std_logic_vector(tpDataWidth - 1 downto 0));
-end component tapLine;
+end component tap_line;
 component sharp_mac is
 port (
     clk                         : in std_logic;
@@ -556,7 +555,7 @@ port (
     iCord                       : in coord;
     pDetect                     : out std_logic);
 end component detect_pixel;
-component point_of_interest is
+component ro_interest is
 generic (
     i_data_width                : integer := 8;
     s_data_width                : integer := 16;
@@ -572,8 +571,8 @@ port (
     gridLockDatao               : out std_logic_vector(b_data_width-1 downto 0);
     fifoStatus                  : out std_logic_vector(b_data_width-1 downto 0);
     oGridLocation               : out std_logic);
-end component point_of_interest;
-component grid_lock_fifo is
+end component ro_interest;
+component ro_fifo is
 generic (
     FIFO_DEPTH                  : integer := 24;
     FIFO_DATA_WIDTH             : integer := 24;
@@ -655,7 +654,7 @@ port (
     cr                          : out std_logic_vector(i_data_width-1 downto 0);
     oValid                      : out std_logic);
 end component rgb_ycbcr;
-component color_correction is
+component color_filter is
 generic (
     i_data_width                : integer := 8);
 port (
@@ -664,7 +663,7 @@ port (
     iRgb                        : in channel;
     als                         : in coefficient;
     oRgb                        : out channel);
-end component color_correction;
+end component color_filter;
 component ImageKernel is
 generic (
     SHARP_FRAME           : boolean := false;
@@ -714,7 +713,7 @@ port (
     r_address                   : in std_logic_vector(addrWidth - 1 downto 0);
     odata                       : out std_logic_vector(dataWidth - 1 downto 0));
 end component;
-component mWrRd
+component master_wr_reg
 generic (
     revision_number             : std_logic_vector(31 downto 0) := x"00000000";
     s_data_width                : integer    := 16;
@@ -766,7 +765,7 @@ port (
     iCord                       : in cord;
     oRgb                        : out channel);
 end component pixel_cord;
-component axis_external
+component axi_external
 generic (
     revision_number             : std_logic_vector(31 downto 0) := x"05022019";
     C_rgb_m_axis_TDATA_WIDTH    : integer := 16;

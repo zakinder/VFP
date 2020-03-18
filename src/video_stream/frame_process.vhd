@@ -185,7 +185,7 @@ end process pipCoordP;
     iKcoeff.k9   <= iKls.k9(15 downto 0);
     iKcoeff.kSet <= iKls.config;
 
-FiltersInst: filters
+filters_inst: filters
 generic map(
     F_TES               =>  F_TES,
     F_LUM               =>  F_LUM,
@@ -231,7 +231,7 @@ port map(
     edgeValid           => edgeValid,
     oRgb                => rgbImageFilters);
 
-detectInst: detect_pixel
+detect_pixel_inst: detect_pixel
 generic map(
     i_data_width        => i_data_width)
 port map(
@@ -243,7 +243,7 @@ port map(
     iCord               => cord,
     pDetect             => rgbDetectLock,
     oRgb                => rgbDetect);
-pointOfInterestInst: point_of_interest
+ro_interest_inst: ro_interest 
 generic map(
     i_data_width        => i_data_width,
     s_data_width        => s_data_width,

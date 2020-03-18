@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : color_correction.vhd
+-- Filename    : color_filter.vhd
 -- Create Date : 05022019 [05-02-2019]
 -- Author      : Zakinder
 --
@@ -20,7 +20,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
-entity color_correction is
+entity color_filter is
   generic (
     i_data_width  : integer := 8);
   port (
@@ -29,8 +29,8 @@ entity color_correction is
     iRgb      : in channel;
     als       : in coefficient;
     oRgb      : out channel);
-end color_correction;
-architecture Behavioral of color_correction is
+end color_filter;
+architecture Behavioral of color_filter is
 
   signal cc                   : ccKernel;
   signal ccRgb                : ccRgbRecord;

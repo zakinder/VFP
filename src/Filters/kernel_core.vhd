@@ -36,7 +36,10 @@ port (
     kCoeff           : in kernelCoeDWord;
     oRgb             : out channel);
 end kernel_core;
+
+
 architecture Behavioral of kernel_core is
+
     signal cc               : ccRecord;
     signal rgbSyncValid     : std_logic_vector(15 downto 0)  := x"0000";
     signal rgbToFl_red      : std_logic_vector(31 downto 0);
@@ -46,10 +49,12 @@ architecture Behavioral of kernel_core is
     signal kCoeffDWord      : kernelCoeDWord;
     signal FractLevelProd   : kernelCoeDWord;
     signal kCoeffProd       : kCoeffFloat;
+
 begin
 -----------------------------------------------------------------------------------------------
 -- STAGE 1
 -----------------------------------------------------------------------------------------------
+-- Latency
 ByteToFloatTopRedinst: ByteToFloatTop
     port map (
       aclk       => clk,
@@ -58,6 +63,7 @@ ByteToFloatTopRedinst: ByteToFloatTop
       iData      => iRgb.red,
       oValid     => open,
       oDataFloat => rgbToFl_red);
+
 ByteToFloatTopGreeninst: ByteToFloatTop
     port map (
       aclk       => clk,

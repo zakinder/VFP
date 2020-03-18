@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : camera_raw_data.vhd
+-- Filename    : bayer_data.vhd
 -- Create Date : 01062019 [01-06-2019]
 -- Author      : Zakinder
 --
 -- Description:
 -- This module read camera input control valids and data signals.
--- camera_raw_data is the first module inside the VFP system which
+-- bayer_data is the first module inside the VFP system which
 -- communicate with D5M camera.It receives the data of 12 bits
 -- per pixel at each clock cycle from the cmos camera when the
 -- frame valid and line valid are asserted high.Pixel clock is
@@ -25,6 +25,10 @@
 -- varies which is adjusted by the camera valid signals upto
 -- maximum supported value.
 ----------------------------------------------------------------
+-- Latency : 
+-- Clock Rate pixclk : 
+-- Clock Rate m_axis_aclk:
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -33,7 +37,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
-entity camera_raw_data is
+entity bayer_data is
 generic (
     img_width         : integer := 8);
 port (
@@ -44,9 +48,9 @@ port (
     ilval             : in std_logic;
     idata             : in std_logic_vector(11 downto 0);
     oRawData          : out rData);
-end camera_raw_data;
+end bayer_data;
 
-architecture arch_imp of camera_raw_data is
+architecture arch_imp of bayer_data is
     --PIXCLK SIDE
     signal pLine          : std_logic :=lo;
     signal pFrame         : std_logic :=lo;
@@ -89,7 +93,7 @@ d5mDataSyncP: process(pixclk) begin
         if (pFrame = hi and pLine = hi) then
             pWrAdr  <= pWrAdr + one;
         else
-            pWrAdr <= zero;
+            pWrAdr  <= zero;
         end if;
         if (pEolBufferFull = hi) then
             imgWidth  <= pWrAdr;

@@ -76,7 +76,7 @@ end process tapValidAdressP;
 
 rAddress  <= std_logic_vector(to_unsigned(rCountAddress, 16));
 
-RGB_inst: buffer_controller
+buffer_taps_inst: buffer_taps
 generic map(
     img_width       => img_width,
     adwrWidth       => adwrWidth,
@@ -93,7 +93,7 @@ port map(
     taps1x          => dTapRgb2,
     taps2x          => dTapRgb3);
 
-MAC_R_inst: blur_mac
+blur_mac_red_inst: blur_mac
 generic map(
     i_data_width    => 8)
 port map(
@@ -104,7 +104,7 @@ port map(
     iTap3           => vTapRgb3(23 downto 16),
     oBlurData       => blurRgb.red);
 
-MAC_G_inst: blur_mac
+blur_mac_gre_inst: blur_mac
 generic map(
     i_data_width    => 8)
 port map(
@@ -115,7 +115,7 @@ port map(
     iTap3           => vTapRgb3(15 downto 8),
     oBlurData       => blurRgb.green);
 
-MAC_B_inst: blur_mac
+blur_mac_blu_inst: blur_mac
 generic map(
     i_data_width    => 8)
 port map(
