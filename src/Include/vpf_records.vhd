@@ -150,15 +150,22 @@ type tps is record
   vTap2x              : std_logic_vector(31 downto 0);
 end record;
 type ccRecord is record
+    tpsd1            : tps;
+    tpsd2            : tps;
+    tpsd3            : tps;
+end record;
+
+type TapsRecord is record
+    tpsd1            : tps;
+    tpsd2            : tps;
+    tpsd3            : tps;
+end record;
+
+type snFixedResizeRecord is record
     fxToSnFxProd     : ty2std;
     snFxToSnProd     : ty2snRz;
     snToTrimProd     : ty1sn;
     snSum            : rgbToSnSumRecord;
-    snToTrimSum      : rgbToSnSumTrRecord;
-    tpsd1            : tps;
-    tpsd2            : tps;
-    tpsd3            : tps;
-    rgbSum           : signed(12 downto 0);
 end record;
 type filtersCoefRecord is record
     flCoef           : ty2fl;
@@ -210,6 +217,12 @@ type channel is record
     green            : std_logic_vector(7 downto 0);
     blue             : std_logic_vector(7 downto 0);
 end record;
+type rgbFloat is record
+    valid            : std_logic;
+    red              : std_logic_vector(31 downto 0);
+    green            : std_logic_vector(31 downto 0);
+    blue             : std_logic_vector(31 downto 0);
+end record;
 type colors is record
     sobel          : channel;
     embos          : channel;
@@ -223,6 +236,14 @@ type colors is record
     tPattern       : channel;
     colorTrm       : channel;
     colorLmp       : channel;
+end record;
+type blur_frames is record
+    ditRgb1vx           : channel;
+    ditRgb2vx           : channel;
+    ditRgb3vx           : channel;
+    blur1vx             : channel;
+    blur2vx             : channel;
+    blur3vx             : channel;
 end record;
 type frameColors is record
     sobel             : channel;

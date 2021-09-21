@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : buffer_taps.vhd
+-- Filename    : buffer_controller.vhd
 -- Create Date : 01062019 [01-06-2019]
 -- Author      : Zakinder
 --
@@ -17,7 +17,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
-entity buffer_taps is
+entity buffer_controller is
 generic (
     img_width     : integer := 4096;
     adwrWidth     : integer := 16;
@@ -34,7 +34,7 @@ port (
     taps1x      : out std_logic_vector(dataWidth - 1 downto 0);
     taps2x      : out std_logic_vector(dataWidth - 1 downto 0));
 end entity;
-architecture arch of buffer_taps is
+architecture arch of buffer_controller is
     signal wrchx0_io   : std_logic :='0';
     signal wrchx1_io   : std_logic :='0';
     signal wrchx2_io   : std_logic :='0';

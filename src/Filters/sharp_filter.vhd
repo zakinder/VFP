@@ -61,7 +61,7 @@ tapValidAdressP: process(clk)begin
     end if;
 end process tapValidAdressP;
 rAddress  <= std_logic_vector(to_unsigned(rCountAddress, 16));
-buffer_taps_inst: buffer_taps
+RGBInst: buffer_controller
 generic map(
     img_width       => img_width,
     adwrWidth       => adwrWidth,
@@ -77,7 +77,7 @@ port map(
     taps0x          => v1TapRGB0x,
     taps1x          => v1TapRGB1x,
     taps2x          => v1TapRGB2x);
-sharp_mac_red_inst: sharp_mac 
+MACrInst: sharp_mac
 port map(
     clk             => clk,
     rst_l           => rst_l,
@@ -86,7 +86,7 @@ port map(
     vTap2x          => vTapRGB2x(23 downto 16),
     kls             => kls,
     DataO           => oRgb.red);
-sharp_mac_gre_inst: sharp_mac
+MACgInst: sharp_mac
 port map(
     clk             => clk,
     rst_l           => rst_l,
@@ -95,7 +95,7 @@ port map(
     vTap2x          => vTapRGB2x(15 downto 8),
     kls             => kls,
     DataO           => oRgb.green);
-sharp_mac_blu_inst: sharp_mac
+MACbInst: sharp_mac
 port map(
     clk             => clk,
     rst_l           => rst_l,

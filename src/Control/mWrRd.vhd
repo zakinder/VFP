@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : master_wr_reg.vhd
+-- Filename    : mWrRd.vhd
 -- Create Date : 05012019 [05-01-2019]
 -- Author      : Zakinder
 --
@@ -14,7 +14,7 @@ use ieee.numeric_std.all;
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-entity master_wr_reg is
+entity mWrRd is
 generic (
     revision_number   : std_logic_vector(31 downto 0) := x"00000000";
     s_data_width      : integer    := 16;
@@ -56,8 +56,8 @@ port (
     oRgbSelect        : out integer;
     -- Region of interest
     oRoi              : out poi);
-end master_wr_reg;
-architecture Behavioral of master_wr_reg is
+end mWrRd;
+architecture Behavioral of mWrRd is
 begin
 --CPU Registers
     -- Write Registers

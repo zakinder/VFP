@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : axi_external.vhd
+-- Filename    : axis_external.vhd
 -- Create Date : 05022019 [05-02-2019]
 -- Author      : Zakinder
 --
@@ -17,7 +17,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
-entity axi_external is
+entity axis_external is
 generic (
     revision_number             : std_logic_vector(31 downto 0) := x"05022019";
     C_rgb_m_axis_TDATA_WIDTH    : integer := 16;
@@ -85,9 +85,9 @@ port (
     vfpconfig_rresp             : out std_logic_vector(1 downto 0);
     vfpconfig_rvalid            : out std_logic;
     vfpconfig_rready            : in std_logic);
-end axi_external;
+end axis_external;
 
-architecture arch_imp of axi_external is
+architecture arch_imp of axis_external is
 
     signal rx_axis_tready       : std_logic;
     signal rx_axis_tvalid       : std_logic;
@@ -99,7 +99,7 @@ begin
 
 -- this module convert ycbcr 444 to 422 and also generate basic test patten
 -- for testing at hdmi level at cpu. Both selection controlled by cpu.
-vfp_s_axis_inst: vfp_s_axis
+mAxisInst: vfp_s_axis
 generic map (
     i_data_width         => i_data_width,
     b_data_width         => b_data_width,
@@ -133,7 +133,7 @@ port map (
     rgb_s_axis_tdata     =>  rgb_s_axis_tdata);
 
 --- this module transfer video stream data to master axi4 stream
-vfp_m_axis_inst: vfp_m_axis
+mm2sInst: vfp_m_axis
 generic map(
     s_data_width         => s_data_width)
 port map(
@@ -157,7 +157,7 @@ port map(
     m_axis_mm2s_tdata    => m_axis_mm2s_tdata);
 
 -- this module encode and decode cpu config data to slave components
-vfp_config_inst: vfp_config
+vfpConfigInst: vfp_config
 generic map(
     revision_number      => revision_number,
     conf_data_width      => conf_data_width,

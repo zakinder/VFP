@@ -77,7 +77,7 @@ architecture arch_imp of video_stream is
 begin
 
 
-f_p_inst: frame_process
+frameProcessInst: frame_process
 generic map(
     i_data_width         => i_data_width,
     s_data_width         => s_data_width,
@@ -118,14 +118,14 @@ port map(
     oGridLockData        => sGridLockData,
     oFrameData           => sFrameData);
 
-digital_clock_inst: digital_clock
+digiClkInst: digital_clock
 port map(
     clk                  => clk,
     oSec                 => sSec,
     oMin                 => sMin,
     oHou                 => sHou);
 
-master_wr_reg_inst: master_wr_reg
+mWrRdInst: mWrRd
 generic map(
     revision_number      => revision_number,
     s_data_width         => s_data_width,
@@ -152,7 +152,7 @@ port map(
     oRgbSelect           => sRgbSelect,
     oRoi                 => sRoi);
 
-video_select_inst: video_select
+videoSelectInst: video_select
 generic map (
     bmp_width            => bmp_width,
     bmp_height           => bmp_height,

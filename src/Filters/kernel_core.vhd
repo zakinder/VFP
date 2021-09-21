@@ -36,237 +36,30 @@ port (
     kCoeff           : in kernelCoeDWord;
     oRgb             : out channel);
 end kernel_core;
-
-
 architecture Behavioral of kernel_core is
-
-    signal cc               : ccRecord;
-    signal rgbSyncValid     : std_logic_vector(15 downto 0)  := x"0000";
-    signal rgbToFl_red      : std_logic_vector(31 downto 0);
-    signal rgbToFl_gre      : std_logic_vector(31 downto 0);
-    signal rgbToFl_blu      : std_logic_vector(31 downto 0);
-    signal fractLevel       : std_logic_vector(31 downto 0);
-    signal kCoeffDWord      : kernelCoeDWord;
-    signal FractLevelProd   : kernelCoeDWord;
-    signal kCoeffProd       : kCoeffFloat;
-
+    signal taps             : TapsRecord;
+    signal rgb_float        : rgbFloat;
+    signal rgbSum           : signed(12 downto 0);
+    signal snfixRgb         : rgbToSnSumTrRecord;
 begin
------------------------------------------------------------------------------------------------
--- STAGE 1
------------------------------------------------------------------------------------------------
--- Latency
-ByteToFloatTopRedinst: ByteToFloatTop
-    port map (
-      aclk       => clk,
-      rst_l      => rst_l,
-      iValid     => iRgb.valid,
-      iData      => iRgb.red,
-      oValid     => open,
-      oDataFloat => rgbToFl_red);
 
-ByteToFloatTopGreeninst: ByteToFloatTop
+rgb_kernal_prod_inst: rgb_kernal_prod
     port map (
-      aclk       => clk,
-      rst_l      => rst_l,
-      iValid     => iRgb.valid,
-      iData      => iRgb.green,
-      oValid     => open,
-      oDataFloat => rgbToFl_gre);
-ByteToFloatTopBlueinst: ByteToFloatTop
-    port map (
-      aclk       => clk,
-      rst_l      => rst_l,
-      iValid     => iRgb.valid,
-      iData      => iRgb.blue,
-      oValid     => open,
-      oDataFloat => rgbToFl_blu);
------------------------------------------------------------------------------------------------
--- STAGE 2
------------------------------------------------------------------------------------------------
-FloatMultiplyK1Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k1,
-      iBdata     => cc.tpsd3.vTap2x,
-      oRdata     => FractLevelProd.k1);
-FloatMultiplyK2Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k2,
-      iBdata     => cc.tpsd2.vTap2x,
-      oRdata     => FractLevelProd.k2);
-FloatMultiplyK3Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k3,
-      iBdata     => cc.tpsd1.vTap2x,
-      oRdata     => FractLevelProd.k3);
-FloatMultiplyK4Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k4,
-      iBdata     => cc.tpsd3.vTap1x,
-      oRdata     => FractLevelProd.k4);
-FloatMultiplyK5Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k5,
-      iBdata     => cc.tpsd2.vTap1x,
-      oRdata     => FractLevelProd.k5);
-FloatMultiplyK6Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k6,
-      iBdata     => cc.tpsd1.vTap1x,
-      oRdata     => FractLevelProd.k6);
-FloatMultiplyK7Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k7,
-      iBdata     => cc.tpsd3.vTap0x,
-      oRdata     => FractLevelProd.k7);
-FloatMultiplyK8Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k8,
-      iBdata     => cc.tpsd2.vTap0x,
-      oRdata     => FractLevelProd.k8);
-FloatMultiplyK9Inst: FloatMultiplyTop
-    port map (
-      clk        => clk,
-      iAdata     => kCoeff.k9,
-      iBdata     => cc.tpsd1.vTap0x,
-      oRdata     => FractLevelProd.k9);
------------------------------------------------------------------------------------------------
--- STAGE 3
------------------------------------------------------------------------------------------------
-FloatToFixedv1TopK1Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k1,
-      oData      => kCoeffProd.k1);
-FloatToFixedv1TopK2Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k2,
-      oData      => kCoeffProd.k2);
-FloatToFixedv1TopK3Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k3,
-      oData      => kCoeffProd.k3);
-FloatToFixedv1TopK4Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k4,
-      oData      => kCoeffProd.k4);
-FloatToFixedv1TopK5Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k5,
-      oData      => kCoeffProd.k5);
-FloatToFixedv1TopK6Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k6,
-      oData      => kCoeffProd.k6);
-FloatToFixedv1TopK7Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k7,
-      oData      => kCoeffProd.k7);
-FloatToFixedv1TopK8Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k8,
-      oData      => kCoeffProd.k8);
-FloatToFixedv1TopK9Inst: FloatToFixedv1Top
-    port map (
-      aclk       => clk,
-      iData      => FractLevelProd.k9,
-      oData      => kCoeffProd.k9);
------------------------------------------------------------------------------------------------
--- STAGE 4
------------------------------------------------------------------------------------------------
-process (clk) begin
-    if rising_edge(clk) then
-        cc.fxToSnFxProd.k1 <= to_sfixed((kCoeffProd.k1), cc.fxToSnFxProd.k1);
-        cc.fxToSnFxProd.k2 <= to_sfixed((kCoeffProd.k2), cc.fxToSnFxProd.k2);
-        cc.fxToSnFxProd.k3 <= to_sfixed((kCoeffProd.k3), cc.fxToSnFxProd.k3);
-        cc.fxToSnFxProd.k4 <= to_sfixed((kCoeffProd.k4), cc.fxToSnFxProd.k4);
-        cc.fxToSnFxProd.k5 <= to_sfixed((kCoeffProd.k5), cc.fxToSnFxProd.k5);
-        cc.fxToSnFxProd.k6 <= to_sfixed((kCoeffProd.k6), cc.fxToSnFxProd.k6);
-        cc.fxToSnFxProd.k7 <= to_sfixed((kCoeffProd.k7), cc.fxToSnFxProd.k7);
-        cc.fxToSnFxProd.k8 <= to_sfixed((kCoeffProd.k8), cc.fxToSnFxProd.k8);
-        cc.fxToSnFxProd.k9 <= to_sfixed((kCoeffProd.k9), cc.fxToSnFxProd.k9);
-    end if;
-end process;
------------------------------------------------------------------------------------------------
--- STAGE 5
------------------------------------------------------------------------------------------------
-process (clk) begin
-    if rising_edge(clk) then
-        cc.snFxToSnProd.k1 <= to_signed(cc.fxToSnFxProd.k1(19 downto 0), 20);
-        cc.snFxToSnProd.k2 <= to_signed(cc.fxToSnFxProd.k2(19 downto 0), 20);
-        cc.snFxToSnProd.k3 <= to_signed(cc.fxToSnFxProd.k3(19 downto 0), 20);
-        cc.snFxToSnProd.k4 <= to_signed(cc.fxToSnFxProd.k4(19 downto 0), 20);
-        cc.snFxToSnProd.k5 <= to_signed(cc.fxToSnFxProd.k5(19 downto 0), 20);
-        cc.snFxToSnProd.k6 <= to_signed(cc.fxToSnFxProd.k6(19 downto 0), 20);
-        cc.snFxToSnProd.k7 <= to_signed(cc.fxToSnFxProd.k7(19 downto 0), 20);
-        cc.snFxToSnProd.k8 <= to_signed(cc.fxToSnFxProd.k8(19 downto 0), 20);
-        cc.snFxToSnProd.k9 <= to_signed(cc.fxToSnFxProd.k9(19 downto 0), 20);
-    end if;
-end process;
------------------------------------------------------------------------------------------------
--- STAGE 6
------------------------------------------------------------------------------------------------
-process (clk) begin
-    if rising_edge(clk) then
-        cc.snToTrimProd.k1 <= cc.snFxToSnProd.k1(19 downto 5);
-        cc.snToTrimProd.k2 <= cc.snFxToSnProd.k2(19 downto 5);
-        cc.snToTrimProd.k3 <= cc.snFxToSnProd.k3(19 downto 5);
-        cc.snToTrimProd.k4 <= cc.snFxToSnProd.k4(19 downto 5);
-        cc.snToTrimProd.k5 <= cc.snFxToSnProd.k5(19 downto 5);
-        cc.snToTrimProd.k6 <= cc.snFxToSnProd.k6(19 downto 5);
-        cc.snToTrimProd.k7 <= cc.snFxToSnProd.k7(19 downto 5);
-        cc.snToTrimProd.k8 <= cc.snFxToSnProd.k8(19 downto 5);
-        cc.snToTrimProd.k9 <= cc.snFxToSnProd.k9(19 downto 5);
-    end if;
-end process;
------------------------------------------------------------------------------------------------
--- STAGE 7
------------------------------------------------------------------------------------------------
-process (clk) begin
-    if rising_edge(clk) then
-        cc.snSum.red   <= resize(cc.snToTrimProd.k1, ADD_RESULT_WIDTH) +
-                          resize(cc.snToTrimProd.k2, ADD_RESULT_WIDTH) +
-                          resize(cc.snToTrimProd.k3, ADD_RESULT_WIDTH) + ROUND;
-        cc.snSum.green <= resize(cc.snToTrimProd.k4, ADD_RESULT_WIDTH) +
-                          resize(cc.snToTrimProd.k5, ADD_RESULT_WIDTH) +
-                          resize(cc.snToTrimProd.k6, ADD_RESULT_WIDTH) + ROUND;
-        cc.snSum.blue  <= resize(cc.snToTrimProd.k7, ADD_RESULT_WIDTH) +
-                          resize(cc.snToTrimProd.k8, ADD_RESULT_WIDTH) +
-                          resize(cc.snToTrimProd.k9, ADD_RESULT_WIDTH) + ROUND;
-    end if;
-end process;
------------------------------------------------------------------------------------------------
--- STAGE 8
------------------------------------------------------------------------------------------------
-process (clk) begin
-    if rising_edge(clk) then
-        cc.snToTrimSum.red    <= cc.snSum.red(cc.snSum.red'left downto FRAC_BITS_TO_KEEP);
-        cc.snToTrimSum.green  <= cc.snSum.green(cc.snSum.green'left downto FRAC_BITS_TO_KEEP);
-        cc.snToTrimSum.blue   <= cc.snSum.blue(cc.snSum.blue'left downto FRAC_BITS_TO_KEEP);
-    end if;
-end process;
------------------------------------------------------------------------------------------------
+    clk         => clk,
+    rst_l       => rst_l,
+    iRgb        => iRgb,
+    iCoeff      => kCoeff,
+    iTaps       => taps,
+    oRgbFloat   => rgb_float,
+    oRgbSnFix   => snfixRgb);
+    
 -----------------------------------------------------------------------------------------------
 --FILTERS: SHARP BLURE EMBOS SOBEL
------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 COLOR_DELAYED_ENABLED: if ((SHARP_FRAME = TRUE) or (BLURE_FRAME = TRUE)
                         or (EMBOS_FRAME = TRUE) or (SOBEL_FRAME = TRUE)) generate
 signal cc_rgbSum : std_logic_vector(i_data_width-1 downto 0) := black;
+signal rgb       : channel;
 begin
 -----------------------------------------------------------------------------------------------
 -- STAGE 2
@@ -274,17 +67,17 @@ begin
 process (clk) begin
     if rising_edge(clk) then
         --Red
-        cc.tpsd1.vTap0x <= rgbToFl_red;
-        cc.tpsd2.vTap0x <= cc.tpsd1.vTap0x;
-        cc.tpsd3.vTap0x <= cc.tpsd2.vTap0x;
+        taps.tpsd1.vTap0x <= rgb_float.red;
+        taps.tpsd2.vTap0x <= taps.tpsd1.vTap0x;
+        taps.tpsd3.vTap0x <= taps.tpsd2.vTap0x;
         --Green
-        cc.tpsd1.vTap1x <= rgbToFl_gre;
-        cc.tpsd2.vTap1x <= cc.tpsd1.vTap1x;
-        cc.tpsd3.vTap1x <= cc.tpsd2.vTap1x;
+        taps.tpsd1.vTap1x <= rgb_float.green;
+        taps.tpsd2.vTap1x <= taps.tpsd1.vTap1x;
+        taps.tpsd3.vTap1x <= taps.tpsd2.vTap1x;
         --Blue
-        cc.tpsd1.vTap2x <= rgbToFl_blu;
-        cc.tpsd2.vTap2x <= cc.tpsd1.vTap2x;
-        cc.tpsd3.vTap2x <= cc.tpsd2.vTap2x;
+        taps.tpsd1.vTap2x <= rgb_float.blue;
+        taps.tpsd2.vTap2x <= taps.tpsd1.vTap2x;
+        taps.tpsd3.vTap2x <= taps.tpsd2.vTap2x;
     end if;
 end process;
 -----------------------------------------------------------------------------------------------
@@ -292,13 +85,13 @@ end process;
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        cc.rgbSum  <= (cc.snToTrimSum.red + cc.snToTrimSum.green + cc.snToTrimSum.blue);
-        if (cc.rgbSum(ROUND_RESULT_WIDTH-1) = hi) then
+        rgbSum  <= (snfixRgb.red + snfixRgb.green + snfixRgb.blue);
+        if (rgbSum(ROUND_RESULT_WIDTH-1) = hi) then
             cc_rgbSum <= black;
-        elsif (unsigned(cc.rgbSum(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
+        elsif (unsigned(rgbSum(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
             cc_rgbSum <= white;
         else
-            cc_rgbSum <= std_logic_vector(cc.rgbSum(i_data_width-1 downto 0));
+            cc_rgbSum <= std_logic_vector(rgbSum(i_data_width-1 downto 0));
         end if;
     end if;
 end process;
@@ -307,24 +100,64 @@ end process;
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        oRgb.red    <= cc_rgbSum;
-        oRgb.green  <= cc_rgbSum;
-        oRgb.blue   <= cc_rgbSum;
-        oRgb.valid  <= rgbSyncValid(9);
+        rgb.red    <= cc_rgbSum;
+        rgb.green  <= cc_rgbSum;
+        rgb.blue   <= cc_rgbSum;
+        rgb.valid  <= iRgb.valid;
     end if;
 end process;
+
+SHARP_FRAME_ENABLED: if (SHARP_FRAME = TRUE) generate
+sharp_valid_inst: d_valid
+generic map (
+    pixelDelay   => 31)
+port map(
+    clk      => clk,
+    iRgb     => rgb,
+    oRgb     => oRgb);
+end generate SHARP_FRAME_ENABLED;
+
+BLURE_FRAME_ENABLED: if (BLURE_FRAME = TRUE) generate
+blure_valid_inst: d_valid
+generic map (
+    pixelDelay   => 31)
+port map(
+    clk      => clk,
+    iRgb     => rgb,
+    oRgb     => oRgb);
+end generate BLURE_FRAME_ENABLED;
+
+EMBOS_FRAME_ENABLED: if (EMBOS_FRAME = TRUE) generate
+embos_valid_inst: d_valid
+generic map (
+    pixelDelay   => 31)
+port map(
+    clk      => clk,
+    iRgb     => rgb,
+    oRgb     => oRgb);
+end generate EMBOS_FRAME_ENABLED;
+
+SOBEL_FRAME_ENABLED: if (SOBEL_FRAME = TRUE) generate
+sobel_valid_inst: d_valid
+generic map (
+    pixelDelay   => 31)
+port map(
+    clk      => clk,
+    iRgb     => rgb,
+    oRgb     => oRgb);
+end generate SOBEL_FRAME_ENABLED;
+
 -----------------------------------------------------------------------------------------------
 end generate COLOR_DELAYED_ENABLED;
 -----------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------
 --FILTERS: YCBCR
------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 YCBCR_FRAME_ENABLED: if (YCBCR_FRAME = true) generate
     constant fullRange    : boolean := true;
     signal yCbCrRgb       : uChannel := (valid => lo, red => blackUn, green => blackUn, blue => blackUn);
     signal yCbCr128       : unsigned(i_data_width-1 downto 0);
     signal yCbCr16        : unsigned(i_data_width-1 downto 0);
+    signal rgb            : channel;
 begin
     yCbCr128        <= shift_left(to_unsigned(one,i_data_width), i_data_width - 1);
     yCbCr16         <= shift_left(to_unsigned(one,i_data_width), i_data_width - 4);
@@ -333,15 +166,15 @@ begin
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        cc.tpsd1.vTap0x <= rgbToFl_blu;
-        cc.tpsd2.vTap0x <= rgbToFl_gre;
-        cc.tpsd3.vTap0x <= rgbToFl_red;
-        cc.tpsd1.vTap1x <= rgbToFl_blu;
-        cc.tpsd2.vTap1x <= rgbToFl_gre;
-        cc.tpsd3.vTap1x <= rgbToFl_red;
-        cc.tpsd1.vTap2x <= rgbToFl_blu;
-        cc.tpsd2.vTap2x <= rgbToFl_gre;
-        cc.tpsd3.vTap2x <= rgbToFl_red;
+        taps.tpsd1.vTap0x <= rgb_float.blue;
+        taps.tpsd2.vTap0x <= rgb_float.green;
+        taps.tpsd3.vTap0x <= rgb_float.red;
+        taps.tpsd1.vTap1x <= rgb_float.blue;
+        taps.tpsd2.vTap1x <= rgb_float.green;
+        taps.tpsd3.vTap1x <= rgb_float.red;
+        taps.tpsd1.vTap2x <= rgb_float.blue;
+        taps.tpsd2.vTap2x <= rgb_float.green;
+        taps.tpsd3.vTap2x <= rgb_float.red;
     end if;
 end process;
 -----------------------------------------------------------------------------------------------
@@ -353,7 +186,7 @@ process (clk)
     variable crRound     : unsigned(i_data_width-1 downto 0);
     begin
     if rising_edge(clk) then
-        if (cc.snToTrimSum.red(ROUND_RESULT_WIDTH-1) = hi)  then
+        if (snfixRgb.red(ROUND_RESULT_WIDTH-1) = hi)  then
             if fullRange then
                 yRound := yCbCr16 + 1;
             else
@@ -366,20 +199,20 @@ process (clk)
                 yRound := (others => '0');
             end if;
         end if;
-        if (cc.snToTrimSum.green(ROUND_RESULT_WIDTH-1) = hi) then
+        if (snfixRgb.green(ROUND_RESULT_WIDTH-1) = hi) then
             cbRound := resize(yCbCr128+1, i_data_width);
         else
             cbRound := yCbCr128;
         end if;
-        if (cc.snToTrimSum.blue(ROUND_RESULT_WIDTH-1) = hi) then
+        if (snfixRgb.blue(ROUND_RESULT_WIDTH-1) = hi) then
             crRound := resize(yCbCr128+1, i_data_width);
         else
             crRound := yCbCr128;
         end if;
         ---------------------------------------------------------------------------------------
-        yCbCrRgb.red   <= (unsigned(cc.snToTrimSum.red(i_data_width-1 downto 0))) + yRound;
-        yCbCrRgb.green <= (unsigned(cc.snToTrimSum.green(i_data_width-1 downto 0))) + cbRound;
-        yCbCrRgb.blue  <= (unsigned(cc.snToTrimSum.blue(i_data_width-1 downto 0))) + crRound;
+        yCbCrRgb.red   <= (unsigned(snfixRgb.red(i_data_width-1 downto 0))) + yRound;
+        yCbCrRgb.green <= (unsigned(snfixRgb.green(i_data_width-1 downto 0))) + cbRound;
+        yCbCrRgb.blue  <= (unsigned(snfixRgb.blue(i_data_width-1 downto 0))) + crRound;
         ---------------------------------------------------------------------------------------
     end if;
 end process;
@@ -388,63 +221,86 @@ end process;
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        oRgb.red     <= std_logic_vector(yCbCrRgb.red);
-        oRgb.green   <= std_logic_vector(yCbCrRgb.green);
-        oRgb.blue    <= std_logic_vector(yCbCrRgb.blue);
-        oRgb.valid   <=  rgbSyncValid(9);
+        rgb.red     <= std_logic_vector(yCbCrRgb.red);
+        rgb.green   <= std_logic_vector(yCbCrRgb.green);
+        rgb.blue    <= std_logic_vector(yCbCrRgb.blue);
+        rgb.valid   <= iRgb.valid;
     end if;
 end process;
+yCbCr_valid_Inst: d_valid
+generic map (
+    pixelDelay   => 9)
+port map(
+    clk      => clk,
+    iRgb     => rgb,
+    oRgb     => oRgb);
 -----------------------------------------------------------------------------------------------
 end generate YCBCR_FRAME_ENABLED;
 -----------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------
 --FILTERS: CGAIN
------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------
 CGAIN_FRAME_ENABLED: if (CGAIN_FRAME = true) generate
     signal cGain : channel := (valid => lo, red => black, green => black, blue => black);
+    signal rgb   : channel;
 begin
 -----------------------------------------------------------------------------------------------
--- STAGE 2
+-- STAGE 2: PER PIXEL
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        cc.tpsd1.vTap0x <= rgbToFl_blu;
-        cc.tpsd2.vTap0x <= rgbToFl_gre;
-        cc.tpsd3.vTap0x <= rgbToFl_red;
-        cc.tpsd1.vTap1x <= rgbToFl_blu;
-        cc.tpsd2.vTap1x <= rgbToFl_gre;
-        cc.tpsd3.vTap1x <= rgbToFl_red;
-        cc.tpsd1.vTap2x <= rgbToFl_blu;
-        cc.tpsd2.vTap2x <= rgbToFl_gre;
-        cc.tpsd3.vTap2x <= rgbToFl_red;
+
+        
+        -- tpsd1_vTap0x x k9-> p33
+        taps.tpsd1.vTap0x <= rgb_float.blue;
+        -- tpsd2_vTap0x x k8-> p32
+        taps.tpsd2.vTap0x <= rgb_float.green;
+        -- tpsd3_vTap0x x k7-> p31
+        taps.tpsd3.vTap0x <= rgb_float.red;
+        
+        -- tpsd1_vTap1x x k6 -> p23
+        taps.tpsd1.vTap1x <= rgb_float.blue;
+        -- tpsd2_vTap1x x k5 -> p22
+        taps.tpsd2.vTap1x <= rgb_float.green;
+        -- tpsd3_vTap1x x k4 -> p21
+        taps.tpsd3.vTap1x <= rgb_float.red;
+
+        -- tpsd1_vTap2x x k3 -> p13
+        taps.tpsd1.vTap2x <= rgb_float.blue;
+        -- tpsd2_vTap2x x k2 -> p12
+        taps.tpsd2.vTap2x <= rgb_float.green;
+        -- tpsd3_vTap2x x k1 -> p11
+        taps.tpsd3.vTap2x <= rgb_float.red;
+        
     end if;
 end process;
 -----------------------------------------------------------------------------------------------
--- STAGE 9
+-- STAGE 9 PER PIXEL
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        if (cc.snToTrimSum.red(ROUND_RESULT_WIDTH-1) = hi) then
+        -- cGain.red= snfixRgb.red(p11+p12+p13)
+        if (snfixRgb.red(ROUND_RESULT_WIDTH-1) = hi) then
             cGain.red <= black;
-        elsif (unsigned(cc.snToTrimSum.red(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
+        elsif (unsigned(snfixRgb.red(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
             cGain.red <= white;
         else
-            cGain.red <= std_logic_vector(cc.snToTrimSum.red(i_data_width-1 downto 0));
+            cGain.red <= std_logic_vector(snfixRgb.red(i_data_width-1 downto 0));
         end if;
-        if (cc.snToTrimSum.green(ROUND_RESULT_WIDTH-1) = hi) then
+        -- cGain.green= snfixRgb.green(p21+p22+p23)
+        if (snfixRgb.green(ROUND_RESULT_WIDTH-1) = hi) then
             cGain.green <= black;
-        elsif (unsigned(cc.snToTrimSum.green(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
+        elsif (unsigned(snfixRgb.green(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
             cGain.green <= white;
         else
-            cGain.green <= std_logic_vector(cc.snToTrimSum.green(i_data_width-1 downto 0));
+            cGain.green <= std_logic_vector(snfixRgb.green(i_data_width-1 downto 0));
         end if;
-        if (cc.snToTrimSum.blue(ROUND_RESULT_WIDTH-1) = hi) then
+        -- cGain.blue= snfixRgb.blue(p31+p32+p33)
+        if (snfixRgb.blue(ROUND_RESULT_WIDTH-1) = hi) then
             cGain.blue <= black;
-        elsif (unsigned(cc.snToTrimSum.blue(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
+        elsif (unsigned(snfixRgb.blue(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= zero) then
             cGain.blue <= white;
         else
-            cGain.blue <= std_logic_vector(cc.snToTrimSum.blue(i_data_width-1 downto 0));
+            cGain.blue <= std_logic_vector(snfixRgb.blue(i_data_width-1 downto 0));
         end if;
     end if;
 end process;
@@ -453,38 +309,19 @@ end process;
 -----------------------------------------------------------------------------------------------
 process (clk) begin
     if rising_edge(clk) then
-        oRgb.red    <= cGain.red;
-        oRgb.green  <= cGain.green;
-        oRgb.blue   <= cGain.blue;
-        oRgb.valid  <=  rgbSyncValid(9);
+        rgb.red     <= cGain.red;
+        rgb.green   <= cGain.green;
+        rgb.blue    <= cGain.blue;
+        rgb.valid   <= iRgb.valid;
     end if;
 end process;
+cgain_valid_inst: d_valid
+generic map (
+    pixelDelay   => 27)
+port map(
+    clk      => clk,
+    iRgb     => rgb,
+    oRgb     => oRgb);
 -----------------------------------------------------------------------------------------------
 end generate CGAIN_FRAME_ENABLED;
------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------
---VALID DELAYS
------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------
-process (clk) begin
-    if rising_edge(clk) then
-        rgbSyncValid(0)  <= iRgb.valid;
-        rgbSyncValid(1)  <= rgbSyncValid(0);
-        rgbSyncValid(2)  <= rgbSyncValid(1);
-        rgbSyncValid(3)  <= rgbSyncValid(2);
-        rgbSyncValid(4)  <= rgbSyncValid(3);
-        rgbSyncValid(5)  <= rgbSyncValid(4);
-        rgbSyncValid(6)  <= rgbSyncValid(5);
-        rgbSyncValid(7)  <= rgbSyncValid(6);
-        rgbSyncValid(8)  <= rgbSyncValid(7);
-        rgbSyncValid(9)  <= rgbSyncValid(8);
-        rgbSyncValid(10) <= rgbSyncValid(9);
-        rgbSyncValid(11) <= rgbSyncValid(10);
-        rgbSyncValid(12) <= rgbSyncValid(11);
-        rgbSyncValid(13) <= rgbSyncValid(12);
-        rgbSyncValid(14) <= rgbSyncValid(13);
-        rgbSyncValid(15) <= rgbSyncValid(14);
-    end if;
-end process;
------------------------------------------------------------------------------------------------
 end Behavioral;

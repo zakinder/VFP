@@ -96,7 +96,7 @@ architecture arch of frame_process is
     signal rgbImageKernelv5 : colors;
     signal iKcoeff          : kernelCoeff;
     signal rgbImageFilters  : frameColors;
-
+    signal blur_channels    : blur_frames;
 
 
     signal edgeValid        : std_logic;
@@ -185,7 +185,7 @@ end process pipCoordP;
     iKcoeff.k9   <= iKls.k9(15 downto 0);
     iKcoeff.kSet <= iKls.config;
 
-filters_inst: filters
+FiltersInst: filters
 generic map(
     F_TES               =>  F_TES,
     F_LUM               =>  F_LUM,
@@ -229,9 +229,10 @@ port map(
     iFilterId           => iFilterId,
     oKcoeff             => oKcoeff,
     edgeValid           => edgeValid,
+    blur_channels       => blur_channels,
     oRgb                => rgbImageFilters);
 
-detect_pixel_inst: detect_pixel
+detectInst: detect_pixel
 generic map(
     i_data_width        => i_data_width)
 port map(
@@ -243,7 +244,7 @@ port map(
     iCord               => cord,
     pDetect             => rgbDetectLock,
     oRgb                => rgbDetect);
-ro_interest_inst: ro_interest 
+pointOfInterestInst: point_of_interest
 generic map(
     i_data_width        => i_data_width,
     s_data_width        => s_data_width,

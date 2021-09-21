@@ -70,6 +70,7 @@ architecture arch_imp of vfp_config is
     signal aw_en                 : std_logic;
     signal localRegs             : mRegs;
 
+
 begin
 
 -- transfer response ack and data of request.

@@ -11,11 +11,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-
 entity VFP_v1_0 is
 generic (
     -- System Revision
@@ -115,48 +113,30 @@ port (
     vfpconfig_rvalid          : out std_logic;
     vfpconfig_rready          : in std_logic);
 end VFP_v1_0;
-
 architecture arch_imp of VFP_v1_0 is
-
     constant adwrWidth        : integer := 16;
     constant addrWidth        : integer := 12;
-    
-    signal s_mm_axi           : integer := 0;
-    signal s_rgb_set          : rRgb;
-    signal s_wr_regs          : mRegs;
-    signal s_rd_regs          : mRegs;
-    signal s_video_data       : vStreamData;
-
+    signal sMmAxi             : integer := 0;
+    signal rgb_set            : rRgb;
+    signal wr_regs            : mRegs;
+    signal rd_regs            : mRegs;
+    signal video_data         : vStreamData;
 begin
-
-
--- This module recieve stream raw data in format of bayer pattern from d5m camera device 
--- and it convert into 24 bit rgb pixel value with its frame mapped coordinates, start of 
--- frame, end of frame and line valid.
-bayer_to_rgb_inst: bayer_to_rgb
+-- Convert raw to rgb module
+camera_raw_to_rgb_inst: camera_raw_to_rgb
 generic map(
-    -- d5m camera max supported frame width 3741.
     img_width                 => d5m_frame_width,
-    -- d5m camera input data width.
-    dataWidth                 => d5m_data_width)
+    dataWidth                 => d5m_data_width,
+    addrWidth                 => addrWidth)
 port map(
-    -- system clock
-    clk                       => m_axis_mm2s_aclk,
-    -- system async reset
-    rst_l                     => m_axis_mm2s_aresetn,
-    -- d5m clock
+    m_axis_mm2s_aclk          => m_axis_mm2s_aclk,
+    m_axis_mm2s_aresetn       => m_axis_mm2s_aresetn,
     pixclk                    => pixclk,
-    -- d5m frame valid
     ifval                     => ifval,
-    -- d5m line valid
     ilval                     => ilval,
-    -- d5m data
     idata                     => idata,
-    -- rgb frame data set record
-    oRgbSet                   => s_rgb_set);
-
-
--- This module implement master requests, process frames and select video channel.
+    oRgbSet                   => rgb_set);
+-- Filter rgb data module
 video_stream_inst: video_stream
 generic map(
     revision_number           => revision_number,
@@ -181,23 +161,16 @@ generic map(
     F_HSV                     => F_HSV,
     F_HSL                     => F_HSL)
 port map(
-    -- system clock
     clk                       => m_axis_mm2s_aclk,
-    -- system async reset
     rst_l                     => m_axis_mm2s_aresetn,
-    -- master write registers
-    iWrRegs                   => s_wr_regs,
-    -- master read registers
-    oRdRegs                   => s_rd_regs,
-    -- rgb frame data set record
-    iRgbSet                   => s_rgb_set,
-    -- filtered rgb data
-    oVideoData                => s_video_data,
-    -- end node bus select configed by master
-    oMmAxi                    => s_mm_axi);
+    iWrRegs                   => wr_regs,
+    oRdRegs                   => rd_regs,
+    iRgbSet                   => rgb_set,
+    oVideoData                => video_data,
+    oMmAxi                    => sMmAxi);
 
--- This module transmit filtered video data to axi4 stream and transmit and recieve request from master.
-axis_external_inst: axi_external
+-- Transmit filtered video data
+axis_external_inst: axis_external
 generic map(
     revision_number           => revision_number,
     C_rgb_m_axis_TDATA_WIDTH  => C_rgb_m_axis_TDATA_WIDTH,
@@ -211,14 +184,10 @@ generic map(
     s_data_width              => s_data_width,
     b_data_width              => b_data_width)
 port map(
-    -- end node bus select configed by master
-    iMmAxi                    => s_mm_axi,
-    -- filtered rgb data
-    iStreamData               => s_video_data,
-    -- master write registers
-    oWrRegs                   => s_wr_regs,
-    -- master read registers
-    iRdRegs                   => s_rd_regs,
+    iMmAxi                    => sMmAxi,
+    iStreamData               => video_data,
+    oWrRegs                   => wr_regs,
+    iRdRegs                   => rd_regs,
     --tx channel
     rgb_m_axis_aclk           => rgb_m_axis_aclk,
     rgb_m_axis_aresetn        => rgb_m_axis_aresetn,
@@ -269,5 +238,4 @@ port map(
     vfpconfig_rresp           => vfpconfig_rresp,
     vfpconfig_rvalid          => vfpconfig_rvalid,
     vfpconfig_rready          => vfpconfig_rready);
-    
 end arch_imp;

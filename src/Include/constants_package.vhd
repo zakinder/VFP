@@ -65,7 +65,7 @@ package constants_package is
     constant FILTER_RGB_DETECT                  : integer   := 47;
     constant FILTER_RGB_POI                     : integer   := 48;
     constant FILTER_YCC                         : integer   := 49;
-
+    constant FILTER_K_CGA                       : integer   := 50;
     -------------------------------------------------------------------------
     constant kCoefYcbcrIndex                    : integer   := 1;
     constant kCoefCgainIndex                    : integer   := 2;

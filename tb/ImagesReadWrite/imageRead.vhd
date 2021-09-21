@@ -33,7 +33,9 @@ port (
     endOfFrame    : out std_logic);
 end image_read;
 architecture Behavioral of image_read is
-    constant readbmp    : string := input_file&".bmp";
+    constant proj_fol  : string := "K:/ZEDBOARD/uvm_tb/VFP_TEST/dut/tb/uvm_images/read";
+    constant bacslash  : string := "/";
+    constant readbmp   : string := proj_fol&bacslash&input_file&".bmp";
     type bit_file is file of bit_vector;
     file read_file      : bit_file open read_mode  is readbmp;
     type t_color is array(1 to 3) of std_logic_vector(i_data_width-1 downto 0);
@@ -167,7 +169,7 @@ begin
                     end loop;
                 end loop;
             end loop;
-            wait for 10 ns;
+            wait for 100 ns;
             ReadyToRead <= '1';
             wait;        
     end process pfile_actions;

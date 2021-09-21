@@ -16,7 +16,6 @@ architecture behavioral of video_process_tb is
     signal clk                           : std_logic;
     signal kCoeff                        : kernelCoeff;
     signal oKcoeff                       : kernelCoeff;
-    
     signal iAls                          : coefficient;
     signal olm                           : rgbConstraint;
     signal edgeValid                     : std_logic;
@@ -24,7 +23,7 @@ architecture behavioral of video_process_tb is
     signal txCord                        : coord;
     signal iVideoChannel                 : integer;
     signal iThreshold                    : std_logic_vector(s_data_width-1 downto 0); 
-	--cgain  ycbcr sobel blur emboss sobelRgb hsv ycbcr_y ycbcr_r hsv_h hsv_s hsv_v
+    --cgain  ycbcr sobel blur emboss sobelRgb hsv ycbcr_y ycbcr_r hsv_h hsv_s hsv_v
     constant testFolder                  : string  := "F_BLU_TO_HSL";
     -------------------------------------------------
     constant DUT_FILTERS_TESTENABLED     : boolean := true;
@@ -41,7 +40,7 @@ architecture behavioral of video_process_tb is
     constant DUT_FIFO_ENABLED            : boolean := false;
     constant DUT_RGBASSERTION_ENABLED    : boolean := false;
     -------------------------------------------------
-    constant F_READ_COEFF_DATA           : boolean := false;
+    constant F_READ_COEFF_DATA           : boolean := true;
     -------------------------------------------------
     constant F_CGA_BRIGHT                : boolean := false;
     constant F_CGA_DARK                  : boolean := false;
@@ -53,6 +52,7 @@ architecture behavioral of video_process_tb is
     constant F_TES                       : boolean := false;
     constant F_LUM                       : boolean := false;
     constant F_TRM                       : boolean := false;
+    -------------------------------------------------
     constant F_RGB                       : boolean := true;
     constant F_SHP                       : boolean := false;
     constant F_BLU                       : boolean := false;
@@ -62,6 +62,7 @@ architecture behavioral of video_process_tb is
     constant F_CGA                       : boolean := false;
     constant F_HSV                       : boolean := false;
     constant F_HSL                       : boolean := false;
+    constant L_BLU                       : boolean := false;
     -------------------------------------------------
     constant MASK_TRUE                   : boolean := true;
     constant MASK_FLSE                   : boolean := false;
@@ -75,7 +76,7 @@ architecture behavioral of video_process_tb is
     constant M_SOB_HSV                   : boolean := SelFrame(F_SOB,F_HSV,MASK_FLSE);
     constant M_SOB_HSL                   : boolean := SelFrame(F_SOB,F_HSL,MASK_FLSE);
     -------------------------------------------------
-    constant F_CGA_TO_CGA                : boolean := false;
+    constant F_CGA_TO_CGA                : boolean := false;--IF:FILTER_K_CGA = F_KCGA_TO_LCGA
     constant F_CGA_TO_HSL                : boolean := false;
     constant F_CGA_TO_HSV                : boolean := false;
     constant F_CGA_TO_YCC                : boolean := false;
@@ -93,9 +94,11 @@ architecture behavioral of video_process_tb is
     constant F_BLU_TO_HSL                : boolean := false;
     constant F_BLU_TO_HSV                : boolean := false;
     constant F_BLU_TO_YCC                : boolean := false;
-    constant F_BLU_TO_CGA                : boolean := false;
+    constant F_BLU_TO_CGA                : boolean := false;--IF:FILTER_K_CGA = F_KCGA
     constant F_BLU_TO_SHP                : boolean := false;
     -------------------------------------------------
+    constant F_BLUR_CHANNELS             : boolean := false;
+    constant F_DITH_CHANNELS             : boolean := false;
     signal cHsvH                         : std_logic := lo;
     signal cHsvS                         : std_logic := lo;
     signal cHsvV                         : std_logic := hi;
@@ -104,17 +107,17 @@ architecture behavioral of video_process_tb is
     signal cYccB                         : std_logic := lo;
     signal cYccR                         : std_logic := lo;
     signal cYcc                          : std_logic_vector(2 downto 0);
-    signal iLumTh                        : integer := 30;
+    signal iLumTh                        : integer := 0;
+    signal iSobelTh                      : integer := 30;
     signal iHsvPerCh                     : integer := 0;--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
     signal iYccPerCh                     : integer := 0;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
-    signal iFilterId                     : integer := 0;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
-
-    signal vChannelSelect                : integer := 38;
+    signal iFilterId                     : integer := 2;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
+    signal vChannelSelect                : integer := FILTER_K_CGA;
+    signal blur_channels                 : blur_frames;
     -------------------------------------------------
 begin
     -------------------------------------------------
     iAls.config  <= 0;
-
     cHsv                  <= std_logic_vector(to_unsigned(iHsvPerCh,3));
     cYcc                  <= std_logic_vector(to_unsigned(iYccPerCh,3));
     iVideoChannel         <= vChannelSelect;
@@ -158,7 +161,6 @@ FILTERS_TEST_ENABLED: if (DUT_FILTERS_TESTENABLED = true) generate
     signal rgbRead           : channel;
     signal endOfFrame        : std_logic := lo;
     signal rgbImageFilters   : frameColors;
-
 begin
 ImageReadInst: image_read
 generic map (
@@ -185,6 +187,7 @@ generic map(
     F_CGA                 =>  F_CGA,
     F_HSV                 =>  F_HSV,
     F_HSL                 =>  F_HSL,
+    L_BLU                 =>  L_BLU,
     M_SOB_LUM             =>  M_SOB_LUM,
     M_SOB_TRM             =>  M_SOB_TRM,
     M_SOB_RGB             =>  M_SOB_RGB,
@@ -194,26 +197,10 @@ generic map(
     M_SOB_CGA             =>  M_SOB_CGA,
     M_SOB_HSV             =>  M_SOB_HSV,
     M_SOB_HSL             =>  M_SOB_HSL,
-    --F_CGA_TO_CGA          =>  F_CGA_TO_CGA,
-    --F_CGA_TO_HSL          =>  F_CGA_TO_HSL,
-    --F_CGA_TO_HSV          =>  F_CGA_TO_HSV,
-    --F_CGA_TO_YCC          =>  F_CGA_TO_YCC,
-    --F_CGA_TO_SHP          =>  F_CGA_TO_SHP,
-    --F_CGA_TO_BLU          =>  F_CGA_TO_BLU,
-    --F_SHP_TO_SHP          =>  F_SHP_TO_SHP,
-    --F_SHP_TO_HSL          =>  F_SHP_TO_HSL,
-    --F_SHP_TO_HSV          =>  F_SHP_TO_HSV,
-    --F_SHP_TO_YCC          =>  F_SHP_TO_YCC,
-    --F_SHP_TO_CGA          =>  F_SHP_TO_CGA,
-    --F_SHP_TO_BLU          =>  F_SHP_TO_BLU,
-    --F_BLU_TO_BLU          =>  F_BLU_TO_BLU,
-    --F_BLU_TO_HSL          =>  F_BLU_TO_HSL,
-    --F_BLU_TO_HSV          =>  F_BLU_TO_HSV,
-    --F_BLU_TO_YCC          =>  F_BLU_TO_YCC,
-    --F_BLU_TO_CGA          =>  F_BLU_TO_CGA,
-    --F_BLU_TO_SHP          =>  F_BLU_TO_SHP,
+    F_BLUR_CHANNELS       =>  F_BLUR_CHANNELS,
+    F_DITH_CHANNELS       =>  F_DITH_CHANNELS,
     img_width             =>  img_width,
-    img_height            =>  img_width + 100,
+    img_height            =>  img_width,
     adwrWidth             =>  adwrWidth,
     addrWidth             =>  addrWidth,
     s_data_width          =>  s_data_width,
@@ -224,7 +211,7 @@ port map(
     txCord                => txCord,
     iRgb                  => rgbRead,
     iLumTh                => iLumTh,
-    iSobelTh              => iLumTh,
+    iSobelTh              => iSobelTh,
     iVideoChannel         => iVideoChannel,
     iFilterId             => iFilterId,
     iHsvPerCh             => iHsvPerCh,
@@ -233,14 +220,108 @@ port map(
     iKcoeff               => kCoeff,
     oKcoeff               => oKcoeff,
     edgeValid             => edgeValid,
+    blur_channels         => blur_channels,
     oRgb                  => rgbImageFilters);
 
-M_SOB_CGA_TEST_ENABLED : if (M_SOB_CGA = true) generate begin
+F_BLUR_CHANNELS_TEST_ENABLED : if (F_BLUR_CHANNELS = true) generate 
+
+signal write_en_ditrgb1vx  : std_logic := lo;
+signal write_en_ditRgb2vx  : std_logic := lo;
+signal write_en_ditRgb3vx  : std_logic := lo;
+signal write_en_blur1vx    : std_logic := lo;
+signal write_en_blur2vx    : std_logic := lo;
+signal write_en_blur3vx    : std_logic := lo;
+
+begin 
+
+write_en_ditrgb1vx <= hi when (blur_channels.ditRgb1vx.valid = hi);
+write_en_ditRgb2vx <= hi when (blur_channels.ditRgb2vx.valid = hi);
+write_en_ditRgb3vx <= hi when (blur_channels.ditRgb3vx.valid = hi);
+write_en_blur1vx   <= hi when (blur_channels.blur1vx.valid = hi);
+write_en_blur2vx   <= hi when (blur_channels.blur2vx.valid = hi);
+write_en_blur3vx   <= hi when (blur_channels.blur3vx.valid = hi);
+
+ditrgb1vx_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "ditrgb1vx")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => write_en_ditrgb1vx,
+    iRgb                  => blur_channels.ditRgb1vx);
+ditrgb2vx_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "ditrgb2vx")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => write_en_ditRgb2vx,
+    iRgb                  => blur_channels.ditRgb2vx);
+ditrgb3vx_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "ditrgb3vx")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => write_en_ditRgb3vx,
+    iRgb                  => blur_channels.ditRgb3vx);
+blur1vx_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "blur1vx")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => write_en_blur1vx,
+    iRgb                  => blur_channels.blur1vx);
+blur2vx_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "blur2vx")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => write_en_blur2vx,
+    iRgb                  => blur_channels.blur2vx);
+blur3vx_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "blur3vx")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => write_en_blur3vx,
+    iRgb                  => blur_channels.blur3vx);
+end generate F_BLUR_CHANNELS_TEST_ENABLED;
+M_SOB_CGA_TEST_ENABLED : if (M_SOB_CGA = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelCga.valid = hi);
 ImageWriteCgainToshpSBInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -250,12 +331,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelCga);
 end generate M_SOB_CGA_TEST_ENABLED;
-M_SOB_TRM_TEST_ENABLED : if (M_SOB_TRM = true) generate begin
+M_SOB_TRM_TEST_ENABLED : if (M_SOB_TRM = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelTrm.valid = hi);
 ImageWriteMaskSobelTrmInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -265,12 +348,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelTrm);
 end generate M_SOB_TRM_TEST_ENABLED;  
-M_SOB_HSL_TEST_ENABLED : if (M_SOB_HSL = true) generate begin
+M_SOB_HSL_TEST_ENABLED : if (M_SOB_HSL = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelHsl.valid = hi);
 ImageWriteMaskSobelHslInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -280,12 +365,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelHsl);
 end generate M_SOB_HSL_TEST_ENABLED;  
-M_SOB_HSV_TEST_ENABLED : if (M_SOB_HSV = true) generate begin
+M_SOB_HSV_TEST_ENABLED : if (M_SOB_HSV = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelHsv.valid = hi);
 ImageWriteMaskSobelHsvInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -295,12 +382,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelHsv);
 end generate M_SOB_HSV_TEST_ENABLED;
-M_SOB_YCC_TEST_ENABLED : if (M_SOB_YCC = true) generate begin
+M_SOB_YCC_TEST_ENABLED : if (M_SOB_YCC = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelYcc.valid = hi);
 ImageWriteMaskSobelYccInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -310,12 +399,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelYcc);
 end generate M_SOB_YCC_TEST_ENABLED;
-M_SOB_SHP_TEST_ENABLED : if (M_SOB_SHP = true) generate begin
+M_SOB_SHP_TEST_ENABLED : if (M_SOB_SHP = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelShp.valid = hi);
 ImageWriteMaskSobelShpInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -325,12 +416,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelShp);
 end generate M_SOB_SHP_TEST_ENABLED;
-M_SOB_RGB_TEST_ENABLED : if (M_SOB_RGB = true) generate begin
+M_SOB_RGB_TEST_ENABLED : if (M_SOB_RGB = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelRgb.valid = hi);
 ImageWriteMaskSobelRgbInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -340,12 +433,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelRgb);
 end generate M_SOB_RGB_TEST_ENABLED;
-M_SOB_LUM_TEST_ENABLED : if (M_SOB_LUM = true) generate begin
+M_SOB_LUM_TEST_ENABLED : if (M_SOB_LUM = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelLum.valid = hi);
 ImageWriteMaskSobelLumInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -355,12 +450,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelLum);
 end generate M_SOB_LUM_TEST_ENABLED;
-M_SOB_BLU_TEST_ENABLED : if (M_SOB_BLU = true) generate begin
+M_SOB_BLU_TEST_ENABLED : if (M_SOB_BLU = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.maskSobelBlu.valid = hi);
 ImageWriteMaskSobelBluInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -370,12 +467,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.maskSobelBlu);
 end generate M_SOB_BLU_TEST_ENABLED;
-F_TRM_TEST_ENABLED : if (F_TRM = true) generate begin
+F_TRM_TEST_ENABLED : if (F_TRM = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.colorTrm.valid = hi);
 ImageWriteCgainToshpInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -385,12 +484,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.colorTrm);
 end generate F_TRM_TEST_ENABLED;    
-F_LUM_TEST_ENABLED : if (F_LUM = true) generate begin
+F_LUM_TEST_ENABLED : if (F_LUM = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.colorLmp.valid = hi);  
 ImageWriteCgainToshpInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -400,12 +501,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.colorLmp);
 end generate F_LUM_TEST_ENABLED;
-F_CGA_TO_SHP_TEST_ENABLED : if (F_CGA_TO_SHP = true) generate begin
+F_CGA_TO_SHP_TEST_ENABLED : if (F_CGA_TO_SHP = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.cgainToShp.valid = hi);
 ImageWriteCgainToshpInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -415,12 +518,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.cgainToShp);
 end generate F_CGA_TO_SHP_TEST_ENABLED;
-F_CGA_TO_BLU_TEST_ENABLED : if (F_CGA_TO_BLU = true) generate begin
+F_CGA_TO_BLU_TEST_ENABLED : if (F_CGA_TO_BLU = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.cgainToBlu.valid = hi); 
 ImageWritcgainTobluInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -430,12 +535,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.cgainToBlu);
 end generate F_CGA_TO_BLU_TEST_ENABLED;
-F_CGA_TO_YCC_TEST_ENABLED : if (F_CGA_TO_YCC = true) generate begin
+F_CGA_TO_YCC_TEST_ENABLED : if (F_CGA_TO_YCC = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.cgainToYcbcr.valid = hi); 
 ImageWritaetextRGBInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -445,12 +552,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.cgainToYcbcr);
 end generate F_CGA_TO_YCC_TEST_ENABLED;
-F_CGA_TO_HSV_TEST_ENABLED : if (F_CGA_TO_HSV = true) generate begin
+F_CGA_TO_HSV_TEST_ENABLED : if (F_CGA_TO_HSV = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.cgainToHsv.valid = hi); 
 ImageWriteCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -460,27 +569,99 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.cgainToHsv);
 end generate F_CGA_TO_HSV_TEST_ENABLED;
-F_CGA_TO_HSL_TEST_ENABLED : if (F_CGA_TO_HSL = true) generate begin
+F_CGA_TO_HSL_TEST_ENABLED : if (F_CGA_TO_HSL = true) generate 
+signal enableWrite                : std_logic;
+signal HslR                  : channel;
+signal HslG                  : channel;
+signal HslB                  : channel;
+signal HslBB                 : channel;
+begin
 enableWrite <= hi when (rgbImageFilters.cgainToHsl.valid = hi);  
+hsl_r_select_Inst: rgb_select
+port map(
+    clk      => clk,
+    iPerCh   => 1,
+    iRgb     => rgbImageFilters.cgainToHsl,
+    oRgb     => HslR);
+hsl_g_select_Inst: rgb_select
+port map(
+    clk      => clk,
+    iPerCh   => 2,
+    iRgb     => rgbImageFilters.cgainToHsl,
+    oRgb     => HslG);
+hsl_b_select_Inst: rgb_select
+port map(
+    clk      => clk,
+    iPerCh   => 3,
+    iRgb     => rgbImageFilters.cgainToHsl,
+    oRgb     => HslB);
+process(HslR,HslB) begin
+    if (HslR.red = x"00" and HslR.valid = hi) then
+            HslBB <= HslB;
+    else
+            HslBB.red       <= x"00";
+            HslBB.green     <= x"00";
+            HslBB.blue      <= x"00";
+            HslBB.valid     <= HslB.valid;
+    end if;
+end process;
 ImageWriteCgainToHslInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "cgainToHsl")
+    output_file           => "CgainToHsl")
 port map (                  
     pixclk                => clk,
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.cgainToHsl);
+ImageWriteCgainTo_Hsl_H_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "CgainToHsl_H")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => enableWrite,
+    iRgb                  => HslR);
+ImageWriteCgainTo_Hsl_S_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "CgainToHsl_S")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => enableWrite,
+    iRgb                  => HslG);
+ImageWriteCgainTo_Hsl_L_Inst: image_write
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "CgainToHsl_L")
+port map (                  
+    pixclk                => clk,
+    enableWrite           => enableWrite,
+    iRgb                  => HslBB);
 end generate F_CGA_TO_HSL_TEST_ENABLED;
-F_CGA_TO_CGA_TEST_ENABLED : if (F_CGA_TO_CGA = true) generate begin
+F_CGA_TO_CGA_TEST_ENABLED : if (F_CGA_TO_CGA = true) generate 
+signal enableWrite                : std_logic;
+begin
 enableWrite <= hi when (rgbImageFilters.cgainToCgain.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -494,8 +675,8 @@ F_SOB_TEST_ENABLED : if (F_SOB = true) generate begin
 enableWrite <= hi when (rgbImageFilters.sobel.valid = hi); 
 ImageWriteSobelInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -509,8 +690,8 @@ F_TES_TEST_ENABLED : if (F_TES = true) generate begin
 enableWrite <= hi when (rgbImageFilters.tPattern.valid = hi);
 ImageWritetPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -520,132 +701,152 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.tPattern);
 end generate F_TES_TEST_ENABLED;
-F_RGB_TEST_ENABLED : if (F_RGB = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.inrgb.valid = hi);
+F_RGB_TEST_ENABLED : if (F_RGB = true) generate 
+signal rgb_enablewrite                : std_logic;
+begin 
+rgb_enablewrite <= hi when (rgbImageFilters.inrgb.valid = hi);
 ImageWritesharptPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "inrgb")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => rgb_enablewrite,
     iRgb                  => rgbImageFilters.inrgb);
 end generate F_RGB_TEST_ENABLED;
-F_SHP_TEST_ENABLED : if (F_SHP = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.sharp.valid = hi);
+F_SHP_TEST_ENABLED : if (F_SHP = true) generate 
+signal shp_enablewrite                : std_logic;
+begin 
+shp_enablewrite <= hi when (rgbImageFilters.sharp.valid = hi);
 ImageWritesharptPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "sharp")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => shp_enablewrite,
     iRgb                  => rgbImageFilters.sharp);
 end generate F_SHP_TEST_ENABLED;
-F_HSV_TEST_ENABLED : if (F_HSV = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.hsv.valid = hi);
+F_HSV_TEST_ENABLED : if (F_HSV = true) generate 
+signal enableWriteHsv       : std_logic := lo;
+
+begin 
+enableWriteHsv <= hi when (rgbImageFilters.hsv.valid = hi);
+
 ImageWritehsvInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "hsv")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => enableWriteHsv,
     iRgb                  => rgbImageFilters.hsv);
 end generate F_HSV_TEST_ENABLED;
-F_HSL_TEST_ENABLED : if (F_HSL = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.hsl.valid = hi);
+F_HSL_TEST_ENABLED : if (F_HSL = true) generate 
+signal enableWriteHsl       : std_logic := lo;
+begin 
+enableWriteHsl <= hi when (rgbImageFilters.hsl.valid = hi);
 ImageWritehsltPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "hsl")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => enableWriteHsl,
     iRgb                  => rgbImageFilters.hsl);
 end generate F_HSL_TEST_ENABLED;
-F_EMB_TEST_ENABLED : if (F_EMB = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.embos.valid = hi);
+F_EMB_TEST_ENABLED : if (F_EMB = true) generate 
+signal enablewriteemb       : std_logic := lo;
+begin 
+enablewriteemb <= hi when (rgbImageFilters.embos.valid = hi);
 ImageWriteembostPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "embos")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => enablewriteemb,
     iRgb                  => rgbImageFilters.embos);
 end generate F_EMB_TEST_ENABLED;
-F_BLU_TEST_ENABLED : if (F_BLU = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.blur.valid = hi);
+F_BLU_TEST_ENABLED : if (F_BLU = true) generate 
+signal enablewriteblu       : std_logic := lo;
+begin 
+enablewriteblu <= hi when (rgbImageFilters.blur.valid = hi);
 ImageWriteblurtPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "blur")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => enablewriteblu,
     iRgb                  => rgbImageFilters.blur);
 end generate F_BLU_TEST_ENABLED;
-F_CGA_TEST_ENABLED : if (F_CGA = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.cgain.valid = hi);
+F_CGA_TEST_ENABLED : if (F_CGA = true) generate 
+signal enableWriteCga       : std_logic := lo;
+begin 
+enableWriteCga <= hi when (rgbImageFilters.cgain.valid = hi);
 ImageWritecgaintPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "cgain")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => enableWriteCga,
     iRgb                  => rgbImageFilters.cgain);
 end generate F_CGA_TEST_ENABLED;
-F_YCC_TEST_ENABLED : if (F_YCC = true) generate begin 
-enableWrite <= hi when (rgbImageFilters.ycbcr.valid = hi);
+F_YCC_TEST_ENABLED : if (F_YCC = true) generate 
+signal enableWriteycbcr       : std_logic := lo;
+begin 
+enableWriteycbcr <= hi when (rgbImageFilters.ycbcr.valid = hi);
 ImageWriteycbcrtPatternInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
     output_file           => "ycbcr")
 port map (                  
     pixclk                => clk,
-    enableWrite           => enableWrite,
+    enableWrite           => enableWriteycbcr,
     iRgb                  => rgbImageFilters.ycbcr);
 end generate F_YCC_TEST_ENABLED;
-F_SHP_TO_SHP_TEST_ENABLED : if (F_SHP_TO_SHP = true) generate begin  
+F_SHP_TO_SHP_TEST_ENABLED : if (F_SHP_TO_SHP = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.shpToShp.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -655,12 +856,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.shpToShp);
 end generate F_SHP_TO_SHP_TEST_ENABLED;
-F_SHP_TO_HSL_TEST_ENABLED : if (F_SHP_TO_HSL = true) generate begin  
+F_SHP_TO_HSL_TEST_ENABLED : if (F_SHP_TO_HSL = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.shpToHsl.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -670,12 +873,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.shpToHsl);
 end generate F_SHP_TO_HSL_TEST_ENABLED;
-F_SHP_TO_HSV_TEST_ENABLED : if (F_SHP_TO_HSV = true) generate begin  
+F_SHP_TO_HSV_TEST_ENABLED : if (F_SHP_TO_HSV = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.shpToHsv.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -685,12 +890,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.shpToHsv);
 end generate F_SHP_TO_HSV_TEST_ENABLED;
-F_SHP_TO_YCC_TEST_ENABLED : if (F_SHP_TO_YCC = true) generate begin 
+F_SHP_TO_YCC_TEST_ENABLED : if (F_SHP_TO_YCC = true) generate 
+signal enableWrite                : std_logic;
+begin 
 enableWrite <= hi when (rgbImageFilters.shpToYcbcr.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -700,12 +907,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.shpToYcbcr);
 end generate F_SHP_TO_YCC_TEST_ENABLED;
-F_SHP_TO_CGA_TEST_ENABLED : if (F_SHP_TO_CGA = true) generate begin  
+F_SHP_TO_CGA_TEST_ENABLED : if (F_SHP_TO_CGA = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.shpToCgain.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -715,12 +924,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.shpToCgain);
 end generate F_SHP_TO_CGA_TEST_ENABLED;
-F_SHP_TO_BLU_TEST_ENABLED : if (F_SHP_TO_BLU = true) generate begin 
+F_SHP_TO_BLU_TEST_ENABLED : if (F_SHP_TO_BLU = true) generate 
+signal enableWrite                : std_logic;
+begin 
 enableWrite <= hi when (rgbImageFilters.shpToBlu.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -730,12 +941,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.shpToBlu);
 end generate F_SHP_TO_BLU_TEST_ENABLED;
-F_BLU_TO_BLU_TEST_ENABLED : if (F_BLU_TO_BLU = true) generate begin  
+F_BLU_TO_BLU_TEST_ENABLED : if (F_BLU_TO_BLU = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.bluToBlu.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -745,12 +958,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.bluToBlu);
 end generate F_BLU_TO_BLU_TEST_ENABLED;
-F_BLU_TO_HSL_TEST_ENABLED : if (F_BLU_TO_HSL = true) generate begin  
+F_BLU_TO_HSL_TEST_ENABLED : if (F_BLU_TO_HSL = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.bluToHsl.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -760,12 +975,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.bluToHsl);
 end generate F_BLU_TO_HSL_TEST_ENABLED;
-F_BLU_TO_HSV_TEST_ENABLED : if (F_BLU_TO_HSV = true) generate begin  
+F_BLU_TO_HSV_TEST_ENABLED : if (F_BLU_TO_HSV = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.bluToHsv.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -775,12 +992,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.bluToHsv);
 end generate F_BLU_TO_HSV_TEST_ENABLED;
-F_BLU_TO_YCC_TEST_ENABLED : if (F_BLU_TO_YCC = true) generate begin  
+F_BLU_TO_YCC_TEST_ENABLED : if (F_BLU_TO_YCC = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.bluToYcc.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -790,12 +1009,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.bluToYcc);
 end generate F_BLU_TO_YCC_TEST_ENABLED;
-F_BLU_TO_CGA_TEST_ENABLED : if (F_BLU_TO_CGA = true) generate begin  
+F_BLU_TO_CGA_TEST_ENABLED : if (F_BLU_TO_CGA = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.bluToCga.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -805,12 +1026,14 @@ port map (
     enableWrite           => enableWrite,
     iRgb                  => rgbImageFilters.bluToCga);
 end generate F_BLU_TO_CGA_TEST_ENABLED;
-F_BLU_TO_SHP_TEST_ENABLED : if (F_BLU_TO_SHP = true) generate begin  
+F_BLU_TO_SHP_TEST_ENABLED : if (F_BLU_TO_SHP = true) generate 
+signal enableWrite                : std_logic;
+begin  
 enableWrite <= hi when (rgbImageFilters.bluToShp.valid = hi);
 ImageWriteCgainToCgainInst: image_write
 generic map (
-    enImageText           => false,
-    enImageIndex          => false,
+    enImageText           => true,
+    enImageIndex          => true,
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
@@ -821,12 +1044,12 @@ port map (
     iRgb                  => rgbImageFilters.bluToShp);
 end generate F_BLU_TO_SHP_TEST_ENABLED;
 end generate FILTERS_TEST_ENABLED;
-FRAMEPROCESS_ENABLED : if (DUT_FRAMEPROCESS_ENABLED = true) generate
-frameProcess_test : dut_frame_process
-port map(
-    clk          => clk,
-    resetn       => resetn);
-end generate FRAMEPROCESS_ENABLED;
+--FRAMEPROCESS_ENABLED : if (DUT_FRAMEPROCESS_ENABLED = true) generate
+--frameProcess_test : dut_frame_process
+--port map(
+--    clk          => clk,
+--    resetn       => resetn);
+--end generate FRAMEPROCESS_ENABLED;
 VFP_ENABLED : if (DUT_VFP_ENABLED = true) generate
     -- d5m input
     signal pixclk                : std_logic;

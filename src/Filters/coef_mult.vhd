@@ -35,6 +35,7 @@ architecture behavioral of coef_mult is
     type kCoefSt is (kCoefSetState,kCoefYcbcrState,kCoefCgainState,kCoefSharpState,kCoefBlureState,kCoefXSobeState,kCoefYSobeState,kCoefEmbosState,kCoefUpdaterState,kCoefIdleState);
     signal kCoefStates      : kCoefSt;
     signal kCoefVals        : kCoefFilters;
+    signal userCoefVals     : kCoefFilters;
     signal kCoeffDWord      : kernelCoeDWord;
     signal kCofFrtProd      : kernelCoeDWord;
     signal upCtr            : integer   :=zero;
@@ -43,6 +44,30 @@ architecture behavioral of coef_mult is
     signal kCof             : kernelCoeff;
     
 begin
+
+NewUserCoeffValuesP: process(clk) begin
+    if (rising_edge (clk)) then
+        if (iKcoeff.kSet = kCoefYcbcrIndex) then
+            userCoefVals.kCoeffYcbcr   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefCgainIndex)then
+            userCoefVals.kCoeffCgain   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefSharpIndex)then
+            userCoefVals.kCoeffSharp   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefBlureIndex)then
+            userCoefVals.kCoeffBlure   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefSobeXIndex)then
+            userCoefVals.kCoefXSobel   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefSobeYIndex)then
+            userCoefVals.kCoefYSobel   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefEmbosIndex)then
+            userCoefVals.kCoeffEmbos   <= iKcoeff;
+        elsif(iKcoeff.kSet = kCoefCgai1Index)then
+            userCoefVals.kCoef1Cgain   <= iKcoeff;
+        end if;
+    end if;
+end process NewUserCoeffValuesP;
+
+
 
 FloatMaxLatP: process(clk) begin
     if (rising_edge (clk)) then
@@ -57,6 +82,8 @@ FloatMaxLatP: process(clk) begin
         end if;
     end if;
 end process FloatMaxLatP;
+
+
 kCoefStP: process (clk) begin
     if (rising_edge (clk)) then
         if (rst_l = lo) then
@@ -64,26 +91,48 @@ kCoefStP: process (clk) begin
         else
         case (kCoefStates) is
         when kCoefSetState =>
+        
+            ---------------------------------------------
+            --           [-2]  [-1]   [+0]
+            --           [-1]  [+1]   [+1]
+            --           [+0]  [+1]   [+2]
             kCoefVals.kCoeffYcbcr.k1   <= x"0101";--  0.257
             kCoefVals.kCoeffYcbcr.k2   <= x"01F8";--  0.504
             kCoefVals.kCoeffYcbcr.k3   <= x"0062";--  0.098
+            
             kCoefVals.kCoeffYcbcr.k4   <= x"FF6C";-- -0.148
             kCoefVals.kCoeffYcbcr.k5   <= x"FEDD";-- -0.291
             kCoefVals.kCoeffYcbcr.k6   <= x"01B7";--  0.439
+            
             kCoefVals.kCoeffYcbcr.k7   <= x"01B7";--  0.439
             kCoefVals.kCoeffYcbcr.k8   <= x"FE90";-- -0.368
             kCoefVals.kCoeffYcbcr.k9   <= x"FFB9";-- -0.071
             kCoefVals.kCoeffYcbcr.kSet <= kCoefYcbcrIndex;
+            ---------------------------------------------
+            -- x"05DC";--  1500
+            -- x"0FF5";--  1375
+            -- x"FF06";--  -250
+            -- x"FE0C";--  -500
+            -- x"FF83";--  -125
+            ---------------------------------------------
             kCoefVals.kCoeffCgain.k1   <= x"05DC";--  1375  =  1.375
             kCoefVals.kCoeffCgain.k2   <= x"FF06";-- -250   = -0.250
-            kCoefVals.kCoeffCgain.k3   <= x"FF06";-- -500   = -0.500
-            kCoefVals.kCoeffCgain.k4   <= x"FF06";-- -500   = -0.500
+            kCoefVals.kCoeffCgain.k3   <= x"FF83";-- -125   = -0.500
+            
+            kCoefVals.kCoeffCgain.k4   <= x"FF83";-- -125   = -0.500
             kCoefVals.kCoeffCgain.k5   <= x"05DC";--  1375  =  1.375
             kCoefVals.kCoeffCgain.k6   <= x"FF06";-- -250   = -0.250
-            kCoefVals.kCoeffCgain.k7   <= x"FF06";-- -250   = -0.250
-            kCoefVals.kCoeffCgain.k8   <= x"FF06";-- -500   = -0.500
-            kCoefVals.kCoeffCgain.k9   <= x"05DC";--  1375  =  1.375
+            
+            kCoefVals.kCoeffCgain.k7   <= x"FF83";-- -125   = -0.250
+            kCoefVals.kCoeffCgain.k8   <= x"FF06";-- -250   = -0.500
+            kCoefVals.kCoeffCgain.k9   <= x"05DC";--  1500  =  1.500
             kCoefVals.kCoeffCgain.kSet <= kCoefCgainIndex;
+            ---------------------------------------------
+            
+            ---------------------------------------------
+            --           [-2]  [-1]   [+0]
+            --           [-1]  [+1]   [+1]
+            --           [+0]  [+1]   [+2]
             kCoefVals.kCoeffSharp.k1   <= x"0000";--  0
             kCoefVals.kCoeffSharp.k2   <= x"FE0C";-- -0.5
             kCoefVals.kCoeffSharp.k3   <= x"0000";--  0
@@ -94,6 +143,8 @@ kCoefStP: process (clk) begin
             kCoefVals.kCoeffSharp.k8   <= x"FE0C";-- -0.5
             kCoefVals.kCoeffSharp.k9   <= x"0000";--  0
             kCoefVals.kCoeffSharp.kSet <= kCoefSharpIndex;
+            
+            ---------------------------------------------
             kCoefVals.kCoeffBlure.k1   <= x"006F";-- 0.111
             kCoefVals.kCoeffBlure.k2   <= x"006F";-- 0.111
             kCoefVals.kCoeffBlure.k3   <= x"006F";-- 0.111
@@ -104,163 +155,198 @@ kCoefStP: process (clk) begin
             kCoefVals.kCoeffBlure.k8   <= x"006F";-- 0.111
             kCoefVals.kCoeffBlure.k9   <= x"006F";-- 0.111
             kCoefVals.kCoeffBlure.kSet <= kCoefBlureIndex;
+            
+            ---------------------------------------------
+            --           Sobel kernel Gx
+            --           [-1]  [+0]   [+1]
+            --           [-1]  [+0]   [+1]
+            --           [-1]  [+0]   [+1]
             kCoefVals.kCoefXSobel.k1   <= x"FC18";--  [-1]
             kCoefVals.kCoefXSobel.k2   <= x"0000";--  [+0]
             kCoefVals.kCoefXSobel.k3   <= x"03E8";--  [+1]
-            kCoefVals.kCoefXSobel.k4   <= x"F830";--  [-2]
+            kCoefVals.kCoefXSobel.k4   <= x"FC18";--  [-1]--<= x"F830";--  [-2]
             kCoefVals.kCoefXSobel.k5   <= x"0000";--  [+0]
-            kCoefVals.kCoefXSobel.k6   <= x"07D0";--  [+2]
+            kCoefVals.kCoefXSobel.k6   <= x"03E8";--  [+1]--<= x"07D0";--  [+2]
             kCoefVals.kCoefXSobel.k7   <= x"FC18";--  [-1]
             kCoefVals.kCoefXSobel.k8   <= x"0000";--  [+0]
             kCoefVals.kCoefXSobel.k9   <= x"03E8";--  [+1]
+            
+            --           Sobel kernel Gy
+            --           [+1]  [+1]   [+1]
+            --           [+0]  [+0]   [+0]
+            --           [-1]  [-2]   [-1]
             kCoefVals.kCoefXSobel.kSet <= kCoefSobeXIndex;
             kCoefVals.kCoefYSobel.k1   <= x"03E8";--  [+1]
-            kCoefVals.kCoefYSobel.k2   <= x"07D0";--  [+2]
+            kCoefVals.kCoefYSobel.k2   <= x"03E8";--  [+1]--<= x"07D0";--  [+2]
             kCoefVals.kCoefYSobel.k3   <= x"03E8";--  [+1]
-            kCoefVals.kCoefYSobel.k4   <= x"F830";--  [-2]
+            kCoefVals.kCoefYSobel.k4   <= x"0000";--  [+0]
             kCoefVals.kCoefYSobel.k5   <= x"0000";--  [+0]
-            kCoefVals.kCoefYSobel.k6   <= x"07D0";--  [+2]
+            kCoefVals.kCoefYSobel.k6   <= x"0000";--  [+0]
             kCoefVals.kCoefYSobel.k7   <= x"FC18";--  [-1]
-            kCoefVals.kCoefYSobel.k8   <= x"F830";--  [-2]
+            kCoefVals.kCoefYSobel.k8   <= x"FC18";--  [-1]--<= x"F830";--  [-2]
             kCoefVals.kCoefYSobel.k9   <= x"FC18";--  [-1]
             kCoefVals.kCoefYSobel.kSet <= kCoefSobeYIndex;
-            kCoefVals.kCoeffEmbos.k1   <= x"FC18";-- -1
-            kCoefVals.kCoeffEmbos.k2   <= x"FC18";-- -1
-            kCoefVals.kCoeffEmbos.k3   <= x"0000";--  0
-            kCoefVals.kCoeffEmbos.k4   <= x"FC18";-- -1
-            kCoefVals.kCoeffEmbos.k5   <= x"0000";--  0
-            kCoefVals.kCoeffEmbos.k6   <= x"03E8";--  1
-            kCoefVals.kCoeffEmbos.k7   <= x"0000";--  0
-            kCoefVals.kCoeffEmbos.k8   <= x"03E8";--  1
-            kCoefVals.kCoeffEmbos.k9   <= x"03E8";--  1
+            ---------------------------------------------
+            
+            
+            --           Emboss kernel
+            --           [-2]  [-1]   [+0]
+            --           [-1]  [+1]   [+1]
+            --           [+0]  [+1]   [+2]
+            ---------------------------------------------
+            kCoefVals.kCoeffEmbos.k1   <= x"F830";--  [-2]
+            kCoefVals.kCoeffEmbos.k2   <= x"FC18";--  [-1]
+            kCoefVals.kCoeffEmbos.k3   <= x"0000";--  [+0]
+            
+            kCoefVals.kCoeffEmbos.k4   <= x"FC18";--  [-1]
+            kCoefVals.kCoeffEmbos.k5   <= x"03E8";--  [+1]
+            kCoefVals.kCoeffEmbos.k6   <= x"03E8";--  [+1]
+            
+            kCoefVals.kCoeffEmbos.k7   <= x"0000";--  [+0]
+            kCoefVals.kCoeffEmbos.k8   <= x"03E8";--  [+1]
+            kCoefVals.kCoeffEmbos.k9   <= x"07D0";--  [+2]
             kCoefVals.kCoeffEmbos.kSet <= kCoefEmbosIndex;
+            ---------------------------------------------
+            
+            
+            ---------------------------------------------
             kCoefVals.kCoef1Cgain.k1   <= x"055F";--  1375  =  1.375
             kCoefVals.kCoef1Cgain.k2   <= x"FF83";-- -125   = -0.125
             kCoefVals.kCoef1Cgain.k3   <= x"FF06";-- -250   = -0.250
+            
             kCoefVals.kCoef1Cgain.k4   <= x"FF06";-- -250   = -0.250
             kCoefVals.kCoef1Cgain.k5   <= x"055F";--  1375  =  1.375
             kCoefVals.kCoef1Cgain.k6   <= x"FF83";-- -125   = -0.125
+            
             kCoefVals.kCoef1Cgain.k7   <= x"FF83";-- -125   = -0.125
             kCoefVals.kCoef1Cgain.k8   <= x"FF06";-- -250   = -0.250
             kCoefVals.kCoef1Cgain.k9   <= x"055F";--  1375  =  1.375
+            
             kCoefVals.kCoef1Cgain.kSet <= kCoefCgai1Index;
+            ---------------------------------------------
+            
             
             kCoefStates <= kCoefYcbcrState;
             
+            
         when kCoefYcbcrState =>
+            if (userCoefVals.kCoeffYcbcr.kSet = kCoefVals.kCoeffYcbcr.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoeffYcbcr;
+            else
+                -- Default Coefficients Values
                 kCof <= kCoefVals.kCoeffYcbcr;
+            end if;
+
             if (upCtr = FloatMaxLat) then
-                oCoeffProd.kCoeffYcbcr <= kCofFrtProd;
+                -- Updated Default Coefficients Values
+                oCoeffProd.kCoeffYcbcr      <= kCofFrtProd;
                 oCoeffProd.kCoeffYcbcr.kSet <= kCoefVals.kCoeffYcbcr.kSet;
                 kCoefStates <= kCoefCgainState;
             end if;
+            
         when kCoefCgainState =>
-            kCof <= kCoefVals.kCoeffCgain;
+            if (userCoefVals.kCoeffCgain.kSet = kCoefVals.kCoeffCgain.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoeffCgain;
+            else
+                -- Default Coefficients Values
+                kCof <= kCoefVals.kCoeffCgain;
+            end if;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoeffCgain <= kCofFrtProd;
                 oCoeffProd.kCoeffCgain.kSet <= kCoefVals.kCoeffCgain.kSet;
                 kCoefStates <= kCoefSharpState;
             end if;
         when kCoefSharpState =>
-            kCof <= kCoefVals.kCoeffSharp;
+            if (userCoefVals.kCoeffSharp.kSet = kCoefVals.kCoeffSharp.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoeffSharp;
+            else
+                -- Default Coefficients Values
+                kCof <= kCoefVals.kCoeffSharp;
+            end if;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoeffSharp <= kCofFrtProd;
                 oCoeffProd.kCoeffSharp.kSet <= kCoefVals.kCoeffSharp.kSet;
                 kCoefStates <= kCoefBlureState;
             end if;
         when kCoefBlureState =>
-            kCof <= kCoefVals.kCoeffBlure;
+            if (userCoefVals.kCoeffBlure.kSet = kCoefVals.kCoeffBlure.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoeffBlure;
+            else
+                -- Default Coefficients Values
+                kCof <= kCoefVals.kCoeffBlure;
+            end if;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoeffBlure <= kCofFrtProd;
                 oCoeffProd.kCoeffBlure.kSet <= kCoefVals.kCoeffBlure.kSet;
                 kCoefStates <= kCoefXSobeState;
             end if;
         when kCoefXSobeState =>
-            kCof <= kCoefVals.kCoefXSobel;
+            if (userCoefVals.kCoefXSobel.kSet = kCoefVals.kCoefXSobel.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoefXSobel;
+            else
+                -- Default Coefficients Values
+                kCof <= kCoefVals.kCoefXSobel;
+            end if;
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoefXSobel <= kCofFrtProd;
                 oCoeffProd.kCoefXSobel.kSet <= kCoefVals.kCoefXSobel.kSet;
                 kCoefStates <= kCoefYSobeState;
             end if;
         when kCoefYSobeState =>
-            kCof <= kCoefVals.kCoefYSobel;
+            if (userCoefVals.kCoefYSobel.kSet = kCoefVals.kCoefYSobel.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoefYSobel;
+            else
+                -- Default Coefficients Values
+                kCof <= kCoefVals.kCoefYSobel;
+            end if;
+
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoefYSobel <= kCofFrtProd;
                 oCoeffProd.kCoefYSobel.kSet <= kCoefVals.kCoefYSobel.kSet;
                 kCoefStates <= kCoefEmbosState;
             end if;
         when kCoefEmbosState =>
-            kCof <= kCoefVals.kCoeffEmbos;
+            if (userCoefVals.kCoeffEmbos.kSet = kCoefVals.kCoeffEmbos.kSet) then
+                -- Updated User Coefficients Values
+                kCof <= userCoefVals.kCoeffEmbos;
+            else
+                -- Default Coefficients Values
+                kCof <= kCoefVals.kCoeffEmbos;
+            end if;
+
             if (upCtr = FloatMaxLat) then
                 oCoeffProd.kCoeffEmbos <= kCofFrtProd;
                 oCoeffProd.kCoeffEmbos.kSet <= kCoefVals.kCoeffEmbos.kSet;
                 kCoefStates <= kCoefUpdaterState;
             end if;
+            
+
         when kCoefUpdaterState =>
-            if (iKcoeff.kSet = kCoefVals.kCoeffYcbcr.kSet) then
-                kCoefVals.kCoeffYcbcr       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoeffYcbcr      <= kCofFrtProd;
-                oCoeffProd.kCoeffYcbcr.kSet <= kCoefYcbcrIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoeffCgain.kSet)then
-                kCoefVals.kCoeffCgain       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoeffCgain      <= kCofFrtProd;
-                oCoeffProd.kCoeffCgain.kSet <= kCoefCgainIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoeffSharp.kSet)then
-                kCoefVals.kCoeffSharp       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoeffSharp      <= kCofFrtProd;
-                oCoeffProd.kCoeffSharp.kSet <= kCoefSharpIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoeffBlure.kSet)then
-                kCoefVals.kCoeffBlure       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoeffBlure      <= kCofFrtProd;
-                oCoeffProd.kCoeffBlure.kSet <= kCoefBlureIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoefXSobel.kSet)then
-                kCoefVals.kCoefXSobel       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoefXSobel      <= kCofFrtProd;
-                oCoeffProd.kCoefXSobel.kSet <= kCoefSobeXIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoefYSobel.kSet)then
-                kCoefVals.kCoefYSobel       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoefYSobel      <= kCofFrtProd;
-                oCoeffProd.kCoefYSobel.kSet <= kCoefSobeYIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoeffEmbos.kSet)then
-                kCoefVals.kCoeffEmbos       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoeffEmbos      <= kCofFrtProd;
-                oCoeffProd.kCoeffEmbos.kSet <= kCoefEmbosIndex;
-            elsif(iKcoeff.kSet = kCoefVals.kCoef1Cgain.kSet)then
-                kCoefVals.kCoef1Cgain       <= iKcoeff;
-                kCof                        <= iKcoeff;
-                oCoeffProd.kCoef1Cgain      <= kCofFrtProd;
-                oCoeffProd.kCoef1Cgain.kSet <= kCoefCgai1Index;
+            -- baremetal os last write readback
+            if (iFilterId = kCoefYcbcrIndex) then
+                oKcoeff                      <= userCoefVals.kCoeffYcbcr;
+            elsif(iFilterId = kCoefCgainIndex)then
+                oKcoeff                      <= userCoefVals.kCoeffCgain;
+            elsif(iFilterId = kCoefSharpIndex)then
+                oKcoeff                      <= userCoefVals.kCoeffSharp;
+            elsif(iFilterId = kCoefBlureIndex)then
+                oKcoeff                      <= userCoefVals.kCoeffBlure;
+            elsif(iFilterId = kCoefSobeXIndex)then
+                oKcoeff                      <= userCoefVals.kCoefXSobel;
+            elsif(iFilterId = kCoefSobeYIndex)then
+                oKcoeff                      <= userCoefVals.kCoefYSobel;
+            elsif(iFilterId = kCoefEmbosIndex)then
+                oKcoeff                      <= userCoefVals.kCoeffEmbos;
             else
-                kCof                        <= iKcoeff;
+                oKcoeff                      <= userCoefVals.kCoef1Cgain;
             end if;
-            
-            if (iFilterId = kCoefVals.kCoeffYcbcr.kSet) then
-                oKcoeff                      <= kCoefVals.kCoeffYcbcr;
-            elsif(iFilterId = kCoefVals.kCoeffCgain.kSet)then
-                oKcoeff                      <= kCoefVals.kCoeffCgain;
-            elsif(iFilterId = kCoefVals.kCoeffSharp.kSet)then
-                oKcoeff                      <= kCoefVals.kCoeffSharp;
-            elsif(iFilterId = kCoefVals.kCoeffBlure.kSet)then
-                oKcoeff                      <= kCoefVals.kCoeffBlure;
-            elsif(iFilterId = kCoefVals.kCoefXSobel.kSet)then
-                oKcoeff                      <= kCoefVals.kCoefXSobel;
-            elsif(iFilterId = kCoefVals.kCoefYSobel.kSet)then
-                oKcoeff                      <= kCoefVals.kCoefYSobel;
-            elsif(iFilterId = kCoefVals.kCoeffEmbos.kSet)then
-                oKcoeff                      <= kCoefVals.kCoeffEmbos;
-            elsif(iFilterId = kCoefVals.kCoef1Cgain.kSet)then
-                oKcoeff                      <= kCoefVals.kCoef1Cgain;
-            else
-                oKcoeff                      <= iKcoeff;
-            end if;
-            
+            kCoefStates <= kCoefYcbcrState;
         when others =>
             kCoefStates <= kCoefUpdaterState;
         end case;
@@ -349,6 +435,8 @@ WordToFloatTopK9inst: WordToFloatTop
       iData      => kCof.k9,
       oValid     => open,
       oDataFloat => kCoeffDWord.k9);
+      
+      
 FloatMultiplyTopK1Inst: FloatMultiplyTop
     port map (
       clk        => clk,

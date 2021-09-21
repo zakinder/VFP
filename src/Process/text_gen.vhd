@@ -41,7 +41,7 @@ begin
 grid.x <= to_integer(unsigned(txCord.x(11 downto 0)));
 grid.y <= (img_height_bmp-1) - (to_integer(unsigned(txCord.y(11 downto 0))));
 
-display_txt_inst: display_txt
+textElement2: pixel_on_display
 generic map (
     img_width_bmp  => img_width_bmp,
     img_height_bmp => img_height_bmp,
