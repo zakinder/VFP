@@ -8,15 +8,12 @@
 -- This file instantiation axi4 components.
 --
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-
 entity frame_process is
 generic (
     i_data_width            : integer := 8;
@@ -62,7 +59,20 @@ port (
     oGridLockData           : out std_logic_vector(b_data_width-1 downto 0));
 end entity;
 architecture arch of frame_process is
-
+    constant L_BLU          : boolean := false;  -- 8
+    constant L_SHP          : boolean := false;  -- 9
+    constant L_CGA          : boolean := false;  -- 9
+    constant L_YCC          : boolean := false;  -- 5
+    constant L_D1T          : boolean := false;  -- 1
+    constant L_B1T          : boolean := false;  -- 9
+    constant L_AVG          : boolean := false;  -- 7
+    constant L_OBJ          : boolean := false;  -- 4
+    constant F_OHS          : boolean := true;
+    constant F_RE1          : boolean := true;
+    constant F_RE2          : boolean := true;
+    constant L_HSL          : boolean := true;
+    constant L_HIS          : boolean := true;
+    constant L_SPC          : boolean := true;
     constant MASK_TRUE      : boolean := true;
     constant MASK_FLSE      : boolean := false;
     constant M_SOB_LUM      : boolean := SelFrame(F_SOB,F_LUM,MASK_FLSE);
@@ -74,7 +84,6 @@ architecture arch of frame_process is
     constant M_SOB_CGA      : boolean := SelFrame(F_SOB,F_CGA,MASK_TRUE);
     constant M_SOB_HSV      : boolean := SelFrame(F_SOB,F_HSV,MASK_TRUE);
     constant M_SOB_HSL      : boolean := SelFrame(F_SOB,F_HSL,MASK_TRUE);
-
     signal txCord           : coord;
     signal rgbV1Correct     : channel;
     signal rgbV2Correct     : channel;
@@ -97,15 +106,11 @@ architecture arch of frame_process is
     signal iKcoeff          : kernelCoeff;
     signal rgbImageFilters  : frameColors;
     signal blur_channels    : blur_frames;
-
-
     signal edgeValid        : std_logic;
     signal rgbDetectLock    : std_logic;
     signal rgbPoiLock       : std_logic;
     signal sValid           : std_logic;
-
 begin
-
     oFrameData.sobel             <= rgbImageFilters.sobel;
     oFrameData.embos             <= rgbImageFilters.embos;
     oFrameData.blur              <= rgbImageFilters.blur;
@@ -166,14 +171,12 @@ begin
     rgbIn.valid                  <= iRgbSet.valid;
     cordIn.x                     <= iRgbSet.cord.x;
     cordIn.y                     <= iRgbSet.cord.y;
-
 pipCoordP: process (clk) begin
     if rising_edge(clk) then
         syncxy          <= cordIn;
         cord            <= syncxy;
     end if;
 end process pipCoordP;
-
     iKcoeff.k1   <= iKls.k1(15 downto 0);
     iKcoeff.k2   <= iKls.k2(15 downto 0);
     iKcoeff.k3   <= iKls.k3(15 downto 0);
@@ -184,13 +187,15 @@ end process pipCoordP;
     iKcoeff.k8   <= iKls.k8(15 downto 0);
     iKcoeff.k9   <= iKls.k9(15 downto 0);
     iKcoeff.kSet <= iKls.config;
-
 FiltersInst: filters
 generic map(
     F_TES               =>  F_TES,
     F_LUM               =>  F_LUM,
     F_TRM               =>  F_TRM,
     F_RGB               =>  F_RGB,
+    F_OHS               =>  F_OHS,
+    F_RE1               =>  F_RE1,
+    F_RE2               =>  F_RE2,
     F_SHP               =>  F_SHP,
     F_BLU               =>  F_BLU,
     F_EMB               =>  F_EMB,
@@ -199,6 +204,17 @@ generic map(
     F_CGA               =>  F_CGA,
     F_HSV               =>  F_HSV,
     F_HSL               =>  F_HSL,
+    L_BLU               =>  L_BLU,
+    L_SHP               =>  L_SHP,
+    L_AVG               =>  L_AVG,
+    L_OBJ               =>  L_OBJ,
+    L_D1T               =>  L_D1T,
+    L_B1T               =>  L_B1T,
+    L_CGA               =>  L_CGA,
+    L_YCC               =>  L_YCC,
+    L_HSL               =>  L_HSL,
+    L_HIS               =>  L_HIS,
+    L_SPC               =>  L_SPC,
     M_SOB_LUM           =>  M_SOB_LUM,
     M_SOB_TRM           =>  M_SOB_TRM,
     M_SOB_RGB           =>  M_SOB_RGB,
@@ -231,7 +247,6 @@ port map(
     edgeValid           => edgeValid,
     blur_channels       => blur_channels,
     oRgb                => rgbImageFilters);
-
 detectInst: detect_pixel
 generic map(
     i_data_width        => i_data_width)

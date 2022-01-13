@@ -105,10 +105,12 @@ begin
     yCounter    <= to_integer(unsigned(iCord.y));
 nRowDistP: process(clk) begin
     if rising_edge(clk) then
-        if (xcounter = frameSizeRht-2) and (nrowdist <= 2) then
+        if (xCounter = frameSizeRht-1) then
             nrowdist  <= nrowdist + one;
         else
-            nrowdist <= zero;
+            if (nrowdist>2) then
+                nrowdist <= zero;
+            end if;
         end if;
     end if;
 end process nRowDistP;

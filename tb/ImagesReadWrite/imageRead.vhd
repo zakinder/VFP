@@ -33,9 +33,7 @@ port (
     endOfFrame    : out std_logic);
 end image_read;
 architecture Behavioral of image_read is
-    constant proj_fol  : string := "K:/ZEDBOARD/uvm_tb/VFP_TEST/dut/tb/uvm_images/read";
-    constant bacslash  : string := "/";
-    constant readbmp   : string := proj_fol&bacslash&input_file&".bmp";
+    constant readbmp     : string := rImgFolder&fSlash&readbmp&fSlash&readbmp&".bmp";
     type bit_file is file of bit_vector;
     file read_file      : bit_file open read_mode  is readbmp;
     type t_color is array(1 to 3) of std_logic_vector(i_data_width-1 downto 0);

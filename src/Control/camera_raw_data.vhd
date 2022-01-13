@@ -20,10 +20,10 @@
 -- pixclk clock edge.As long as both valids are active high by
 -- the camera, the line buffer stores the pWrData upto maximum
 -- supported image width maxImgWidth of plineRam.
--- maxImgWidth maximum image width is configured as fixed constant
--- value of img_width which is 3741.calImgWidth Image width values
+-- maxImgWidth maximum image width. calImgWidth Image width values
 -- varies which is adjusted by the camera valid signals upto
 -- maximum supported value.
+-- Max Full Resolution : 2592x1944 -frame rate @15.15 24-bits
 ----------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;

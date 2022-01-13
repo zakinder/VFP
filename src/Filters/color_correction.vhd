@@ -22,7 +22,7 @@ use work.ports_package.all;
 
 entity color_correction is
   generic (
-    i_data_width  : integer := 8);
+    i_k_config_number  : integer := 8);
   port (
     clk       : in std_logic;
     rst_l     : in std_logic;
@@ -65,17 +65,19 @@ syncValid_P: process (clk,rst_l)begin
 end process syncValid_P;
 ccSfConfig_P: process (clk,rst_l)begin
     if rst_l = '0' then
-        cc.ccSf.k1           <= x"0B";
-        cc.ccSf.k2           <= x"FE";
-        cc.ccSf.k3           <= x"FF";
-        cc.ccSf.k4           <= x"FF";
-        cc.ccSf.k5           <= x"0B";
-        cc.ccSf.k6           <= x"FE";
-        cc.ccSf.k7           <= x"FE";
-        cc.ccSf.k8           <= x"FF";
-        cc.ccSf.k9           <= x"0B";
+        cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50
+        cc.ccSf.k2           <= to_sfixed(-0.250,4,-3); -- -0.25
+        cc.ccSf.k3           <= to_sfixed(-0.125,4,-3); -- -0.125
+        
+        cc.ccSf.k4           <= to_sfixed(-0.125,4,-3); -- -0.125
+        cc.ccSf.k5           <= to_sfixed(1.500,4,-3);  --  1.50
+        cc.ccSf.k6           <= to_sfixed(-0.250,4,-3); -- -0.25
+        
+        cc.ccSf.k7           <= to_sfixed(-0.125,4,-3); -- -0.125
+        cc.ccSf.k8           <= to_sfixed(-0.250,4,-3); -- -0.25
+        cc.ccSf.k9           <= to_sfixed(1.500,4,-3);  --  1.50
     elsif rising_edge(clk) then
-    if(als.config /= 0) then
+    if(als.config = i_k_config_number) then
         cc.ccSf.k1           <= to_sfixed(als.k1(7 downto 0),cc.ccSf.k1);
         cc.ccSf.k2           <= to_sfixed(als.k2(7 downto 0),cc.ccSf.k2);
         cc.ccSf.k3           <= to_sfixed(als.k3(7 downto 0),cc.ccSf.k3);

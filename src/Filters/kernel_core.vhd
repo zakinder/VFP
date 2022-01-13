@@ -110,7 +110,7 @@ end process;
 SHARP_FRAME_ENABLED: if (SHARP_FRAME = TRUE) generate
 sharp_valid_inst: d_valid
 generic map (
-    pixelDelay   => 31)
+    pixelDelay   => 34)
 port map(
     clk      => clk,
     iRgb     => rgb,
@@ -120,7 +120,7 @@ end generate SHARP_FRAME_ENABLED;
 BLURE_FRAME_ENABLED: if (BLURE_FRAME = TRUE) generate
 blure_valid_inst: d_valid
 generic map (
-    pixelDelay   => 31)
+    pixelDelay   => 35)
 port map(
     clk      => clk,
     iRgb     => rgb,
@@ -130,7 +130,7 @@ end generate BLURE_FRAME_ENABLED;
 EMBOS_FRAME_ENABLED: if (EMBOS_FRAME = TRUE) generate
 embos_valid_inst: d_valid
 generic map (
-    pixelDelay   => 31)
+    pixelDelay   => 30)
 port map(
     clk      => clk,
     iRgb     => rgb,
@@ -229,7 +229,7 @@ process (clk) begin
 end process;
 yCbCr_valid_Inst: d_valid
 generic map (
-    pixelDelay   => 9)
+    pixelDelay   => 27)
 port map(
     clk      => clk,
     iRgb     => rgb,

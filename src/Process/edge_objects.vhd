@@ -53,9 +53,16 @@ architecture arch of edge_objects is
     signal minValue         : integer;
     signal maxValue         : integer;
     signal rgbRInt          : integer;
-
+    signal rgbSyncValid     : std_logic_vector(3 downto 0)  := x"0";
 begin
-
+process (clk) begin
+    if rising_edge(clk) then
+        rgbSyncValid(0)  <= iRgb.valid;
+        rgbSyncValid(1)  <= rgbSyncValid(0);
+        rgbSyncValid(2)  <= rgbSyncValid(1);
+        rgbSyncValid(3)  <= rgbSyncValid(2);
+    end if;
+end process;
 
 piplRgbBlurXP : process (clk) begin
     if rising_edge(clk) then
@@ -98,6 +105,18 @@ rgbDeltaP: process (clk) begin
         rgbDelta      <= rgbMax - rgbMin;
     end if;
 end process rgbDeltaP;
+
+rgbP: process (clk) begin
+  if rising_edge(clk) then
+    oRgbRemix.red   <= std_logic_vector(to_unsigned(rgbDelta,8));
+    oRgbRemix.green <= std_logic_vector(to_unsigned(rgbDelta,8));
+    oRgbRemix.blue  <= std_logic_vector(to_unsigned(rgbDelta,8));
+    oRgbRemix.valid <= rgbSyncValid(2);
+  end if;
+end process rgbP;
+
+
+
 ipRgbMaxUfD1P: process (clk) begin
     if rising_edge(clk) then
         maxValue          <= rgbMax;
@@ -113,20 +132,20 @@ process (clk) begin
         end if;
     end if;
 end process;
-hueP: process (clk) begin
-  if rising_edge(clk) then
-    if((rgb2Int.red = rgbMax) and (rgb2Int.green > 40 and rgb2Int.green < 150) and (rgb2Int.blue > 40 and rgb2Int.blue< 150)) then
-            oRgbRemix.red   <= rgb3b.red;
-            oRgbRemix.green <= rgb3b.green;
-            oRgbRemix.blue  <= rgb3b.blue;
-    else
-            oRgbRemix.red   <= black;
-            oRgbRemix.green <= black;
-            oRgbRemix.blue  <= black;
-    end if;
-  end if;
-end process hueP;
-oRgbRemix.valid <= iRgb.valid;
+--hueP: process (clk) begin
+--  if rising_edge(clk) then
+--    if((rgb2Int.red = rgbMax) and (rgb2Int.green > 40 and rgb2Int.green < 150) and (rgb2Int.blue > 40 and rgb2Int.blue< 150)) then
+--            oRgbRemix.red   <= rgb3b.red;
+--            oRgbRemix.green <= rgb3b.green;
+--            oRgbRemix.blue  <= rgb3b.blue;
+--    else
+--            oRgbRemix.red   <= black;
+--            oRgbRemix.green <= black;
+--            oRgbRemix.blue  <= black;
+--    end if;
+--  end if;
+--end process hueP;
+--oRgbRemix.valid <= iRgb.valid;
 ------------------------------------------------------------------------------------------------
 -- rgbRemix : process (clk) begin
     -- if rising_edge(clk) then

@@ -1,8 +1,9 @@
 --------------------------------------------------------------------------------
 --
--- Filename    : filters.vhd
--- Create Date : 05022019 [05-02-2019]
--- Author      : Zakinder
+-- Filename      : filters.vhd
+-- Create Date   : 05022019 [05-02-2019]
+-- Modified Date : 12302021 [12-30-2021]
+-- Author        : Zakinder
 --
 -- Description:
 -- This file instantiation
@@ -40,23 +41,22 @@
 -- ycbcr_f_valid_inst  : d_valid
 -- k_hsv_rgb_sel_inst  : rgb_select
 --------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.fixed_pkg.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-
 entity filters is
 generic (
     F_TES                    : boolean := false;
     F_LUM                    : boolean := false;
     F_TRM                    : boolean := false;
     F_RGB                    : boolean := false;
+    F_OHS                    : boolean := false;
+    F_RE1                    : boolean := false;
+    F_RE2                    : boolean := false;
     F_SHP                    : boolean := false;
     F_BLU                    : boolean := false;
     F_EMB                    : boolean := false;
@@ -66,6 +66,16 @@ generic (
     F_HSV                    : boolean := false;
     F_HSL                    : boolean := false;
     L_BLU                    : boolean := false;
+    L_AVG                    : boolean := false;
+    L_OBJ                    : boolean := false;
+    L_CGA                    : boolean := false;
+    L_YCC                    : boolean := false;
+    L_SHP                    : boolean := false;
+    L_D1T                    : boolean := false;
+    L_B1T                    : boolean := false;
+    L_HSL                    : boolean := true;
+    L_HIS                    : boolean := true;
+    L_SPC                    : boolean := true;
     M_SOB_LUM                : boolean := false;
     M_SOB_TRM                : boolean := false;
     M_SOB_RGB                : boolean := false;
@@ -101,10 +111,10 @@ port (
     blur_channels            : out blur_frames;
     oRgb                     : out frameColors);
 end filters;
-
 architecture Behavioral of filters is
-
     signal rgbImageKernel      : colors;
+    signal rgbLocFilt          : local_filters;
+    signal rgbLocSynSFilt      : local_filters;
     constant init_channel      : channel := (valid => lo, red => black, green => black, blue => black);
     signal fRgb                : frameColors;
     signal sEdgeValid          : std_logic;
@@ -124,33 +134,87 @@ architecture Behavioral of filters is
     signal blurIodValid        : channel;
     signal YcbcrIoOut          : channel;
     signal YcbcrIoOutSelect    : channel;
-    signal rgbImageKernel_blur : channel;
-
     signal blur1vx             : channel;
+    signal blur11x             : channel;
     signal blur2vx             : channel;
+    signal blur21x             : channel;
     signal blur3vx             : channel;
-    
+    signal blur31x             : channel;
     signal ditRgb1vx           : channel;
     signal ditRgb2vx           : channel;
     signal ditRgb3vx           : channel;
-
-    
     signal rgbSel              : channel;
-
-    
+    signal vhsv                : channel;
+    signal vh1s                : channel;
+    signal vh2s                : channel;
+    signal vh3s                : channel;
+    signal rgb_hsvl            : channel;
+    signal rgb_histo           : channel;
+    signal eObject             : channel;
+    signal color_limits        : type_RgbArray(0 to 7);
+    signal valid_vhs           : std_logic;
+    signal dark_ccm            : coefficient;
+    signal light_ccm           : coefficient;
+    signal rgb                 : channel;
 begin
-
+    -- 60  =  7.50
+    -- 24  =  3.00
+    -- 8   =  1.00
+    -- 248 = -1.00
+    -- 232 = -3.00
+    -- 4   =  0.50
+    --    |--------|--------|--------|
+    --    | +0.375 | -0.250 | -0.250 |
+    --    |--------|--------|--------|
+    --    | -0.250 | +1.000 | -0.250 |
+    --    |--------|--------|--------|
+    --    | -0.500 | -0.250 | +1.250 |
+    --    |--------|--------|--------|
+    dark_ccm.config           <= 1;
+    dark_ccm.k1               <= std_logic_vector(to_unsigned(3,32));   --  1.000
+    dark_ccm.k2               <= std_logic_vector(to_unsigned(255,32)); -- -0.500
+    dark_ccm.k3               <= std_logic_vector(to_unsigned(255,32)); -- -0.250
+    dark_ccm.k4               <= std_logic_vector(to_unsigned(255,32));
+    dark_ccm.k5               <= std_logic_vector(to_unsigned(3,32));
+    dark_ccm.k6               <= std_logic_vector(to_unsigned(255,32));
+    dark_ccm.k7               <= std_logic_vector(to_unsigned(255,32));
+    dark_ccm.k8               <= std_logic_vector(to_unsigned(255,32));
+    dark_ccm.k9               <= std_logic_vector(to_unsigned(3,32));
+    -- 30  = 3.75
+    -- 35  = 4.75
+    -- 40  = 5.00
+    -- 45  = 5.625
+    -- 48  = 6.00
+    -- 255 = -0.125
+    -- 254 = -0.25
+    -- 248 = -1.00
+    -- 232 = -3.00
+    -- 224 = -4.00
+    --    |--------|--------|--------|
+    --    | +5.000 | -3.000 | -1.000 |
+    --    |--------|--------|--------|
+    --    | -1.000 | +5.000 | -3.000 |
+    --    |--------|--------|--------|
+    --    | -3.000 | -1.000 | +5.000 | 
+    --    |--------|--------|--------|
+    light_ccm.config           <= 2;
+    light_ccm.k1               <= std_logic_vector(to_unsigned(40,32));
+    light_ccm.k2               <= std_logic_vector(to_unsigned(232,32));
+    light_ccm.k3               <= std_logic_vector(to_unsigned(248,32));
+    light_ccm.k4               <= std_logic_vector(to_unsigned(248,32));
+    light_ccm.k5               <= std_logic_vector(to_unsigned(56,32));
+    light_ccm.k6               <= std_logic_vector(to_unsigned(232,32));
+    light_ccm.k7               <= std_logic_vector(to_unsigned(232,32));
+    light_ccm.k8               <= std_logic_vector(to_unsigned(248,32));
+    light_ccm.k9               <= std_logic_vector(to_unsigned(80,32));
     edgeValid               <= sEdgeValid;
     oRgb                    <= fRgb;
-    
     blur_channels.ditRgb1vx <= ditRgb1vx;
     blur_channels.ditRgb2vx <= ditRgb2vx;
     blur_channels.ditRgb3vx <= ditRgb3vx;
-    
-    blur_channels.blur1vx   <= blur1vx;
-    blur_channels.blur2vx   <= blur2vx;
-    blur_channels.blur3vx   <= blur3vx;
-    
+    fRgb.blur1vx            <= blur1vx;
+    fRgb.blur2vx            <= blur2vx;
+    fRgb.blur3vx            <= blur3vx;
     fRgb.cgainToYcbcr       <= fRgb1.ycbcr;--CgainToYcbcr
     fRgb.cgainToShp         <= fRgb1.sharp;--CgainToSharp
     fRgb.cgainToBlu         <= fRgb1.blur; --CgainToBlur
@@ -169,18 +233,96 @@ begin
     fRgb.shpToHsv           <= fRgb2.hsv;  --SharpToHsv  ,HsvToSharp
     fRgb.bluToHsl           <= fRgb3.hsl;  --BlurToHsl   ,HslToBlur
     fRgb.bluToHsv           <= fRgb3.hsv;  --BlurToHsv   ,HsvToBlur
-
+    fRgb.synBlur            <= rgbLocSynSFilt.blur;
+    fRgb.vhsv               <= vhsv;
+    fRgb.hsvl               <= rgb_hsvl;
+    fRgb.histogram          <= rgb_histo;
+    fRgb.eObject            <= eObject;
 lThSelectP: process (clk) begin
     if rising_edge(clk) then
-        if (iLumTh = 0)  then
+        if (iLumTh >= 0)  then
             rgbSel     <= iRgb;
         else
             rgbSel     <= blur3vx;
         end if;
     end if;
 end process lThSelectP;
-
-
+rgb_range_inst: rgb_range
+generic map (
+    i_data_width       => i_data_width)
+port map (                  
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => rgb);
+hsv_hsvl_inst: hsvl
+generic map (
+    i_data_width       => i_data_width)
+port map (                  
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => fRgb.ycbcr,
+    oHsl               => rgb_hsvl);
+rgb_histogram_inst: rgb_histogram
+generic map (
+    img_width          => img_width,
+    img_height         => img_height)
+port map (                  
+    clk                => clk,
+    reset              => rst_l,
+    txCord             => txCord,
+    iRgb               => rgb,
+    oRgb               => rgb_histo);
+edge_objectsInst: edge_objects
+generic map (
+    i_data_width       => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => rgb,
+    oRgbRemix          => eObject);
+color_space_limits_inst: color_space_limits
+generic map (
+    i_data_width       => 8)
+port map (                  
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => rgb,
+    rgbColors          => color_limits);
+    fRgb.space.ch0.red   <= color_limits(0).red;
+    fRgb.space.ch0.green <= color_limits(0).green;
+    fRgb.space.ch0.blue  <= color_limits(0).blue;
+    fRgb.space.ch0.valid <= color_limits(0).valid;
+    fRgb.space.ch1.red   <= color_limits(1).red;
+    fRgb.space.ch1.green <= color_limits(1).green;
+    fRgb.space.ch1.blue  <= color_limits(1).blue;
+    fRgb.space.ch1.valid <= color_limits(1).valid;
+    fRgb.space.ch2.red   <= color_limits(2).red;
+    fRgb.space.ch2.green <= color_limits(2).green;
+    fRgb.space.ch2.blue  <= color_limits(2).blue;
+    fRgb.space.ch2.valid <= color_limits(2).valid;
+    fRgb.space.ch3.red   <= color_limits(3).red;
+    fRgb.space.ch3.green <= color_limits(3).green;
+    fRgb.space.ch3.blue  <= color_limits(3).blue;
+    fRgb.space.ch3.valid <= color_limits(3).valid;
+    fRgb.space.ch4.red   <= color_limits(4).red;
+    fRgb.space.ch4.green <= color_limits(4).green;
+    fRgb.space.ch4.blue  <= color_limits(4).blue;
+    fRgb.space.ch4.valid <= color_limits(4).valid;
+    fRgb.space.ch5.red   <= color_limits(5).red;
+    fRgb.space.ch5.green <= color_limits(5).green;
+    fRgb.space.ch5.blue  <= color_limits(5).blue;
+    fRgb.space.ch5.valid <= color_limits(5).valid;
+    fRgb.space.ch6.red   <= color_limits(6).red;
+    fRgb.space.ch6.green <= color_limits(6).green;
+    fRgb.space.ch6.blue  <= color_limits(6).blue;
+    fRgb.space.ch6.valid <= color_limits(6).valid;
+    fRgb.space.ch7.red   <= color_limits(7).red;
+    fRgb.space.ch7.green <= color_limits(7).green;
+    fRgb.space.ch7.blue  <= color_limits(7).blue;
+    fRgb.space.ch7.valid <= color_limits(7).valid;
+-- cgainIoIn Input to local cgain module
+-- cgainIoOut Output of local cgain module
 CgainIoP: process (clk) begin
     if rising_edge(clk) then
         if (iVideoChannel = FILTER_SHP_TO_CGA) then
@@ -193,7 +335,7 @@ CgainIoP: process (clk) begin
             cgainIoIn           <= rgbImageKernel.hsv;  --CgainToHsv  ,HsvToCgain
             fRgb1.hsv           <= cgainIoOut;
         elsif(iVideoChannel = FILTER_BLU_TO_CGA)then
-            cgainIoIn           <= rgbImageKernel_blur; --BlurToCgain
+            cgainIoIn           <= rgbLocFilt.blur; --BlurToCgain
             fRgb3.cgain         <= cgainIoOut;
         elsif(iVideoChannel = FILTER_K_CGA)then
             cgainIoIn           <= rgbImageKernel.hsl; --Kernal Cgain
@@ -205,8 +347,6 @@ CgainIoP: process (clk) begin
         end if;
     end if;
 end process CgainIoP;
-
-
 SharpIoP: process (clk) begin
     if rising_edge(clk) then
         if (iVideoChannel = FILTER_CGA_TO_SHP) then
@@ -219,7 +359,7 @@ SharpIoP: process (clk) begin
             sharpIoIn           <= rgbImageKernel.hsv;  --SharpToHsv  ,HsvToSharp
             fRgb2.hsv           <= sharpIoOut;
         elsif(iVideoChannel = FILTER_BLU_TO_SHP)then
-            sharpIoIn           <= rgbImageKernel_blur; --BlurToSharp
+            sharpIoIn           <= rgbLocFilt.blur; --BlurToSharp
             fRgb3.sharp         <= sharpIoOut;
         else
             sharpIoIn           <= rgbImageKernel.sharp;--SharpToSharp
@@ -227,8 +367,6 @@ SharpIoP: process (clk) begin
         end if;
     end if;
 end process SharpIoP;
-
-
 BlurIoP: process (clk) begin
     if rising_edge(clk) then
         if (iVideoChannel = FILTER_CGA_TO_BLU) then
@@ -238,7 +376,7 @@ BlurIoP: process (clk) begin
             blurIoIn            <= rgbImageKernel.sharp; --SharpToBlur
             fRgb2.blur          <= blurIoOut;
         elsif(iVideoChannel = FILTER_BLU_TO_BLU)then
-            blurIoIn            <= rgbImageKernel_blur;   --BlurToHsl   ,HslToBlur
+            blurIoIn            <= rgbLocFilt.blur;   --BlurToHsl   ,HslToBlur
             fRgb3.blur          <= blurIoOut;
         elsif(iVideoChannel = FILTER_BLU_TO_HSV)then
             blurIoIn            <= rgbImageKernel.hsv;   --BlurToHsv   ,HsvToBlur
@@ -247,13 +385,11 @@ BlurIoP: process (clk) begin
             blurIoIn            <= rgbImageKernel.hsl;   --BlurToHsl   ,HslToBlur
             fRgb3.hsl           <= blurIoOut;
         else
-            blurIoIn            <= rgbImageKernel_blur;  --BlurToBlur
+            blurIoIn            <= rgbLocFilt.blur;  --BlurToBlur
             fRgb3.blur          <= blurIoOut;
         end if;
     end if;
 end process BlurIoP;
-
-
 YcbcrIoP: process (clk) begin
     if rising_edge(clk) then
         if (iVideoChannel = FILTER_CGA_TO_YCC) then
@@ -261,28 +397,20 @@ YcbcrIoP: process (clk) begin
             YcbcrIoOut          <= YcbcrIoOutSelect;
             fRgb1.ycbcr         <= YcbcrIoOut;
         elsif(iVideoChannel = FILTER_BLU_TO_YCC)then
-            YcbcrIoIn           <= rgbImageKernel_blur;  --BlurToYcbcr
+            YcbcrIoIn           <= rgbLocFilt.blur;  --BlurToYcbcr
             YcbcrIoOut          <= YcbcrIoOutSelect;
             fRgb3.ycbcr         <= YcbcrIoOut;
         elsif(iVideoChannel = FILTER_SHP_TO_YCC)then
             YcbcrIoIn           <= rgbImageKernel.sharp; --SharpToYcbcr
             YcbcrIoOut          <= YcbcrIoOutSelect;
             fRgb3.ycbcr         <= YcbcrIoOut;
-        elsif(iVideoChannel = FILTER_YCC)then
-            YcbcrIoIn           <= iRgb;
-            fRgb2.ycbcr         <= rgbImageKernel.ycbcr; --
-            YcbcrIoOut          <= rgbImageKernel.ycbcr; --
         else
-            YcbcrIoIn           <= iRgb;
+            YcbcrIoIn           <= rgb;
             YcbcrIoOut          <= YcbcrIoOutSelect;--SharpToYcbcr
             fRgb2.ycbcr         <= YcbcrIoOut;
         end if;
     end if;
 end process YcbcrIoP;
-
-
-
-
 F_BLUR_CHANNELS_ENABLE: if (F_BLUR_CHANNELS = true) generate
 begin
 filter_blur_1_inst  : blur_filter
@@ -296,9 +424,15 @@ generic map(
 port map(
     clk                 => clk,
     rst_l               => rst_l,
-    iRgb                => ditRgb1vx,
+    iRgb                => rgb,
+    oRgb                => blur11x);
+blur_1_valid_inst: d_valid
+generic map (
+    pixelDelay          => 4)
+port map(
+    clk                 => clk,
+    iRgb                => blur11x,
     oRgb                => blur1vx);
-
 filter_blur_2_inst  : blur_filter
 generic map(
     iMSB                => blurMsb - 1,
@@ -311,8 +445,14 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => blur1vx,
+    oRgb                => blur21x);
+blur_2_valid_inst: d_valid
+generic map (
+    pixelDelay          => 4)
+port map(
+    clk                 => clk,
+    iRgb                => blur21x,
     oRgb                => blur2vx);
-
 filter_blur_3_inst  : blur_filter
 generic map(
     iMSB                => blurMsb - 1,
@@ -325,38 +465,39 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => blur2vx,
+    oRgb                => blur31x);
+blur_3_valid_inst: d_valid
+generic map (
+    pixelDelay          => 4)
+port map(
+    clk                 => clk,
+    iRgb                => blur31x,
     oRgb                => blur3vx);
 end generate F_BLUR_CHANNELS_ENABLE;
-
-
 F_DITH_CHANNELS_ENABLE: if (F_DITH_CHANNELS = true) generate
-
 begin
-
 filter_dith_1_inst  : dither_filter
 generic map (
     img_width         => img_width,
     img_height        => img_height,
     color_width       => 8,
-    reduced_width     => 1)
+    reduced_width     => 5)
 port map (
     clk               => clk,
     iCord_x           => txCord.x,
-    iRgb              => iRgb,
+    iRgb              => rgb,
     oRgb              => ditRgb1vx);
-    
 filter_dith_2_inst  : dither_filter
 generic map (
     img_width         => img_width,
     img_height        => img_height,
     color_width       => 8,
-    reduced_width     => 2)
+    reduced_width     => 4)
 port map (
     clk               => clk,
     iCord_x           => txCord.x,
-    iRgb              => iRgb,
+    iRgb              => rgb,
     oRgb              => ditRgb2vx);
-    
 filter_dith_3_inst  : dither_filter
 generic map (
     img_width         => img_width,
@@ -366,12 +507,55 @@ generic map (
 port map (
     clk               => clk,
     iCord_x           => txCord.x,
-    iRgb              => iRgb,
+    iRgb              => rgb,
     oRgb              => ditRgb3vx);
-
 end generate F_DITH_CHANNELS_ENABLE;
-
-
+F_DITH_ENABLE: if (L_D1T = true) generate
+signal dither_syn : channel;
+begin
+filter_dith_inst  : dither_filter
+generic map (
+    img_width         => img_width,
+    img_height        => img_height,
+    color_width       => 8,
+    reduced_width     => 4)
+port map (
+    clk               => clk,
+    iCord_x           => txCord.x,
+    iRgb              => rgb,
+    oRgb              => dither_syn);
+hsv_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 68)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => dither_syn,
+    oRgb       => fRgb.d1t);
+end generate F_DITH_ENABLE;
+F_DITH_BLUR_ENABLE: if (L_B1T = true) generate
+signal di_bl_syn     :  channel;
+begin
+filter_dit_inst      : dither_filter
+generic map (
+    img_width         => img_width,
+    img_height        => img_height,
+    color_width       => 8,
+    reduced_width     => 3)
+port map (
+    clk               => clk,
+    iCord_x           => txCord.x,
+    iRgb              => rgb,
+    oRgb              => di_bl_syn);
+b1t_syncr_inst      : sync_frames
+generic map(
+    pixelDelay => 68)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => di_bl_syn,
+    oRgb       => fRgb.b1t);
+end generate F_DITH_BLUR_ENABLE;
 --------------------------------------------------------------------------------
 --
 --------------------------------------------------------------------------------
@@ -380,6 +564,9 @@ generic map(
     INRGB_FRAME         => F_RGB,
     RGBLP_FRAME         => F_LUM,
     RGBTR_FRAME         => F_TRM,
+    COHSL_FRAME         => F_OHS,
+    RE1CO_FRAME         => F_RE1,
+    RE2CO_FRAME         => F_RE2,
     SHARP_FRAME         => F_SHP,
     BLURE_FRAME         => F_BLU,
     EMBOS_FRAME         => F_EMB,
@@ -405,11 +592,49 @@ port map(
     oKcoeff             => oKcoeff,
     oEdgeValid          => sEdgeValid,
     oRgb                => rgbImageKernel);
-    
-    
-L_BLUR_CHANNELS_ENABLE: if (L_BLU = true) generate
+L_OBJ_ENABLE: if (L_OBJ = true) generate
 begin
-filter_blur_4_inst  : blur_filter
+l_obj_inst: edge_objects
+generic map (
+    i_data_width          => i_data_width)
+port map (                  
+    clk                   => clk,
+    rst_l                 => rst_l,
+    iRgb                  => rgb,
+    oRgbRemix             => rgbLocFilt.lcobj);
+objSyncr_inst  : sync_frames
+generic map(
+    pixelDelay          => 31)
+port map(
+    clk                 => clk,
+    reset               => rst_l,
+    iRgb                => rgbLocFilt.lcobj,
+    oRgb                => rgbLocSynSFilt.lcobj);
+end generate L_OBJ_ENABLE;
+    fRgb.synLcobj        <= rgbLocSynSFilt.lcobj;
+L_AVG_ENABLE: if (L_AVG = true) generate
+begin
+l_avg_inst: color_avg
+generic map (
+    i_data_width          => i_data_width)
+port map (                  
+    clk                   => clk,
+    reset                 => rst_l,
+    iRgb                  => rgb,
+    oRgb                  => rgbLocFilt.rgbag);
+avgSyncr_inst  : sync_frames
+generic map(
+    pixelDelay          => 29)
+port map(
+    clk                 => clk,
+    reset               => rst_l,
+    iRgb                => rgbLocFilt.rgbag,
+    oRgb                => rgbLocSynSFilt.rgbag);
+end generate L_AVG_ENABLE;
+    fRgb.synRgbag        <= rgbLocSynSFilt.rgbag;
+L_BLU_ENABLE: if (L_BLU = true) generate
+begin
+l_blu_inst  : blur_filter
 generic map(
     iMSB                => blurMsb,
     iLSB                => blurLsb,
@@ -420,17 +645,100 @@ generic map(
 port map(
     clk                 => clk,
     rst_l               => rst_l,
-    iRgb                => iRgb,
-    oRgb                => rgbImageKernel_blur);
-end generate L_BLUR_CHANNELS_ENABLE;
-
-
-
-    
-    
+    iRgb                => rgb,
+    oRgb                => rgbLocFilt.blur);
+blurSyncr_inst  : sync_frames
+generic map(
+    pixelDelay          => 27)
+port map(
+    clk                 => clk,
+    reset               => rst_l,
+    iRgb                => rgbLocFilt.blur,
+    oRgb                => rgbLocSynSFilt.blur);
+end generate L_BLU_ENABLE;
+L_CGA_ENABLE: if (L_CGA = true) generate
+signal ccm1_rgb   : channel;
+begin
+dark_ccm_inst  : color_correction
+generic map(
+    i_k_config_number   => 1)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => rgb,
+    als                 => dark_ccm,
+    oRgb                => ccm1_rgb);
+light_ccm_inst  : color_correction
+generic map(
+    i_k_config_number   => 2)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => ccm1_rgb,
+    als                 => light_ccm,
+    oRgb                => rgbLocFilt.cgain);
+blurSyncr_inst  : sync_frames
+generic map(
+    pixelDelay          => 27)
+port map(
+    clk                 => clk,
+    reset               => rst_l,
+    iRgb                => rgbLocFilt.cgain,
+    oRgb                => rgbLocSynSFilt.cgain);
+end generate L_CGA_ENABLE;
+    fRgb.synCgain        <= rgbLocSynSFilt.cgain;
+L_SHP_ENABLE: if (L_SHP = true) generate
+begin
+l_shp_inst  : sharp_filter
+generic map(
+    i_data_width        => i_data_width,
+    img_width           => img_width,
+    adwrWidth           => adwrWidth,
+    addrWidth           => addrWidth)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => rgb,
+    kls                 => iAls,
+    oRgb                => rgbLocFilt.sharp);
+sharpSyncr_inst  : sync_frames
+generic map(
+    pixelDelay          => 27)
+port map(
+    clk                 => clk,
+    reset               => rst_l,
+    iRgb                => rgbLocFilt.sharp,
+    oRgb                => rgbLocSynSFilt.sharp);
+end generate L_SHP_ENABLE;
+    fRgb.synSharp        <= rgbLocSynSFilt.sharp;
+L_YCC_ENABLE: if (L_YCC = true) generate
+begin
+l_ycc_inst  : rgb_ycbcr
+generic map(
+    i_data_width         => i_data_width,
+    i_precision          => 12,
+    i_full_range         => TRUE)
+port map(
+    clk                  => clk,
+    rst_l                => rst_l,
+    iRgb                 => rgb,
+    y                    => rgbLocFilt.ycbcr.red,
+    cb                   => rgbLocFilt.ycbcr.green,
+    cr                   => rgbLocFilt.ycbcr.blue,
+    oValid               => rgbLocFilt.ycbcr.valid);
+yccSyncr_inst  : sync_frames
+generic map(
+    pixelDelay           => 27)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => rgbLocFilt.ycbcr,
+    oRgb                 => rgbLocSynSFilt.ycbcr);
+end generate L_YCC_ENABLE;
+    fRgb.synYcbcr                    <= rgbLocSynSFilt.ycbcr;
 filter_colcor_inst  : color_correction
 generic map(
-    i_data_width        => i_data_width)
+    i_k_config_number   => 0)
 port map(
     clk                 => clk,
     rst_l               => rst_l,
@@ -476,7 +784,6 @@ port map(
     clk      => clk,
     iRgb     => blurIodValid,
     oRgb     => blurIoOut);
-    
 filter_y_cbcr_inst  : rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
@@ -498,12 +805,11 @@ begin
 test_patterns_inst  : testpattern
 port map(
     clk           => clk,
-    iValid        => iRgb.valid,
+    iValid        => rgb.valid,
     iCord         => txCord,
     tpSelect      => iLumTh,
     oRgb          => fRgb.tPattern);
 end generate TEST_FRAME_ENABLE;
-
 MASK_SOB_CGA_FRAME_ENABLE : if (M_SOB_CGA = true) generate
     signal tp2cgain   : channel;
     signal tp2        : std_logic_vector(23 downto 0) := (others => '0');
@@ -683,21 +989,21 @@ port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
-    i1Rgb       => rgbImageKernel.sobel,
-    i2Rgb       => d1Rgb,
+    i1Rgb       => rgbImageKernel.re2color,
+    i2Rgb       => rgbImageKernel.re1color,
     oRgb        => fRgb.maskSobelRgb);
 end generate MASK_SOB_RGB_FRAME_ENABLE;
 MASK_SOB_LUM_FRAME_ENABLE: if (M_SOB_LUM = true) generate
 begin
 frame_masking_inst  : frame_mask
 generic map (
-    eBlack       => true)
+    eBlack       => false)
 port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
-    i1Rgb       => rgbImageKernel.sobel,
-    i2Rgb       => rgbImageKernel.colorLmp,
+    i1Rgb       => fRgb.space.ch4,
+    i2Rgb       => rgbImageKernel.re1color,
     oRgb        => fRgb.maskSobelLum);
 end generate MASK_SOB_LUM_FRAME_ENABLE;
 MASK_SOB_BLU_FRAME_ENABLE: if (M_SOB_BLU = true) generate
@@ -709,39 +1015,16 @@ port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
-    i1Rgb       => rgbImageKernel.sobel,
-    i2Rgb       => rgbImageKernel.blur,
+    i1Rgb       => rgbImageKernel.re1color,
+    i2Rgb       => fRgb.space.ch4,
     oRgb        => fRgb.maskSobelBlu);
 end generate MASK_SOB_BLU_FRAME_ENABLE;
 INRGB_FRAME_ENABLE: if (F_RGB = true) generate
     fRgb.inrgb <= rgbImageKernel.inrgb;
 end generate INRGB_FRAME_ENABLE;
 YCBCR_FRAME_ENABLE: if (F_YCC = true) generate
-    signal dlyYcbcr   : channel;
-    signal rgbYcbcr   : channel;
 begin
-ycbcr_rgb_sel_inst  : rgb_select
-    port map(
-        clk      => clk,
-        iPerCh   => iYccPerCh,
-        iRgb     => rgbYcbcr,
-        oRgb     => fRgb.ycbcr);
-    process (clk) begin
-        if rising_edge(clk) then
-            if (iVideoChannel = FILTER_YCC) then
-                rgbYcbcr    <= dlyYcbcr;
-            else
-                rgbYcbcr    <= YcbcrIoOut;
-            end if;
-        end if;
-    end process;
-ycbcr_f_valid_inst  : d_valid
-    generic map (
-        pixelDelay   => 18)
-    port map(
-        clk      => clk,
-        iRgb     => YcbcrIoOut,
-        oRgb     => dlyYcbcr);
+    fRgb.ycbcr <= rgbImageKernel.ycbcr;
 end generate YCBCR_FRAME_ENABLE;
 SHARP_FRAME_ENABLE: if (F_SHP = true) generate
 begin
@@ -766,13 +1049,8 @@ end generate CGAIN_FRAME_ENABLE;
 HSL_FRAME_ENABLE: if (F_HSL = true) generate
     fRgb.hsl <= rgbImageKernel.hsl;
 end generate HSL_FRAME_ENABLE;
-HSV_FRAME_ENABLE: if (F_HSV = true) generate begin
-k_hsv_rgb_sel_inst  : rgb_select
-        port map(
-            clk      => clk,
-            iPerCh   => iHsvPerCh,
-            iRgb     => rgbImageKernel.hsv,
-            oRgb     => fRgb.hsv);
+HSV_FRAME_ENABLE: if (F_HSV = true) generate
+    fRgb.hsv <= rgbImageKernel.hsv;
 end generate HSV_FRAME_ENABLE;
 LUM_FRAME_ENABLE: if (F_LUM = true) generate
     fRgb.colorLmp <= rgbImageKernel.colorLmp;
@@ -780,6 +1058,21 @@ end generate LUM_FRAME_ENABLE;
 TRM_FRAME_ENABLE: if (F_TRM = true) generate
     fRgb.colorTrm <= rgbImageKernel.colorTrm;
 end generate TRM_FRAME_ENABLE;
+OHS_FRAME_ENABLE: if (F_OHS = true) generate
+    fRgb.colorhsl  <= rgbImageKernel.colorhsl;
+end generate OHS_FRAME_ENABLE;
+RE1_FRAME_ENABLE: if (F_RE1 = true) generate
+    fRgb.re1color  <= rgbImageKernel.re1color;
+end generate RE1_FRAME_ENABLE;
+RE2_FRAME_ENABLE: if (F_RE2 = true) generate
+    fRgb.re2color  <= rgbImageKernel.re2color;
+    fRgb.re3color  <= rgbImageKernel.re3color;
+    fRgb.re4color  <= rgbImageKernel.re4color;
+    fRgb.re5color  <= rgbImageKernel.re5color;
+    fRgb.re6color  <= rgbImageKernel.re6color;
+    fRgb.re7color  <= rgbImageKernel.re7color;
+    fRgb.re8color  <= rgbImageKernel.re8color;
+end generate RE2_FRAME_ENABLE;
 MASK_SOB_CGA_FRAME_DISABLED: if (M_SOB_CGA = false) generate
     fRgb.maskSobelCga  <= init_channel;
 end generate MASK_SOB_CGA_FRAME_DISABLED;
@@ -813,6 +1106,15 @@ end generate LUM_FRAME_DISABLED;
 TRM_FRAME_DISABLED: if (F_TRM = false) generate
     fRgb.colorTrm  <= init_channel;
 end generate TRM_FRAME_DISABLED;
+OHS_FRAME_DISABLED: if (F_OHS = false) generate
+    fRgb.colorhsl  <= init_channel;
+end generate OHS_FRAME_DISABLED;
+RE1_FRAME_DISABLED: if (F_RE1 = false) generate
+    fRgb.re1color  <= init_channel;
+end generate RE1_FRAME_DISABLED;
+RE2_FRAME_DISABLED: if (F_RE2 = false) generate
+    fRgb.re2color  <= init_channel;
+end generate RE2_FRAME_DISABLED;
 INRGB_FRAME_DISABLED: if (F_RGB = false) generate
     fRgb.inrgb     <= init_channel;
 end generate INRGB_FRAME_DISABLED;

@@ -1,4 +1,4 @@
---04282019 [04-28-2019]
+--12302021 [12-30-2021]
 library ieee;
 library work;
 use ieee.std_logic_1164.all;
@@ -127,9 +127,9 @@ package constants_package is
     constant initCordValueTop                   : integer := 65535;
     constant initCordValueBot                   : integer := 0;
     constant frameSizeLft                       : integer := 1;
-    constant frameSizeRht                       : integer := 1920;
+    constant frameSizeRht                       : integer := 128;
     constant frameSizeTop                       : integer := 5;
-    constant frameSizeBot                       : integer := 1080;
+    constant frameSizeBot                       : integer := 128;
     constant pInterestWidth                     : integer := 127;
     constant pInterestHight                     : integer := 127;
     -------------------------------------------------------------------------
@@ -168,17 +168,80 @@ package constants_package is
     constant ROUND_RESULT_WIDTH                 : natural := ADD_RESULT_WIDTH - FRAC_BITS_TO_KEEP;
     constant ROUND                              : signed(ADD_RESULT_WIDTH-1 downto 0) := to_signed(0, ADD_RESULT_WIDTH-FRAC_BITS_TO_KEEP)&'1' & to_signed(0, FRAC_BITS_TO_KEEP-1);
     -------------------------------------------------------------------------
+    subtype rgb_u8bits is std_logic_vector (7 downto 0);
+    subtype rgb_u24bits is std_logic_vector (23 downto 0);
+    
     function iCrdDelta(L, R: integer)   return integer;
     function max(L, R: integer) return integer;
     function min(L, R: integer) return integer;
+    function maxthr(L, M : INTEGER) return INTEGER;
+    function maxthr(L, M, R: INTEGER) return INTEGER;
+    function maxthr(L, M, R, E: INTEGER) return INTEGER;
     function SelFrame(L, R: boolean) return boolean;
     function SelFrame(L, R, M: boolean) return boolean;
+    function Per_Frame(L, R: INTEGER) return boolean;
+    function PerFrame(L,R, M: boolean) return boolean;
     -------------------------------------------------------------------------
 end package;
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.fixed_pkg.all;
+use work.float_pkg.all;
 package body constants_package is
+
+
+    function maxthr(L, M: INTEGER) return INTEGER is
+    begin
+       if L > M then
+           return L;
+       else
+           return M;
+       end if;
+    end;
+
+    function maxthr(L, M, R: INTEGER) return INTEGER is
+    begin
+       if L > R and L > M then
+           return L;
+       elsif M > L and M > R then
+           return M;
+       else
+           return R;
+       end if;
+    end;
+    
+    function maxthr(L, M, R, E : INTEGER) return INTEGER is
+    begin
+       if L > R and L > M and L > E then
+           return L;
+       elsif M > L and M > R and M > E then
+           return M;
+       elsif R > L and R > M and R > E then
+           return R;
+       else
+           return E;
+       end if;
+    end;
+    
+    function Per_Frame(L, R: INTEGER) return boolean is
+    begin
+        if (L = R) then
+            return TRUE;
+        else
+            return FALSE;
+        end if;
+    end;
+    
+    function PerFrame(L, R, M: boolean) return boolean is
+        begin
+        if (L = TRUE) and (R = TRUE) and (M = TRUE) then
+            return TRUE;
+        else
+            return FALSE;
+        end if;
+    end;
+    
     function SelFrame(L, R: boolean) return boolean is
     begin
         if (L = TRUE) and (R = TRUE) then

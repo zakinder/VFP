@@ -27,7 +27,7 @@ port (
     oRgb           : out channel);
 end sync_frames;
 architecture behavioral of sync_frames is
-    signal rgbDelays      : rgbArray(0 to 31);
+    signal rgbDelays      : rgbArray(0 to 70);
 begin
 oRgb <= rgbDelays(pixelDelay).rgb;
 process (clk) begin
@@ -64,6 +64,45 @@ process (clk) begin
         rgbDelays(29)         <= rgbDelays(28);
         rgbDelays(30)         <= rgbDelays(29);
         rgbDelays(31)         <= rgbDelays(30);
+        rgbDelays(32)         <= rgbDelays(31);
+        rgbDelays(33)         <= rgbDelays(32);
+        rgbDelays(34)         <= rgbDelays(33);
+        rgbDelays(35)         <= rgbDelays(34);
+        rgbDelays(36)         <= rgbDelays(35);
+        rgbDelays(37)         <= rgbDelays(36);
+        rgbDelays(38)         <= rgbDelays(37);
+        rgbDelays(39)         <= rgbDelays(38);
+        rgbDelays(40)         <= rgbDelays(39);
+        rgbDelays(41)         <= rgbDelays(40);
+        rgbDelays(42)         <= rgbDelays(41);
+        rgbDelays(43)         <= rgbDelays(42);
+        rgbDelays(44)         <= rgbDelays(43);
+        rgbDelays(45)         <= rgbDelays(44);
+        rgbDelays(46)         <= rgbDelays(45);
+        rgbDelays(47)         <= rgbDelays(46);
+        rgbDelays(48)         <= rgbDelays(47);
+        rgbDelays(49)         <= rgbDelays(48);
+        rgbDelays(50)         <= rgbDelays(49);
+        rgbDelays(51)         <= rgbDelays(50);
+        rgbDelays(52)         <= rgbDelays(51);
+        rgbDelays(53)         <= rgbDelays(52);
+        rgbDelays(54)         <= rgbDelays(53);
+        rgbDelays(55)         <= rgbDelays(54);
+        rgbDelays(56)         <= rgbDelays(55);
+        rgbDelays(57)         <= rgbDelays(56);
+        rgbDelays(58)         <= rgbDelays(57);
+        rgbDelays(59)         <= rgbDelays(58);
+        rgbDelays(60)         <= rgbDelays(59);
+        rgbDelays(61)         <= rgbDelays(60);
+        rgbDelays(62)         <= rgbDelays(61);
+        rgbDelays(63)         <= rgbDelays(62);
+        rgbDelays(64)         <= rgbDelays(63);
+        rgbDelays(65)         <= rgbDelays(64);
+        rgbDelays(66)         <= rgbDelays(65);
+        rgbDelays(67)         <= rgbDelays(66);
+        rgbDelays(68)         <= rgbDelays(67);
+        rgbDelays(69)         <= rgbDelays(68);
+        rgbDelays(70)         <= rgbDelays(69);
     end if;
 end process;
 end behavioral;

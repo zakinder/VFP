@@ -30,10 +30,32 @@ port (
 end frame_mask;
 architecture behavioral of frame_mask is
     signal d1Rgb     : channel;
+    signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
 begin
+process (clk) begin
+    if rising_edge(clk) then
+        rgbSyncValid(0)  <= iEdgeValid;
+        rgbSyncValid(1)  <= rgbSyncValid(0);
+        rgbSyncValid(2)  <= rgbSyncValid(1);
+        rgbSyncValid(3)  <= rgbSyncValid(2);
+        rgbSyncValid(4)  <= rgbSyncValid(3);
+        rgbSyncValid(5)  <= rgbSyncValid(4);
+        rgbSyncValid(6)  <= rgbSyncValid(5);
+        rgbSyncValid(7)  <= rgbSyncValid(6);
+        rgbSyncValid(8)  <= rgbSyncValid(7);
+        rgbSyncValid(9)  <= rgbSyncValid(8);
+        rgbSyncValid(10) <= rgbSyncValid(9);
+        rgbSyncValid(11) <= rgbSyncValid(10);
+        rgbSyncValid(12) <= rgbSyncValid(11);
+        rgbSyncValid(13) <= rgbSyncValid(12);
+        rgbSyncValid(14) <= rgbSyncValid(13);
+        rgbSyncValid(15) <= rgbSyncValid(14);
+    end if;
+end process;
+
 SyncFrames32Inst: sync_frames
 generic map(
-    pixelDelay => 31) --LATENCY 32
+    pixelDelay => 0) --LATENCY 32
 port map(
     clk        => clk,
     reset      => reset,
@@ -42,14 +64,14 @@ port map(
 EBLACK_ENABLED: if (eBlack = true) generate
     process (clk) begin
         if rising_edge(clk) then
-            if (iEdgeValid = hi) then
+            if (rgbSyncValid(4) = hi) then
                 oRgb.red   <= black;
                 oRgb.green <= black;
                 oRgb.blue  <= black;
             else
-                oRgb.red   <= d1Rgb.red;
-                oRgb.green <= d1Rgb.green;
-                oRgb.blue  <= d1Rgb.blue;
+                oRgb.red   <= i1Rgb.red;
+                oRgb.green <= i1Rgb.green;
+                oRgb.blue  <= i1Rgb.blue;
             end if;
                 oRgb.valid <= i1Rgb.valid;
         end if;
@@ -58,7 +80,7 @@ end generate EBLACK_ENABLED;
 EBLACK_DISABLED: if (eBlack = false) generate
     process (clk) begin
         if rising_edge(clk) then
-            if (iEdgeValid = hi) then
+            if (rgbSyncValid(4) = hi) then
                 oRgb.red   <= i1Rgb.red;
                 oRgb.green <= i1Rgb.green;
                 oRgb.blue  <= i1Rgb.blue;

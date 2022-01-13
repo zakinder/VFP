@@ -33,13 +33,20 @@ port (
 end text_gen;
 architecture Behavioral of text_gen is
 
-    signal grid  :  cord;
+    signal grid,s_grid  :  cord;
     signal pixOn : std_logic := '0';
 
 begin
 
-grid.x <= to_integer(unsigned(txCord.x(11 downto 0)));
-grid.y <= (img_height_bmp-1) - (to_integer(unsigned(txCord.y(11 downto 0))));
+s_grid.x <= to_integer(unsigned(txCord.x(11 downto 0)));
+s_grid.y <= (img_height_bmp-1) - (to_integer(unsigned(txCord.y(11 downto 0))));
+
+pipCoordP: process (clk) begin
+    if rising_edge(clk) then
+        grid          <= s_grid;
+    end if;
+end process pipCoordP;
+
 
 textElement2: pixel_on_display
 generic map (

@@ -1,10 +1,11 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : blur_filter.vhd
--- Create Date : 02092019 [02-09-2019]
--- Author      : Zakinder
+-- Filename      : blur_filter.vhd
+-- Create Date   : 02092019 [02-09-2019]
+-- Modified Date : 12302021 [12-30-2021]
+-- Author        : Zakinder
 --
--- Description:
+-- Description   :
 -- This file instantiation
 --
 -------------------------------------------------------------------------------

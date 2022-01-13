@@ -152,6 +152,76 @@ port (
     enableWrite                 : in  std_logic;
     iRgb                        : in channel);
 end component image_write;
+component read_image is
+generic (
+    enImageText                 : boolean := false;
+    enImageIndex                : boolean := false;
+    i_data_width                : integer := 8;
+    test                        : string  := "folder";
+    input_file                  : string  := "input_image";
+    output_file                 : string  := "output_image");
+port (                
+    pixclk                      : in  std_logic;
+    oCord                       : out coord;
+    oRgb                        : out channel);
+end component read_image;
+component write_image is
+generic (
+    enImageText                 : boolean := false;
+    enImageIndex                : boolean := false;
+    i_data_width                : integer := 8;
+    test                        : string  := "folder";
+    input_file                  : string  := "input_image";
+    output_file                 : string  := "output_image");
+port (                
+    pixclk        : in  std_logic;
+    iRgb          : in channel);
+end component write_image;
+component write_valid_image is
+generic (
+    enImageText                 : boolean := false;
+    enImageIndex                : boolean := false;
+    i_data_width                : integer := 8;
+    test                        : string  := "folder";
+    input_file                  : string  := "input_image";
+    output_file                 : string  := "output_image");
+port (                
+    pixclk        : in  std_logic;
+    iRgb          : in channel);
+end component write_valid_image;
+component write_image_filter_logs is
+generic (
+    F_TES                       : boolean := false;
+    F_LUM                       : boolean := false;
+    F_TRM                       : boolean := false;
+    F_RGB                       : boolean := false;
+    F_SHP                       : boolean := false;
+    F_BLU                       : boolean := false;
+    F_EMB                       : boolean := false;
+    F_YCC                       : boolean := false;
+    F_SOB                       : boolean := false;
+    F_CGA                       : boolean := false;
+    F_HSV                       : boolean := false;
+    F_HSL                       : boolean := false;
+    L_BLU                       : boolean := false;
+    L_AVG                       : boolean := false;
+    L_OBJ                       : boolean := false;
+    L_CGA                       : boolean := false;
+    L_YCC                       : boolean := false;
+    L_SHP                       : boolean := false;
+    L_D1T                       : boolean := false;
+    L_B1T                       : boolean := false;
+    enImageText                 : boolean := false;
+    enImageIndex                : boolean := false;
+    i_data_width                : integer := 8;
+    test                        : string  := "folder";
+    input_file                  : string  := "input_image";
+    output_file                 : string  := "output_image");
+port (                
+    pixclk                      : in  std_logic;
+    iRgb                        : in frameColors);
+end component write_image_filter_logs;
+
 component read_kernel1_coefs is
 generic (
     s_data_width    : integer := 16;
@@ -161,4 +231,13 @@ port (
     reset           : in std_logic;
     kSet1Out        : out  coeffData);
 end component read_kernel1_coefs;
+component sync_cord is
+generic (
+    cordDelay       : integer := 16);
+port (                
+    clk             : in std_logic;
+    reset           : in std_logic;
+    iCord           : in cord;
+    oCord           : out  cord);
+end component sync_cord;
 end package;

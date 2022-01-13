@@ -8,20 +8,20 @@
 -- This file instantiation
 --
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-
 entity kernel is
 generic (
     INRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
     RGBTR_FRAME        : boolean := false;
+    COHSL_FRAME        : boolean := false;
+    RE1CO_FRAME        : boolean := false;
+    RE2CO_FRAME        : boolean := false;
     SHARP_FRAME        : boolean := false;
     BLURE_FRAME        : boolean := false;
     EMBOS_FRAME        : boolean := false;
@@ -49,12 +49,26 @@ port (
     oRgb               : out colors);
 end kernel;
 architecture Behavioral of kernel is
-    signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
+
+    constant adwrWidth     : integer := 16;
+    constant addrWidth     : integer := 12;
+    constant init_channel  : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbMac1         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbMac2         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbMac3         : channel := (valid => lo, red => black, green => black, blue => black);
-    constant init_channel  : channel := (valid => lo, red => black, green => black, blue => black);
+    signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal kCoProd         : kCoefFiltFloat;
+    signal colorhsl        : channel;
+    signal re1color        : channel;
+    signal re2color        : channel;
+    signal re3color        : channel;
+    signal re4color        : channel;
+    signal re5color        : channel;
+    signal re6color        : channel;
+    signal re7color        : channel;
+    signal re8color        : channel;
+    signal blurRgb         : channel;
+
 begin
 -----------------------------------------------------------------------------------------------
 --coef_mult
@@ -67,7 +81,6 @@ port map (
     iFilterId      => iFilterId,
     oKcoeff        => oKcoeff,
     oCoeffProd     => kCoProd);
-
 -----------------------------------------------------------------------------------------------
 --taps_controller
 -----------------------------------------------------------------------------------------------
@@ -134,7 +147,7 @@ end generate TPDATAWIDTH3_ENABLED;
 -----------------------------------------------------------------------------------------------
 YCBCR_FRAME_ENABLE: if (YCBCR_FRAME = true) generate
 signal ycbcr       : channel;
-signal ycbcrSyn    : channel;
+signal ycbcrSyncr  : channel;
 signal kCoeffYcbcr : kernelCoeDWord;
 begin
 process (clk) begin
@@ -159,18 +172,28 @@ port map(
     rst_l          => rst_l,
     iRgb           => iRgb,
     kCoeff         => kCoeffYcbcr,
-    oRgb           => oRgb.ycbcr);
+    oRgb           => ycbcrSyncr);
+ycbcr_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 39)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => ycbcrSyncr,
+    oRgb       => oRgb.ycbcr);
 end generate YCBCR_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: CGAIN
 -----------------------------------------------------------------------------------------------
 CGAIN_FRAME_ENABLE: if (CGAIN_FRAME = true or CCGAIN_FRAME = true) generate
-signal c1gain          : channel;
-signal cgain1Syn       : channel;
-signal cgain2Syn       : channel;
-signal c2gain          : channel;
-signal kCofC1gain      : kernelCoeDWord;
-signal kCofC2gain      : kernelCoeDWord;
+    signal c1gain          : channel;
+    signal cgain1Syn       : channel;
+    signal cgain2Syn       : channel;
+    signal c2gain          : channel;
+    signal cgain1Syncr     : channel;
+    signal cgain2Syncr     : channel;
+    signal kCofC1gain      : kernelCoeDWord;
+    signal kCofC2gain      : kernelCoeDWord;
 begin
 CGAIN_FRAME_KSET_ENABLE: if (CGAIN_FRAME = true and CCGAIN_FRAME = false) generate
 kCoeffCgainP:process (clk) begin
@@ -195,7 +218,15 @@ port map(
     rst_l          => rst_l,
     iRgb           => iRgb,
     kCoeff         => kCofC1gain,
-    oRgb           => oRgb.cgain);
+    oRgb           => cgain1Syncr);
+cgain1syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 39)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => cgain1Syncr,
+    oRgb       => oRgb.cgain);
 end generate CGAIN_FRAME_KSET_ENABLE;
 CCGAIN_FRAME_KSET_ENABLE: if (CGAIN_FRAME = false and CCGAIN_FRAME = true) generate
 kCoeffCcgainP:process (clk) begin
@@ -220,7 +251,15 @@ port map(
     rst_l          => rst_l,
     iRgb           => iRgb,
     kCoeff         => kCofC2gain,
-    oRgb           => oRgb.cgain);
+    oRgb           => cgain2Syncr);
+cgain2syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 39)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => cgain2Syncr,
+    oRgb       => oRgb.cgain);
 end generate CCGAIN_FRAME_KSET_ENABLE;
 end generate CGAIN_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
@@ -230,6 +269,7 @@ SHARP_FRAME_ENABLE: if (SHARP_FRAME = true) generate
 signal oRed           : channel;
 signal oGreen         : channel;
 signal oBlue          : channel;
+signal rgbsharp       : channel;
 signal kCoeffSharp    : kernelCoeDWord;
 begin
 process (clk) begin
@@ -287,10 +327,18 @@ port map(
     iRgb           => rgbMac3,
     kCoeff         => kCoeffSharp,
     oRgb           => oBlue);
-    oRgb.sharp.red    <=  oRed.red;
-    oRgb.sharp.green  <=  oGreen.red;
-    oRgb.sharp.blue   <=  oBlue.red;
-    oRgb.sharp.valid  <=  oRed.valid;
+    rgbsharp.red   <=  oRed.red;
+    rgbsharp.green <=  oGreen.red;
+    rgbsharp.blue  <=  oBlue.red;
+    rgbsharp.valid <=  oRed.valid;
+sharp_syncr_inst  : sync_frames
+generic map(
+    pixelDelay     => 33)
+port map(
+    clk            => clk,
+    reset          => rst_l,
+    iRgb           => rgbsharp,
+    oRgb           => oRgb.sharp);
 end generate SHARP_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: BLURE
@@ -356,10 +404,18 @@ port map(
     iRgb           => rgbMac3,
     kCoeff         => kCoeffBlure,
     oRgb           => oBlue);
-    oRgb.blur.red    <=  oRed.red;
-    oRgb.blur.green  <=  oGreen.red;
-    oRgb.blur.blue   <=  oBlue.red;
-    oRgb.blur.valid  <=  oRed.valid;
+    blurRgb.red    <=  oRed.red;
+    blurRgb.green  <=  oGreen.red;
+    blurRgb.blue   <=  oBlue.red;
+    blurRgb.valid  <=  oRed.valid;
+blur_syncr_inst  : sync_frames
+generic map(
+    pixelDelay     => 34)
+port map(
+    clk            => clk,
+    reset          => rst_l,
+    iRgb           => blurRgb,
+    oRgb           => oRgb.blur);
 end generate BLURE_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: EMBOS
@@ -368,6 +424,7 @@ EMBOS_FRAME_ENABLE: if (EMBOS_FRAME = true) generate
 signal oRed           : channel;
 signal oGreen         : channel;
 signal oBlue          : channel;
+signal embosRgb       : channel;
 signal kCoeffEmbos    : kernelCoeDWord;
 begin
 process (clk) begin
@@ -425,10 +482,18 @@ port map(
     iRgb           => rgbMac3,
     kCoeff         => kCoeffEmbos,
     oRgb           => oBlue);
-    oRgb.embos.red    <=  oRed.red;
-    oRgb.embos.green  <=  oGreen.red;
-    oRgb.embos.blue   <=  oBlue.red;
-    oRgb.embos.valid  <=  oRed.valid;
+    embosRgb.red    <=  oRed.red;
+    embosRgb.green  <=  oGreen.red;
+    embosRgb.blue   <=  oBlue.red;
+    embosRgb.valid  <=  oRed.valid;
+embos_syncr_inst  : sync_frames
+generic map(
+    pixelDelay     => 34)
+port map(
+    clk            => clk,
+    reset          => rst_l,
+    iRgb           => embosRgb,
+    oRgb           => oRgb.embos);
 end generate EMBOS_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: SOBEL
@@ -565,7 +630,7 @@ end process;
 squareRootTopInst: squareRootTop
 port map(
     clk        => clk,
-    ivalid     => rgbSyncValid(5),
+    ivalid     => rgbSyncValid(1),
     idata      => sqr,
     ovalid     => ovalid,
     odata      => sbof);
@@ -591,28 +656,43 @@ end generate SOBEL_FRAME_ENABLE;
 --FILTERS: RGB
 -----------------------------------------------------------------------------------------------
 INRGB_FRAME_ENABLE: if (INRGB_FRAME = true) generate
-signal invert_rgb : uChannel;
+    signal invert_rgb : uChannel;
+    signal rgb1Syncr    : channel;
+    signal rgb2Syncr    : channel;
 constant gHold : unsigned(7 downto 0) := x"ff";
 begin
-
     invert_rgb.red   <= (gHold - unsigned(iRgb.red));
     invert_rgb.green <= (gHold - unsigned(iRgb.green));
     invert_rgb.blue  <= (gHold - unsigned(iRgb.blue));
     invert_rgb.valid <= iRgb.valid;
-    
-    oRgb.inrgb.red   <= std_logic_vector(invert_rgb.red);
-    oRgb.inrgb.green <= std_logic_vector(invert_rgb.green);
-    oRgb.inrgb.blue  <= std_logic_vector(invert_rgb.blue);
-    oRgb.inrgb.valid <= invert_rgb.valid;
-    
-    
+    --oRgb.inrgb.red   <= std_logic_vector(invert_rgb.red);
+    --oRgb.inrgb.green <= std_logic_vector(invert_rgb.green);
+    --oRgb.inrgb.blue  <= std_logic_vector(invert_rgb.blue);
+    --oRgb.inrgb.valid <= invert_rgb.valid;
+rgb1_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 63)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => iRgb,
+    oRgb       => rgb1Syncr);
+rgb2_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 4)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => rgb1Syncr,
+    oRgb       => oRgb.inrgb);
 end generate INRGB_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: HSV
 -----------------------------------------------------------------------------------------------
 HSV_FRAME_ENABLE: if (HSV_FRAME = true) generate
-    signal hsvColor    : hsvChannel;
+    signal hsvSyncr    : channel;
 begin
+-- hsv_c latency = 9
 hsvInst: hsv_c
 generic map(
     i_data_width       => i_data_width)
@@ -620,18 +700,23 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
-    oHsv               => hsvColor);
-    oRgb.hsv.red       <= hsvColor.h;
-    oRgb.hsv.green     <= hsvColor.s;
-    oRgb.hsv.blue      <= hsvColor.v;
-    oRgb.hsv.valid     <= hsvColor.valid;
+    oHsv               => hsvSyncr);
+hsv_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 60)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => hsvSyncr,
+    oRgb       => oRgb.hsv);
 end generate HSV_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: HSL
 -----------------------------------------------------------------------------------------------
 HSL_FRAME_ENABLE: if (HSL_FRAME = true) generate
-signal hslColor    : hslChannel;
+    signal hslSyncr    : channel;
 begin
+-- hsl_c latency = 9
 hslInst: hsl_c
 generic map(
     i_data_width       => i_data_width)
@@ -639,30 +724,134 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
-    oHsl               => hslColor);
-    oRgb.hsl.red       <= hslColor.h;
-    oRgb.hsl.green     <= hslColor.s;
-    oRgb.hsl.blue      <= hslColor.l;
-    oRgb.hsl.valid     <= hslColor.valid;
+    oHsl               => hslSyncr);
+hsl_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 60)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => hslSyncr,
+    oRgb       => oRgb.hsl);
 end generate HSL_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: RGBTRIM
 -----------------------------------------------------------------------------------------------
 RGBTRIM_FRAME_ENABLE: if (RGBTR_FRAME = true) generate
 begin
-ColorTrimInst: color_trim
+recolor_space_0_inst: color_trim
 generic map(
-    i_data_width       => i_data_width)
+    img_width         => img_width,
+    i_data_width      => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
     oRgb               => oRgb.colorTrm);
 end generate RGBTRIM_FRAME_ENABLE;
+RGBCOHSL_FRAME_ENABLE: if (COHSL_FRAME = true) generate begin
+recolor_space_0_inst: recolor_space_hsl
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => re2color,
+    oRgb               => colorhsl);
+end generate RGBCOHSL_FRAME_ENABLE;
+oRgb.colorhsl <= colorhsl;
+RE1COLO_FRAME_ENABLE: if (RE1CO_FRAME = true) generate begin
+recolor_space_1_inst: recolor_space_1
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re1color);
+end generate RE1COLO_FRAME_ENABLE;
+oRgb.re1color <= re1color;
+RE2COLO_FRAME_ENABLE: if (RE2CO_FRAME = true) generate begin
+recolor_space_2_inst: recolor_space_2
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re2color);
+recolor_space_3_inst: recolor_space_3
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re3color);
+recolor_space_4_inst: recolor_space_4
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re4color);
+recolor_space_5_inst: recolor_space_5
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re5color);
+recolor_space_6_inst: recolor_space_6
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re6color);
+recolor_space_7_inst: recolor_space_7
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re7color);
+recolor_space_8_inst: recolor_space_8
+generic map(
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => iRgb,
+    oRgb               => re8color);
+end generate RE2COLO_FRAME_ENABLE;
+
+oRgb.re2color   <= re2color;
+oRgb.re3color   <= re3color;
+oRgb.re4color   <= re4color;
+oRgb.re5color   <= re5color;
+oRgb.re6color   <= re6color;
+oRgb.re7color   <= re7color;
+oRgb.re8color   <= re8color;
+
 -----------------------------------------------------------------------------------------------
 --FILTERS: RGBLUMP
 -----------------------------------------------------------------------------------------------
 RGBLUMP_FRAME_ENABLE: if (RGBLP_FRAME = true) generate
+    signal colorLmpSyncr    : channel;
 begin
 SegmentColorsInst: segment_colors
 port map(
@@ -670,7 +859,15 @@ port map(
     reset              => rst_l,
     iLumTh             => iLumTh,
     iRgb               => iRgb,
-    oRgb               => oRgb.colorLmp);
+    oRgb               => colorLmpSyncr);
+colorLmp_syncr_inst  : sync_frames
+generic map(
+    pixelDelay => 59)
+port map(
+    clk        => clk,
+    reset      => rst_l,
+    iRgb       => colorLmpSyncr,
+    oRgb       => oRgb.colorLmp);
 end generate RGBLUMP_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FRAMES_DISABLED
@@ -681,6 +878,21 @@ end generate RGBLUMP_FRAME_DISABLED;
 RGBTRIM_FRAME_DISABLED: if (RGBTR_FRAME = false) generate
     oRgb.colorTrm   <= init_channel;
 end generate RGBTRIM_FRAME_DISABLED;
+OHS_FRAME_DISABLED: if (COHSL_FRAME = false) generate
+    oRgb.colorhsl   <= init_channel;
+end generate OHS_FRAME_DISABLED;
+RE1_FRAME_DISABLED: if (RE1CO_FRAME = false) generate
+    oRgb.re1color   <= init_channel;
+end generate RE1_FRAME_DISABLED;
+RE2_FRAME_DISABLED: if (RE2CO_FRAME = false) generate
+    oRgb.re2color   <= init_channel;
+    oRgb.re3color   <= init_channel;
+    oRgb.re4color   <= init_channel;
+    oRgb.re5color   <= init_channel;
+    oRgb.re6color   <= init_channel;
+    oRgb.re7color   <= init_channel;
+    oRgb.re8color   <= init_channel;
+end generate RE2_FRAME_DISABLED;
 INRGB_FRAME_DISABLED: if (INRGB_FRAME = false) generate
     oRgb.inrgb   <= init_channel;
 end generate INRGB_FRAME_DISABLED;

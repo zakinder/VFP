@@ -23,7 +23,7 @@ port (
     oRgb           : out channel);
 end d_valid;
 architecture behavioral of d_valid is
-signal rgbSyncValid    : std_logic_vector(31 downto 0)  := (others => '0');
+signal rgbSyncValid    : std_logic_vector(56 downto 0)  := (others => '0');
 begin
 process (clk) begin
     if rising_edge(clk) then
@@ -59,6 +59,31 @@ process (clk) begin
         rgbSyncValid(29) <= rgbSyncValid(28);
         rgbSyncValid(30) <= rgbSyncValid(29);
         rgbSyncValid(31) <= rgbSyncValid(30);
+        rgbSyncValid(32) <= rgbSyncValid(31);
+        rgbSyncValid(33) <= rgbSyncValid(32);
+        rgbSyncValid(34) <= rgbSyncValid(33);
+        rgbSyncValid(35) <= rgbSyncValid(34);
+        rgbSyncValid(36) <= rgbSyncValid(35);
+        rgbSyncValid(37) <= rgbSyncValid(36);
+        rgbSyncValid(38) <= rgbSyncValid(37);
+        rgbSyncValid(39) <= rgbSyncValid(38);
+        rgbSyncValid(40) <= rgbSyncValid(39);
+        rgbSyncValid(41) <= rgbSyncValid(40);
+        rgbSyncValid(42) <= rgbSyncValid(41);
+        rgbSyncValid(43) <= rgbSyncValid(42);
+        rgbSyncValid(44) <= rgbSyncValid(43);
+        rgbSyncValid(45) <= rgbSyncValid(44);
+        rgbSyncValid(46) <= rgbSyncValid(45);
+        rgbSyncValid(47) <= rgbSyncValid(46);
+        rgbSyncValid(48) <= rgbSyncValid(47);
+        rgbSyncValid(49) <= rgbSyncValid(48);
+        rgbSyncValid(50) <= rgbSyncValid(49);
+        rgbSyncValid(51) <= rgbSyncValid(50);
+        rgbSyncValid(52) <= rgbSyncValid(51);
+        rgbSyncValid(53) <= rgbSyncValid(52);
+        rgbSyncValid(54) <= rgbSyncValid(53);
+        rgbSyncValid(55) <= rgbSyncValid(54);
+        rgbSyncValid(56) <= rgbSyncValid(55);
     end if;
 end process;
     oRgb.red      <= iRgb.red;

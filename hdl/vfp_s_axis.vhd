@@ -5,8 +5,9 @@
 -- Author      : Zakinder
 --
 -- Description:
--- This file instantiation axi4 components.
---
+-- This module receives video data(24-bits) in YCbCr 4:4:4 format  
+-- with 8 bits per component and configured into axi stream 
+-- YCbCr 4:2:2 format video(16-bits).
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;

@@ -1,3 +1,4 @@
+--12302021 [12-30-2021]
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -18,7 +19,7 @@ port (
     kSet1Out        : out  kernelCoeff);
 end read_kernel2_coefs;
 architecture Behavioral of read_kernel2_coefs is
-constant projFold   : string := "K:/ZEDBOARD/doc/sim/readFiles";
+constant projFold   : string := "K:/ZEDBOARD/simulations/Coeff_Data";
 constant backSlash  : string := "/";
 file test_vector    : text open read_mode is projFold&backSlash&input_file&".txt";
 constant num_col    : integer := 10;

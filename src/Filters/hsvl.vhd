@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : hsl_c.vhd
+-- Filename    : hsvl.vhd
 -- Create Date : 05062019 [05-06-2019]
 -- Author      : Zakinder
 --
 -- Description:
 -- This file instantiation
---
+-- p ← RGB2HSV(p)
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -16,7 +16,7 @@ use work.float_pkg.all;
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-entity hsl_c is
+entity hsvl is
 generic (
     i_data_width   : integer := 8);
 port (
@@ -24,8 +24,8 @@ port (
     reset          : in  std_logic;
     iRgb           : in channel;
     oHsl           : out channel);
-end hsl_c;
-architecture behavioral of hsl_c is
+end hsvl;
+architecture behavioral of hsvl is
     signal uFs1Rgb       : intChannel;
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
@@ -53,16 +53,14 @@ architecture behavioral of hsl_c is
     signal valid2_rgb    : std_logic := '0';
     signal valid3_rgb    : std_logic := '0';
     signal sHsl          : channel;
-    signal rgb_ool4      : channel;
-    signal rgb_colo      : rgbToSfRecord;
-    signal rgb_oolo      : rgbToSfRecord;
-    signal rgb_ool2      : rgbToSf12Record;
-    signal rgb_ool3      : rgbToSfRecord;
-    signal valid4_rgb    : std_logic := '0';
-    signal valid5_rgb    : std_logic := '0';
-    signal valid6_rgb    : std_logic := '0';
-    signal valid7_rgb    : std_logic := '0';
-    signal valid8_rgb    : std_logic := '0';
+    signal rgb_ool4                : channel;
+    signal rgb_colo                : rgbToSfRecord;
+    signal rgb_oolo                : rgbToSfRecord;
+    signal rgb_ool1                : rgbToSfRecord;
+    signal rgb_ool2                : rgbToSf12Record;
+    signal rgb_ool3                : rgbToSfRecord;
+
+    
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
@@ -208,11 +206,6 @@ pipValidP: process (clk) begin
         valid1_rgb    <= uFs3Rgb.valid;
         valid2_rgb    <= valid1_rgb;
         valid3_rgb    <= valid2_rgb;
-        valid4_rgb    <= rgb_ool4.valid;
-        valid5_rgb    <= valid4_rgb;
-        valid6_rgb    <= valid5_rgb;
-        valid7_rgb    <= valid6_rgb;
-        valid8_rgb    <= valid7_rgb;
     end if;
 end process pipValidP;
         sHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
@@ -221,7 +214,7 @@ end process pipValidP;
         sHsl.valid <= valid3_rgb;
 rgb_ool1_inst: sync_frames
 generic map(
-    pixelDelay => 2)
+    pixelDelay => 7)
 port map(
     clk        => clk,
     reset      => reset,
@@ -252,7 +245,7 @@ pipRgbwD2P: process (clk) begin
         oHsl.red   <= std_logic_vector(rgb_ool3.red(i_data_width-1 downto 0));
         oHsl.green <= std_logic_vector(rgb_ool3.green(i_data_width-1 downto 0));
         oHsl.blue  <= std_logic_vector(rgb_ool3.blue(i_data_width-1 downto 0));
-        oHsl.valid <= valid8_rgb;
+        oHsl.valid <= rgb_ool4.valid;
     end if;
 end process pipRgbwD2P;
 end behavioral;

@@ -1,0 +1,66 @@
+
+vfp_s_axis
+
+This module receives video data in YCbCr 4:4:4 format with 8 bits per component and configured into axi stream YCbCr 4:2:2 format.
+
+
+Video data in YCbCr 4:2:2 format and associated synchronization signals 
+are input into the Video Data Capture block from the Video Input 
+Daughtercard.
+
+
+
+
+
+
+The ADV7611 receivers and ADV7511 transmitters used in this design are configured for YCbCr 
+4:2:2 color format with 8 bits per component. This results in a video data interface width of 16 
+bits per clock cycle (8 bits for the luma component and 8 bits for the interleaved chroma red 
+and blue difference components). 
+
+
+The maximum theoretical video memory bandwidth (per stream) is calculated as follows:
+Bandwidth (per stream) = max_frame_rate × max_active_lines_per_frame × 
+max_active_pixels_per_line × bits_per_pixel (b/s).
+
+
+
+
+
+Because this design supports up to UXGA resolution (1600 x 1200) at 60 frames per second, 
+max_frame_rate is 60, max_active_lines_per_frame is 1600, and max_active_pixels_per_line is 
+1200. The design also supports only the YCbCr 4:2:2 color format with 8 bits per component, 
+giving 16 bits per pixel. Using the above equation, the final bandwidth requirement calculation 
+for this design is:
+Bandwidth (per stream) = 60 × 1600 × 1200 × 16 = 1,843,200,000 = 1.8432 (Gb/s)
+The design uses a total of 4 streams (two AXI VDMA instances, each configured for both read 
+and write) so the total aggregate memory bandwidth requirement is:
+Bandwidth (total) = 1.8432 × 4 = 7.3728 (Gb/s)
+Each of the AXI VDMA's memory mapped interfaces must be configured to support at least the 
+required bandwidth per stream. They are configured to be 64 bits wide and run at a rate of 
+200MHz. This gives a maximum theoretical supported bandwidth of 64 × 200 = 12,800 (Mb/s) 
+= 12.8 (Gb/s).
+
+
+The reference design implements four video pipelines running at 1080P60 (1920 x 1080 
+pictures at 60 frames/sec). Each frame consists of three bytes per pixel to represent an 
+upper-bound, high-quality video stream such as RGB with alpha channel information. Each 
+video pipeline requires a bandwidth of 373.248 MB/s, which is approximately 3 Gb/s.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

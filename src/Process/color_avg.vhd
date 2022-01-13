@@ -19,7 +19,7 @@ use work.float_pkg.all;
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-use work.tb_package.all;
+
 
 entity color_avg is
 generic (
@@ -42,23 +42,41 @@ architecture behavioral of color_avg is
 
 
     signal intRg6b          : intChannel;
-
+    signal color_limit      : std_logic := '0';
     signal rgbSyncValid     : std_logic_vector(11 downto 0)  := x"000";
-    signal rgbRedMax        : integer;
-    signal rgbGreMax        : integer;
-    signal rgbBluMax        : integer;
-    signal rgbRed2xMax      : integer;
-    signal rgbGre2xMax      : integer;
-    signal rgbBlu2xMax      : integer;
+	
+    signal rgbRed12Max      : integer;
+    signal rgbGre12Max      : integer;
+    signal rgbBlu12Max      : integer;
+	
+    signal rgbRed12Min      : integer;
+    signal rgbGre12Min      : integer;
+    signal rgbBlu12Min      : integer;
+	
+    signal rgbRed13Max      : integer;
+    signal rgbGre13Max      : integer;
+    signal rgbBlu13Max      : integer;
 
-    signal rgbRedO2Max      : integer;
-    signal rgbGreO2Max      : integer;
-    signal rgbBluO2Max      : integer;
+    signal rgbRed13Min      : integer;
+    signal rgbGre13Min      : integer;
+    signal rgbBlu13Min      : integer;
+	
+	
+    signal rgbRedM12Sum      : integer;
+    signal rgbGreM12Sum      : integer;
+    signal rgbBluM12Sum      : integer;
 
-    signal rgbRedMaxLimit   : integer;
-    signal rgbGreMaxLimit   : integer;
-    signal rgbBluMaxLimit   : integer;
+    signal rgbRedM12Limit   : integer;
+    signal rgbGreM12Limit   : integer;
+    signal rgbBluM12Limit   : integer;
 
+    signal rgbRedM13Limit   : integer;
+    signal rgbGreM13Limit   : integer;
+    signal rgbBluM13Limit   : integer;
+
+    signal rgbLimit         : channel;
+    signal rgbAvg           : channel_9bi;
+	
     signal uFs1Rgb          : rgbToUfRecord;
     signal uFs2Rgb          : rgbToUfRecord;
     signal uFs3Rgb          : rgbToUfRecord;
@@ -76,7 +94,9 @@ architecture behavioral of color_avg is
     signal rgbBluAvg        : ufixed(7 downto 0)    :=(others => '0');
     signal rgbSumBluAvg     : ufixed(9 downto -10)  :=(others => '0');
     signal rgbSumBlu        : ufixed(9 downto 0)    :=(others => '0');
-
+    signal rgb1sRedM13Limit   : integer;
+    signal rgb2sRedM13Limit   : integer;
+	
 begin
 
 -----------------------------------------------------------------------------------------------
@@ -107,20 +127,94 @@ end process;
 
 process (clk) begin
     if rising_edge(clk) then
-        rgbRedMax <= max(int1Rgb.red,int3Rgb.red);
-        rgbGreMax <= max(int1Rgb.green,int3Rgb.green);
-        rgbBluMax <= max(int1Rgb.blue,int3Rgb.blue);
+	
+        rgbRed12Max <= max(int1Rgb.red,int2Rgb.red);
+        rgbGre12Max <= max(int1Rgb.green,int2Rgb.green);
+        rgbBlu12Max <= max(int1Rgb.blue,int2Rgb.blue);
+		
+        rgbRed12Min <= min(int1Rgb.red,int2Rgb.red);
+        rgbGre12Min <= min(int1Rgb.green,int2Rgb.green);
+        rgbBlu12Min <= min(int1Rgb.blue,int2Rgb.blue);
+		
+		
+        rgbRed13Max <= max(int1Rgb.red,int3Rgb.red);
+        rgbGre13Max <= max(int1Rgb.green,int3Rgb.green);
+        rgbBlu13Max <= max(int1Rgb.blue,int3Rgb.blue);
+		
+        rgbRed13Min <= min(int1Rgb.red,int3Rgb.red);
+        rgbGre13Min <= min(int1Rgb.green,int3Rgb.green);
+        rgbBlu13Min <= min(int1Rgb.blue,int3Rgb.blue);
+		
     end if;
 end process;
 
+--either a value or zero later needed
+process (clk) begin
+    if rising_edge(clk) then
+        rgbRedM12Limit <= rgbRed12Max - rgbRed12Min;
+        rgbGreM12Limit <= rgbGre12Max - rgbGre12Min;
+        rgbBluM12Limit <= rgbBlu12Max - rgbBlu12Min;
+	
+        rgbRedM13Limit <= rgbRed13Max - rgbRed13Min;
+        rgbGreM13Limit <= rgbGre13Max - rgbGre13Min;
+        rgbBluM13Limit <= rgbBlu13Max - rgbBlu13Min;
+		
+		rgb1sRedM13Limit <= rgbRedM13Limit;
+		rgb2sRedM13Limit <= rgb1sRedM13Limit;
+    end if;
+end process;
 
 process (clk) begin
     if rising_edge(clk) then
-        rgbRedMaxLimit <= rgbRedMax - int1Rgb.red;
-        rgbGreMaxLimit <= rgbGreMax - int1Rgb.green;
-        rgbBluMaxLimit <= rgbBluMax - int1Rgb.blue;
+        rgbRedM12Sum <= int1Rgb.red + int2Rgb.red;
+        rgbGreM12Sum <= int1Rgb.green + int2Rgb.green;
+        rgbBluM12Sum <= int1Rgb.blue + int2Rgb.blue;
     end if;
 end process;
+
+process (clk) begin
+    if rising_edge(clk) then
+        rgbAvg.red   <= std_logic_vector(to_unsigned(rgbRedM12Sum,9));
+        rgbAvg.green <= std_logic_vector(to_unsigned(rgbGreM12Sum,9));
+        rgbAvg.blue  <= std_logic_vector(to_unsigned(rgbBluM12Sum,9));
+    end if;
+end process;
+
+process (clk) begin
+    if rising_edge(clk) then
+    if (rgb2sRedM13Limit <= 40) then
+	    color_limit    <= '1';
+		rgbLimit.red     <= std_logic_vector(to_unsigned(intRg6b.red,8));
+        rgbLimit.green   <= std_logic_vector(to_unsigned(intRg6b.green,8));
+        rgbLimit.blue   <= std_logic_vector(to_unsigned(intRg6b.blue,8));
+    else
+	    color_limit    <= '0';
+        rgbLimit.red   <= std_logic_vector(to_unsigned(int6Rgb.red,8));
+        rgbLimit.green   <= std_logic_vector(to_unsigned(int6Rgb.green,8));
+        rgbLimit.blue   <= std_logic_vector(to_unsigned(int6Rgb.blue,8));
+    end if;
+    --if (rgbGreM13Limit <= 40) then
+    --    rgbLimit.green   <= std_logic_vector(to_unsigned(intRg6b.green,8));
+    --else
+    --    rgbLimit.green   <= std_logic_vector(to_unsigned(int5Rgb.green,8));
+    --end if;
+    --if(rgbBluM13Limit <= 40) then
+    --    rgbLimit.blue   <= std_logic_vector(to_unsigned(intRg6b.blue,8));
+    --else
+    --    rgbLimit.blue   <= std_logic_vector(to_unsigned(int5Rgb.blue,8));
+    --end if;
+        rgbLimit.valid <= int5Rgb.valid;
+    end if;
+end process;
+
+process (clk) begin
+    if rising_edge(clk) then
+        oRgb   <= rgbLimit;
+    end if;
+end process;
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
 
 process (clk) begin
     if rising_edge(clk) then
@@ -197,37 +291,18 @@ process (clk) begin
     end if;
 end process;
 
-process (clk) begin
-    if rising_edge(clk) then
-        oRgb.red   <= std_logic_vector(to_unsigned(intRg6b.red,8));
-        oRgb.green <= std_logic_vector(to_unsigned(intRg6b.green,8));
-        oRgb.blue  <= std_logic_vector(to_unsigned(intRg6b.blue,8));
-        oRgb.valid <= int5Rgb.valid;
-    end if;
-end process;
+--process (clk) begin
+--    if rising_edge(clk) then
+--        oRgb.red   <= std_logic_vector(to_unsigned(intRg6b.red,8));
+--        oRgb.green <= std_logic_vector(to_unsigned(intRg6b.green,8));
+--        oRgb.blue  <= std_logic_vector(to_unsigned(intRg6b.blue,8));
+--        oRgb.valid <= int5Rgb.valid;
+--    end if;
+--end process;
 -----------------------------------------------------------------------------------------------
 -- STAGE 6
 -----------------------------------------------------------------------------------------------
--- process (clk) begin
-    -- if rising_edge(clk) then
-    -- if (rgbRedMaxLimit <= 40) then
-        -- oRgb.red   <= std_logic_vector(to_unsigned(rgbRedMax,8));
-    -- else
-        -- oRgb.red   <= std_logic_vector(to_unsigned(intRg6b.red,8));
-    -- end if;
-    -- if (rgbGreMaxLimit <= 40) then
-        -- oRgb.green   <= std_logic_vector(to_unsigned(rgbGreO2Max,8));
-    -- else
-        -- oRgb.green   <= std_logic_vector(to_unsigned(intRg6b.green,8));
-    -- end if;
-    -- if(rgbBluMaxLimit <= 40) then
-        -- oRgb.blue   <= std_logic_vector(to_unsigned(rgbBluO2Max,8));
-    -- else
-        -- oRgb.blue   <= std_logic_vector(to_unsigned(intRg6b.blue,8));
-    -- end if;
-        -- oRgb.valid <= int5Rgb.valid;
-    -- end if;
--- end process;
+
 
 process (clk) begin
     if rising_edge(clk) then
@@ -246,20 +321,6 @@ process (clk) begin
     end if;
 end process;
 
-process (clk) begin
-    if rising_edge(clk) then
-        rgbRed2xMax <= rgbRedMax;
-        rgbGre2xMax <= rgbGreMax;
-        rgbBlu2xMax <= rgbBluMax;
-    end if;
-end process;
 
-process (clk) begin
-    if rising_edge(clk) then
-        rgbRedO2Max <= max(int1Rgb.red,rgbRedMax);
-        rgbGreO2Max <= max(int1Rgb.green,rgbGreMax);
-        rgbBluO2Max <= max(int1Rgb.blue,rgbBluMax);
-    end if;
-end process;
 
 end behavioral;
