@@ -40,7 +40,7 @@ package tbPackage is
     constant line_hight          : integer := 5;  
     constant adwrWidth           : integer := 16;
     constant addrWidth           : integer := 12;
-    constant SLOT_NUM            : integer := 40;
+    constant SLOT_NUM            : integer := 53;
     constant wImgFolder          : string := "K:/ZEDBOARD/simulations/images/write";
     constant rImgFolder          : string := "K:/ZEDBOARD/simulations/images/read";
     constant bSlash              : string := "\";
@@ -65,6 +65,8 @@ package body tbPackage is
            return 128;
        elsif bmp = "255_255" then
            return 255;
+       elsif bmp = "255_127" then
+           return 255;
        elsif bmp = "300_300" then
            return 300;
        elsif bmp = "500_500" then
@@ -86,6 +88,8 @@ package body tbPackage is
            return 128;
        elsif bmp = "255_255" then
            return 255;
+       elsif bmp = "255_127" then
+           return 127;
        elsif bmp = "300_300" then
            return 300;
        elsif bmp = "500_500" then

@@ -826,6 +826,7 @@ type colors is record
     blur           : channel;
     sharp          : channel;
     cgain          : channel;
+    cgain2         : channel;
     ycbcr          : channel;
     hsl            : channel;
     hsv            : channel;
@@ -875,6 +876,7 @@ type frameColors is record
     blur              : channel;
     sharp             : channel;
     cgain             : channel;
+    cgain2            : channel;
     ycbcr             : channel;
     hsl               : channel;
     hsv               : channel;
@@ -1175,6 +1177,7 @@ type fcolors is record
     blur              : channel;
     sharp             : channel;
     cgain             : channel;
+    cgain2            : channel;
     ycbcr             : channel;
     hsl               : channel;
     hsv               : channel;

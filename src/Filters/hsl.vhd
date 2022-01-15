@@ -35,6 +35,7 @@ architecture behavioral of hsl_c is
     signal rgbDelta      : natural;
     --H
     signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
+    signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
     signal uFiXhueTop    : integer := zero;
@@ -135,18 +136,18 @@ hueP: process (clk) begin
             uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 60;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 60;
+            hueDeg <= 120;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 30;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 60;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 30;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 60;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 120;
+            hueDeg <= 240;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 30;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 60;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 30;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 60;
         end if;
     end if;
   end if;
@@ -167,7 +168,8 @@ end process hueBottomP;
 uuFiXhueTop   <= to_ufixed(uFiXhueTop,uuFiXhueTop);
 uuFiXhueBot   <= to_ufixed(uFiXhueBot,uuFiXhueBot);
 uuFiXhueQuot  <= (uuFiXhueTop / uuFiXhueBot);
-uFiXhueQuot   <= to_integer(unsigned(uuFiXhueQuot));
+hue_quot      <= resize(uuFiXhueQuot,hue_quot);
+uFiXhueQuot   <= to_integer(unsigned(hue_quot));
 hueDegreeP: process (clk) begin
     if rising_edge(clk) then
         hueDeg1x       <= hueDeg;
@@ -175,7 +177,12 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        hueQuot1x <= (uFiXhueQuot mod 45900) /255;
+        if (uFs3Rgb.red  = maxValue) then
+            hueQuot1x <= uFiXhueQuot;
+        else
+            hueQuot1x <= uFiXhueQuot;
+        end if;
+        --hueQuot1x <= (uFiXhueQuot mod 45900) /255;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin

@@ -87,6 +87,18 @@ ccSfConfig_P: process (clk,rst_l)begin
         cc.ccSf.k7           <= to_sfixed(als.k7(7 downto 0),cc.ccSf.k7);
         cc.ccSf.k8           <= to_sfixed(als.k8(7 downto 0),cc.ccSf.k8);
         cc.ccSf.k9           <= to_sfixed(als.k9(7 downto 0),cc.ccSf.k9);
+    elsif(als.config = 3)then
+        cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50
+        cc.ccSf.k2           <= to_sfixed(-0.500,4,-3); -- -0.25
+        cc.ccSf.k3           <= to_sfixed(-0.125,4,-3); -- -0.125
+        
+        cc.ccSf.k4           <= to_sfixed(-0.125,4,-3); -- -0.125
+        cc.ccSf.k5           <= to_sfixed(1.500,4,-3);  --  1.50
+        cc.ccSf.k6           <= to_sfixed(-0.500,4,-3); -- -0.25
+        
+        cc.ccSf.k7           <= to_sfixed(-0.125,4,-3); -- -0.125
+        cc.ccSf.k8           <= to_sfixed(-0.500,4,-3); -- -0.25
+        cc.ccSf.k9           <= to_sfixed(1.500,4,-3);  --  1.50
     end if;
     end if;
 end process ccSfConfig_P;

@@ -155,14 +155,16 @@ architecture Behavioral of filters is
     signal valid_vhs           : std_logic;
     signal dark_ccm            : coefficient;
     signal light_ccm           : coefficient;
+    signal balance_ccm         : coefficient;
     signal rgb                 : channel;
+    signal rgbYcbcr            : channel;
 begin
     -- 60  =  7.50
     -- 24  =  3.00
     -- 8   =  1.00
     -- 248 = -1.00
     -- 232 = -3.00
-    -- 4   =  0.50
+    --     =  0.50
     --    |--------|--------|--------|
     --    | +0.375 | -0.250 | -0.250 |
     --    |--------|--------|--------|
@@ -207,6 +209,26 @@ begin
     light_ccm.k7               <= std_logic_vector(to_unsigned(232,32));
     light_ccm.k8               <= std_logic_vector(to_unsigned(248,32));
     light_ccm.k9               <= std_logic_vector(to_unsigned(80,32));
+    --    |--------|--------|--------|
+    --    | +0.500 | +0.375 | +0.125 |
+    --    |--------|--------|--------|
+    --    | +0.250 | +0.625 | +0.125 |
+    --    |--------|--------|--------|
+    --    | +0.125 | +0.125 | +0.750 |
+    --    |--------|--------|--------|
+    balance_ccm.config         <= 3;
+    balance_ccm.k1             <= std_logic_vector(to_unsigned(4,32));
+    balance_ccm.k2             <= std_logic_vector(to_unsigned(3,32));
+    balance_ccm.k3             <= std_logic_vector(to_unsigned(1,32));
+    balance_ccm.k4             <= std_logic_vector(to_unsigned(2,32));
+    balance_ccm.k5             <= std_logic_vector(to_unsigned(5,32));
+    balance_ccm.k6             <= std_logic_vector(to_unsigned(1,32));
+    balance_ccm.k7             <= std_logic_vector(to_unsigned(80,32));
+    balance_ccm.k8             <= std_logic_vector(to_unsigned(3,32));
+    balance_ccm.k9             <= std_logic_vector(to_unsigned(232,32));
+    
+    
+    
     edgeValid               <= sEdgeValid;
     oRgb                    <= fRgb;
     blur_channels.ditRgb1vx <= ditRgb1vx;
@@ -255,13 +277,28 @@ port map (
     reset              => rst_l,
     iRgb               => iRgb,
     oRgb               => rgb);
+    
+    
+hsvl_ycc_inst  : rgb_ycbcr
+generic map(
+    i_data_width         => i_data_width,
+    i_precision          => 12,
+    i_full_range         => TRUE)
+port map(
+    clk                  => clk,
+    rst_l                => rst_l,
+    iRgb                 => iRgb,
+    y                    => rgbYcbcr.red,
+    cb                   => rgbYcbcr.green,
+    cr                   => rgbYcbcr.blue,
+    oValid               => rgbYcbcr.valid);
 hsv_hsvl_inst: hsvl
 generic map (
     i_data_width       => i_data_width)
 port map (                  
     clk                => clk,
     reset              => rst_l,
-    iRgb               => fRgb.ycbcr,
+    iRgb               => rgbYcbcr,
     oHsl               => rgb_hsvl);
 rgb_histogram_inst: rgb_histogram
 generic map (
@@ -658,6 +695,7 @@ port map(
 end generate L_BLU_ENABLE;
 L_CGA_ENABLE: if (L_CGA = true) generate
 signal ccm1_rgb   : channel;
+signal bbm1_rgb   : channel;
 begin
 dark_ccm_inst  : color_correction
 generic map(
@@ -676,7 +714,18 @@ port map(
     rst_l               => rst_l,
     iRgb                => ccm1_rgb,
     als                 => light_ccm,
+    oRgb                => bbm1_rgb);
+    
+balance_ccm_inst  : color_correction
+generic map(
+    i_k_config_number   => 0)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => bbm1_rgb,
+    als                 => balance_ccm,
     oRgb                => rgbLocFilt.cgain);
+
 blurSyncr_inst  : sync_frames
 generic map(
     pixelDelay          => 27)

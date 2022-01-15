@@ -53,7 +53,7 @@ architecture behavioral of video_process_tb is
     -------------------------------------------------
     constant F_TES                       : boolean := false;
     constant F_LUM                       : boolean := false;
-    constant F_TRM                       : boolean := true;
+    constant F_TRM                       : boolean := false;
     constant F_OHS                       : boolean := true;
     constant F_RE1                       : boolean := true;
     constant F_RE2                       : boolean := true;
@@ -63,18 +63,18 @@ architecture behavioral of video_process_tb is
     constant L_HIS                       : boolean := true;
     constant L_SPC                       : boolean := true;
     -------------------------------------------------
-    constant F_RGB                       : boolean := true;   -- 58
-    constant F_SHP                       : boolean := false;  -- 36
+    constant F_RGB                       : boolean := false;   -- 58
+    constant F_SHP                       : boolean := false;   -- 36
     constant F_BLU                       : boolean := false;  -- 58
-    constant F_EMB                       : boolean := false;  -- 58
-    constant F_YCC                       : boolean := false;  -- 58
+    constant F_EMB                       : boolean := false;   -- 58
+    constant F_YCC                       : boolean := true;  -- 58
     constant F_SOB                       : boolean := false;  -- 58
-    constant F_CGA                       : boolean := true;   -- 58
-    constant F_HSV                       : boolean := false;   -- 58
-    constant F_HSL                       : boolean := false;   -- 58
+    constant F_CGA                       : boolean := false;   -- 58
+    constant F_HSV                       : boolean := true;   -- 58
+    constant F_HSL                       : boolean := true;   -- 58
     constant L_BLU                       : boolean := false;  -- 8 synBlur
     constant L_SHP                       : boolean := false;  -- 9 synSharp
-    constant L_CGA                       : boolean := true;  -- 9 synCgain
+    constant L_CGA                       : boolean := false;   -- 9 synCgain
     constant L_YCC                       : boolean := false;  -- 5
     constant L_D1T                       : boolean := false;  -- 1
     constant L_B1T                       : boolean := false;  -- 9
@@ -128,7 +128,7 @@ architecture behavioral of video_process_tb is
     signal cYccR                         : std_logic := lo;
     signal cYcc                          : std_logic_vector(2 downto 0);
     signal iLumTh                        : integer := 5;
-    signal iSobelTh                      : integer := 100;
+    signal iSobelTh                      : integer := 75;
     signal iHsvPerCh                     : integer := 0;--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
     signal iYccPerCh                     : integer := 0;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
     signal iFilterId                     : integer := 2;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
