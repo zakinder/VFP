@@ -219,7 +219,78 @@ port (
     iRgb           : in channel;
     oHsl           : out channel);
 end component hsvl;
-
+component hsvl_1range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsvl_1range;
+component hsvl_2range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsvl_2range;
+component hsvl_3range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsvl_3range;
+component hsvl_4range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsvl_4range;
+component hsl_1range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsl_1range;
+component hsl_2range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsl_2range;
+component hsl_3range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsl_3range;
+component hsl_4range is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oHsl           : out channel);
+end component hsl_4range;
 component recolor_space_hsl is
 generic (
     img_width     : integer := 1920;
@@ -868,6 +939,15 @@ port (
     als                         : in coefficient;
     oRgb                        : out channel);
 end component color_correction;
+component ccm is
+generic (
+    i_k_config_number           : integer := 8);
+port (
+    clk                         : in std_logic;
+    rst_l                       : in std_logic;
+    iRgb                        : in channel;
+    oRgb                        : out channel);
+end component ccm;
 component ImageKernel is
 generic (
     SHARP_FRAME           : boolean := false;

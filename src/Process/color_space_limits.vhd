@@ -93,9 +93,9 @@ process (clk) begin
     if rising_edge(clk) then
             Rgb1          <= iRgb;
             Rgb2.valid    <= Rgb1.valid;
-            Rgb2.red      <=  Rgb1.red;
-            Rgb2.green    <=  Rgb1.green;
-            Rgb2.blue     <=  Rgb1.blue;
+            Rgb2.red      <= Rgb1.red;
+            Rgb2.green    <= Rgb1.green;
+            Rgb2.blue     <= Rgb1.blue;
         -- if (int1Rgb.red = rgbMax) then
         -- else
             -- Rgb2.red      <=  black;

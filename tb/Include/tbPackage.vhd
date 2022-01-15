@@ -20,11 +20,14 @@ package tbPackage is
     --       [64_64   = 5   us]
     --       [128_128 = 18  us]
     --       [255_255 = 18  us]
+    --       [272_416 = 239 us]
+    --       [272_832 = 239 us]
     --       [300_300 = 110 us]
     --       [400_300 = 123 us] 1/2 HR
     --       [500_500 = 250 us] 1   HR
+    --       [619_479 = 304 us]
     --       [770_580 = 452 us]
-    constant readbmp             : string  := "128_128";
+    constant readbmp             : string  := "272_416";
     constant Histrograms         : string  := "Histrograms";
     constant img_width           : integer := image_size_width(readbmp);
     constant img_height          : integer := image_size_height(readbmp);
@@ -40,7 +43,7 @@ package tbPackage is
     constant line_hight          : integer := 5;  
     constant adwrWidth           : integer := 16;
     constant addrWidth           : integer := 12;
-    constant SLOT_NUM            : integer := 53;
+    constant SLOT_NUM            : integer := 60;
     constant wImgFolder          : string := "K:/ZEDBOARD/simulations/images/write";
     constant rImgFolder          : string := "K:/ZEDBOARD/simulations/images/read";
     constant bSlash              : string := "\";
@@ -67,16 +70,24 @@ package body tbPackage is
            return 255;
        elsif bmp = "255_127" then
            return 255;
+       elsif bmp = "272_416" then
+           return 272;
+       elsif bmp = "272_832" then
+           return 272;
        elsif bmp = "300_300" then
            return 300;
        elsif bmp = "500_500" then
            return 500;
        elsif bmp = "600_600" then
            return 600;
+       elsif bmp = "619_479" then
+           return 619;
        elsif bmp = "770_580" then
            return 770;
        elsif bmp = "950_950" then
            return 950;
+       elsif bmp = "1000_500" then
+           return 1000;
        end if;
     end;
     ----------------------------------------------------------------------------------------------------
@@ -90,16 +101,24 @@ package body tbPackage is
            return 255;
        elsif bmp = "255_127" then
            return 127;
+       elsif bmp = "272_416" then
+           return 416;
+       elsif bmp = "272_832" then
+           return 832;
        elsif bmp = "300_300" then
            return 300;
        elsif bmp = "500_500" then
            return 500;
        elsif bmp = "600_600" then
            return 600;
+       elsif bmp = "619_479" then
+           return 479;
        elsif bmp = "770_580" then
            return 580;
        elsif bmp = "950_950" then
            return 950;
+       elsif bmp = "1000_500" then
+           return 500;
        end if;
     end;
     ----------------------------------------------------------------------------------------------------

@@ -54,24 +54,24 @@ architecture behavioral of video_process_tb is
     constant F_TES                       : boolean := false;
     constant F_LUM                       : boolean := false;
     constant F_TRM                       : boolean := false;
-    constant F_OHS                       : boolean := true;
+    constant F_OHS                       : boolean := false;
     constant F_RE1                       : boolean := true;
     constant F_RE2                       : boolean := true;
-    constant L_AVG                       : boolean := true;
-    constant L_OBJ                       : boolean := true;
+    constant L_AVG                       : boolean := false;
+    constant L_OBJ                       : boolean := false;
     constant L_HSL                       : boolean := true;
-    constant L_HIS                       : boolean := true;
-    constant L_SPC                       : boolean := true;
+    constant L_HIS                       : boolean := false;
+    constant L_SPC                       : boolean := false;
     -------------------------------------------------
     constant F_RGB                       : boolean := false;   -- 58
-    constant F_SHP                       : boolean := false;   -- 36
+    constant F_SHP                       : boolean := true;   -- 36
     constant F_BLU                       : boolean := false;  -- 58
-    constant F_EMB                       : boolean := false;   -- 58
-    constant F_YCC                       : boolean := true;  -- 58
+    constant F_EMB                       : boolean := true;   -- 58
+    constant F_YCC                       : boolean := false;  -- 58
     constant F_SOB                       : boolean := false;  -- 58
-    constant F_CGA                       : boolean := false;   -- 58
-    constant F_HSV                       : boolean := true;   -- 58
-    constant F_HSL                       : boolean := true;   -- 58
+    constant F_CGA                       : boolean := true;   -- 58
+    constant F_HSV                       : boolean := false;   -- 58
+    constant F_HSL                       : boolean := false;   -- 58
     constant L_BLU                       : boolean := false;  -- 8 synBlur
     constant L_SHP                       : boolean := false;  -- 9 synSharp
     constant L_CGA                       : boolean := false;   -- 9 synCgain
@@ -128,7 +128,7 @@ architecture behavioral of video_process_tb is
     signal cYccR                         : std_logic := lo;
     signal cYcc                          : std_logic_vector(2 downto 0);
     signal iLumTh                        : integer := 5;
-    signal iSobelTh                      : integer := 75;
+    signal iSobelTh                      : integer := 50;
     signal iHsvPerCh                     : integer := 0;--[0-cHsv,1-cHsvH,2-cHsvS,3-cHsvV]
     signal iYccPerCh                     : integer := 0;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
     signal iFilterId                     : integer := 2;--[0-cYcc,1-cYccY,2-cYccB,3-cYccR]
@@ -278,6 +278,8 @@ port map(
     edgeValid             => edgeValid,
     blur_channels         => blur_channels,
     oRgb                  => rgbImageFilters);
+L_HIS_ENABLE: if (L_HIS = true) generate
+begin
 write_valid_rgb_histogram_inst: write_valid_image
 generic map (
     enImageText           => true,
@@ -289,6 +291,8 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.histogram);
+end generate L_HIS_ENABLE;
+L_SPC_ENABLE: if (L_SPC = true) generate begin
 init_channel_0_inst: write_image
 generic map (
     enImageText           => true,
@@ -377,6 +381,7 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.space.ch7);
+end generate L_SPC_ENABLE;
 LOGS_INST: write_image_filter_logs
 generic map (
     F_TES                 => F_TES,
@@ -796,7 +801,7 @@ port map (
     iRgb                  => rgbImageFilters.cgainToYcbcr);
 end generate F_CGA_TO_YCC_TEST_ENABLED;
 F_CGA_TO_HSV_TEST_ENABLED : if (F_CGA_TO_HSV = true) generate 
-signal enableWrite                : std_logic;
+signal enableWrite        : std_logic;
 begin
 enableWrite <= hi when (rgbImageFilters.cgainToHsv.valid = hi); 
 ImageWriteCgainInst: image_write
@@ -840,12 +845,12 @@ port map(
     oRgb     => HslB);
 process(HslR,HslB) begin
     if (HslR.red = x"00" and HslR.valid = hi) then
-            HslBB <= HslB;
+        HslBB <= HslB;
     else
-            HslBB.red       <= x"00";
-            HslBB.green     <= x"00";
-            HslBB.blue      <= x"00";
-            HslBB.valid     <= HslB.valid;
+        HslBB.red       <= x"00";
+        HslBB.green     <= x"00";
+        HslBB.blue      <= x"00";
+        HslBB.valid     <= HslB.valid;
     end if;
 end process;
 ImageWriteCgainToHslInst: image_write
@@ -1065,6 +1070,94 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsl);
+hsl1_range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsl1_range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsl1_range);
+hsl2_range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsl2_range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsl2_range);
+hsl3_range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsl3_range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsl3_range);
+hsl4_range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsl4_range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsl4_range);
+hsll1range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsll1range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsll1range);
+hsll2range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsll2range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsll2range);
+hsll3range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsll3range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsll3range);
+hsll4range_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hsll4range")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hsll4range);
 end generate F_HSL_TEST_ENABLED;
 F_EMB_TEST_ENABLED : if (F_EMB = true) generate 
 begin 

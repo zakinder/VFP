@@ -133,21 +133,21 @@ hueP: process (clk) begin
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
             uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 60;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 60;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 140;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
             hueDeg <= 120;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
             uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 60;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 60;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 140;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 240;
+            hueDeg <= 200;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
             uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 60;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 60;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 140;
         end if;
     end if;
   end if;
@@ -177,12 +177,7 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        if (uFs3Rgb.red  = maxValue) then
-            hueQuot1x <= uFiXhueQuot;
-        else
-            hueQuot1x <= uFiXhueQuot;
-        end if;
-        --hueQuot1x <= (uFiXhueQuot mod 45900) /255;
+        hueQuot1x <= uFiXhueQuot;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin

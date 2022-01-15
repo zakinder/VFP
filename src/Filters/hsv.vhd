@@ -8,18 +8,14 @@
 -- This file instantiation
 -- p ← RGB2HSV(p)
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.fixed_pkg.all;
 use work.float_pkg.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-
 entity hsv_c is
 generic (
     i_data_width   : integer := 8);
@@ -33,7 +29,6 @@ architecture behavioral of hsv_c is
     signal uFs1Rgb       : intChannel;
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
-    
     signal uFs11Rgb      : intChannel;
     signal uFs22Rgb      : intChannel;
     signal rgbMax        : natural;
@@ -55,14 +50,34 @@ architecture behavioral of hsv_c is
     signal h_value       : integer := zero;
     --S
     signal s1value       : unsigned(7 downto 0);
+    signal s2value       : unsigned(7 downto 0);
+    signal s3value       : unsigned(7 downto 0);
     --V
     signal v1value       : unsigned(7 downto 0);
+    signal v2value       : unsigned(7 downto 0);
+    signal v3value       : unsigned(7 downto 0);
+    signal v4value       : unsigned(7 downto 0);
+    signal v5value       : unsigned(7 downto 0);
     --Valid
     signal valid1_rgb    : std_logic := '0';
     signal valid2_rgb    : std_logic := '0';
     signal valid3_rgb    : std_logic := '0';
     signal sHsl          : channel;
     signal lHsl          : channel;
+    signal rgb_ol1_red       : sfixed(9 downto 0);
+    signal rgb_ol2_red       : sfixed(9 downto 0);
+    signal rgb_ol3_red       : sfixed(9 downto 0);
+    signal rgb_ol4_red       : sfixed(9 downto 0);
+    signal rgb_ool4      : channel;
+    signal rgb_colo      : rgbToSfRecord;
+    signal rgb_oolo      : rgbToSfRecord;
+    signal rgb_ool2      : rgbToSf12Record;
+    signal rgb_ool3      : rgbToSfRecord;
+    signal valid4_rgb    : std_logic := '0';
+    signal valid5_rgb    : std_logic := '0';
+    signal valid6_rgb    : std_logic := '0';
+    signal valid7_rgb    : std_logic := '0';
+    signal valid8_rgb    : std_logic := '0';
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
@@ -130,23 +145,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 60;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 140;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 60;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 100;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
             hueDeg <= 60;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 60;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 255;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 60;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 255;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
             hueDeg <= 120;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 60;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 255;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 60;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 255;
         end if;
     end if;
   end if;
@@ -164,13 +179,11 @@ hueBottomP: process (clk) begin
         end if;
     end if;
 end process hueBottomP;
-
 uuFiXhueTop   <= to_ufixed(uFiXhueTop,uuFiXhueTop);
 uuFiXhueBot   <= to_ufixed(uFiXhueBot,uuFiXhueBot);
 uuFiXhueQuot  <= (uuFiXhueTop / uuFiXhueBot);
 hue_quot      <= resize(uuFiXhueQuot,hue_quot);
 uFiXhueQuot   <= to_integer(unsigned(hue_quot));
-
 hueDegreeP: process (clk) begin
     if rising_edge(clk) then
         hueDeg1x       <= hueDeg;
@@ -178,12 +191,7 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        if (uFs3Rgb.red  = maxValue) then
             hueQuot1x <= uFiXhueQuot;
-        else
-            hueQuot1x <= uFiXhueQuot;
-        end if;
-        --hueQuot1x <= (uFiXhueQuot mod 45900) /255;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin
@@ -209,24 +217,30 @@ end process satValueP;
 valValueP: process (clk) begin
     if rising_edge(clk) then
         v1value <= to_unsigned(rgbMax, 8);
+        v2value <= v2value;
+        v3value <= v1value;
+        v4value <= v3value;
+        v5value <= v4value;
     end if;
 end process valValueP;
-pipValidP: process (clk) begin
+process (clk) begin
     if rising_edge(clk) then
         valid1_rgb    <= uFs3Rgb.valid;
         valid2_rgb    <= valid1_rgb;
         valid3_rgb    <= valid2_rgb;
     end if;
-end process pipValidP;
-
-
+end process;
+process (clk) begin
+    if rising_edge(clk) then
+        s2value    <= s1value;
+        s3value    <= s2value;
+    end if;
+end process;
 -------------------------------------------------
 lHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
-lHsl.green <= std_logic_vector(s1value);
-lHsl.blue  <= std_logic_vector(v1value);
+lHsl.green <= std_logic_vector(s3value);
+lHsl.blue  <= std_logic_vector(v5value);
 lHsl.valid <= valid3_rgb;
-
-
 process (clk,reset)begin
     if (reset = lo) then
         uFs11Rgb.red    <= zero;
@@ -239,181 +253,222 @@ process (clk,reset)begin
         uFs11Rgb.valid  <= lHsl.valid;
     end if;
 end process;
-
--- RGB.max = max(R, G, B)
+rgb_ool1_inst: sync_frames
+generic map(
+    pixelDelay => 5)
+port map(
+    clk        => clk,
+    reset      => reset,
+    iRgb       => iRgb,
+    oRgb       => rgb_ool4);
 process (clk) begin
     if rising_edge(clk) then
-    
-    sHsl.valid <= uFs11Rgb.valid;
-    sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
-    sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
-    
-        if ((uFs11Rgb.red >= uFs11Rgb.green) and (uFs11Rgb.red >= uFs11Rgb.blue)) then
-            --if (uFs11Rgb.green >= uFs11Rgb.blue) then
-            --    sHsl.red   <= std_logic_vector(to_unsigned(2, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
-            --    sHsl.green <= std_logic_vector(to_unsigned(2, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
-            --    sHsl.blue  <= std_logic_vector(to_unsigned(2, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
-            --else
-                --if (uFs11Rgb.red >= 150) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(uFs11Rgb.red,   8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
-                --elsif (uFs11Rgb.red >= 130  and uFs11Rgb.red <= 149) then
-                --    sHsl.red   <= std_logic_vector(to_unsigned(130, 8));
-                --    sHsl.green <= std_logic_vector(to_unsigned(130, 8));
-                --    sHsl.blue  <= std_logic_vector(to_unsigned(130, 8));
-                --elsif (uFs11Rgb.red >= 100  and uFs11Rgb.red <= 129) then
-                --    sHsl.red   <= std_logic_vector(to_unsigned(110, 8));
-                --    sHsl.green <= std_logic_vector(to_unsigned(110, 8));
-                --    sHsl.blue  <= std_logic_vector(to_unsigned(110, 8));
-                --elsif (uFs11Rgb.red >= 80  and uFs11Rgb.red <= 99) then
-                --    sHsl.red   <= std_logic_vector(to_unsigned(80, 8));
-                --    sHsl.green <= std_logic_vector(to_unsigned(80, 8));
-                --    sHsl.blue  <= std_logic_vector(to_unsigned(80, 8));
-                --elsif (uFs11Rgb.red >= 40  and uFs11Rgb.red <= 79) then
-                --    sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
-                --    sHsl.green <= std_logic_vector(to_unsigned(40, 8));
-                --    sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
-                --elsif (uFs11Rgb.red >= 21  and uFs11Rgb.red <= 39) then
-                --    sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
-                --    sHsl.green <= std_logic_vector(to_unsigned(30, 8));
-                --    sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
-                --elsif (uFs11Rgb.red >= 20 and uFs11Rgb.red <= 0) then
-                --    sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
-                --    sHsl.green <= std_logic_vector(to_unsigned(20, 8));
-                --    sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
-                --end if;
-            --end if;
-        elsif((uFs11Rgb.green >= uFs11Rgb.red) and (uFs11Rgb.green >= uFs11Rgb.blue))then
-        
-               if (uFs11Rgb.green >= 150) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(uFs11Rgb.red,   8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
-                elsif (uFs11Rgb.green >= 130  and uFs11Rgb.green <= 149) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(130, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(130, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(130, 8));
-                elsif (uFs11Rgb.green >= 100  and uFs11Rgb.green <= 129) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(110, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(110, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(110, 8));
-                elsif (uFs11Rgb.green >= 80  and uFs11Rgb.green <= 99) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(80, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(80, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(80, 8));
-                elsif (uFs11Rgb.green >= 40  and uFs11Rgb.green <= 79) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(40, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
-                elsif (uFs11Rgb.green >= 21  and uFs11Rgb.green <= 39) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(30, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
-                elsif (uFs11Rgb.green >= 20 and uFs11Rgb.green <= 0) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(20, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
-                end if;
-        
-            --if (uFs11Rgb.blue >= uFs11Rgb.red ) then
-            --    sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
-            --    sHsl.green <= std_logic_vector(to_unsigned(0, 1)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 7));
-            --    sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
-            --else
-            --    if (uFs11Rgb.green >= 50) then
-            --        sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
-            --        sHsl.green <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
-            --        sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
-            --    elsif (uFs11Rgb.green >= 40) then
-            --        sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
-            --        sHsl.green <= std_logic_vector(to_unsigned(40, 8));
-            --        sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
-            --    elsif (uFs11Rgb.green >= 30) then
-            --        sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
-            --        sHsl.green <= std_logic_vector(to_unsigned(30, 8));
-            --        sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
-            --    elsif (uFs11Rgb.green >= 20) then
-            --        sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
-            --        sHsl.green <= std_logic_vector(to_unsigned(20, 8));
-            --        sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
-            --    else
-            --        sHsl.red   <= std_logic_vector(to_unsigned(10, 8));
-            --        sHsl.green <= std_logic_vector(to_unsigned(10, 8));
-            --        sHsl.blue  <= std_logic_vector(to_unsigned(10, 8));
-            --    end if;
-            --end if;
-        else
-               if (uFs11Rgb.blue >= 150) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(uFs11Rgb.red,   8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
-                elsif (uFs11Rgb.blue >= 130  and uFs11Rgb.blue <= 149) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(130, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(130, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(130, 8));
-                elsif (uFs11Rgb.blue >= 100  and uFs11Rgb.blue <= 129) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(110, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(110, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(110, 8));
-                elsif (uFs11Rgb.blue >= 80  and uFs11Rgb.blue <= 99) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(80, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(80, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(80, 8));
-                elsif (uFs11Rgb.blue >= 40  and uFs11Rgb.blue <= 79) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(40, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
-                elsif (uFs11Rgb.blue >= 21  and uFs11Rgb.blue <= 39) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(30, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
-                elsif (uFs11Rgb.blue >= 20 and uFs11Rgb.blue <= 0) then
-                    sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
-                    --sHsl.green <= std_logic_vector(to_unsigned(20, 8));
-                    --sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
-                end if;
-        
-         --if (uFs11Rgb.red  >= uFs11Rgb.green) then
-         --    sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
-         --    sHsl.green <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
-         --    sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
-         --else
-         --   if (uFs11Rgb.blue >= 50) then
-         --        sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
-         --        sHsl.green <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
-         --        sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
-         --    elsif (uFs11Rgb.blue >= 40) then
-         --        sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
-         --        sHsl.green <= std_logic_vector(to_unsigned(40, 8));
-         --        sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
-         --    elsif (uFs11Rgb.blue >= 30) then
-         --        sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
-         --        sHsl.green <= std_logic_vector(to_unsigned(30, 8));
-         --        sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
-         --    elsif (uFs11Rgb.blue >= 20) then
-         --        sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
-         --        sHsl.green <= std_logic_vector(to_unsigned(20, 8));
-         --        sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
-         --    else
-         --        sHsl.red   <= std_logic_vector(to_unsigned(10, 8));
-         --        sHsl.green <= std_logic_vector(to_unsigned(10, 8));
-         --        sHsl.blue  <= std_logic_vector(to_unsigned(10, 8));
-         --    end if;
-         --end if;
-        end if;
+        rgb_colo.red    <= to_sfixed("00" & lHsl.red,rgb_colo.red);
+        rgb_colo.green  <= to_sfixed("00" & lHsl.green,rgb_colo.green);
+        rgb_colo.blue   <= to_sfixed("00" & lHsl.blue,rgb_colo.blue);
+        rgb_oolo.red    <= to_sfixed("00" & rgb_ool4.red,rgb_oolo.red);
+        rgb_oolo.green  <= to_sfixed("00" & rgb_ool4.green,rgb_oolo.green);
+        rgb_oolo.blue   <= to_sfixed("00" & rgb_ool4.blue,rgb_oolo.blue);
+    end if;
+end process;
+process (clk) begin
+    if rising_edge(clk) then
+        rgb_ool2.red   <= abs(rgb_oolo.red - rgb_colo.red);
+        rgb_ool2.green <= abs(rgb_oolo.green - rgb_colo.green);
+        rgb_ool2.blue  <= abs(rgb_oolo.blue - rgb_colo.blue);
+        rgb_ool3.red   <= resize(rgb_ool2.red,rgb_ool3.red);
+        rgb_ool3.green <= resize(rgb_ool2.green,rgb_ool3.green);
+        rgb_ool3.blue  <= resize(rgb_ool2.blue,rgb_ool3.blue);
     end if;
 end process;
 
--------------------------------------------------
--- Hsv
--------------------------------------------------
+process (clk) begin
+    if rising_edge(clk) then
+        rgb_ol1_red     <= rgb_colo.red;
+        rgb_ol2_red     <= rgb_ol1_red;
+        rgb_ol3_red     <= rgb_ol2_red;
+        rgb_ol4_red     <= rgb_ol3_red;
+    end if;
+end process;
+process (clk) begin
+    if rising_edge(clk) then
+        valid4_rgb    <= rgb_ool4.valid;
+        valid5_rgb    <= valid4_rgb;
+        valid6_rgb    <= valid5_rgb;
+        valid7_rgb    <= valid6_rgb;
+        valid8_rgb    <= valid7_rgb;
+    end if;
+end process;
 pipRgbwD2P: process (clk) begin
     if rising_edge(clk) then
-        oHsv.red   <= sHsl.red;
-        oHsv.green <= sHsl.green;
-        oHsv.blue  <= sHsl.blue;
-        oHsv.valid <= sHsl.valid;
+        oHsv.red   <= std_logic_vector(rgb_ol4_red(i_data_width-1 downto 0));
+        oHsv.green <= std_logic_vector(rgb_ool3.green(i_data_width-1 downto 0));
+        oHsv.blue  <= std_logic_vector(rgb_ool3.blue(i_data_width-1 downto 0));
+        oHsv.valid <= valid8_rgb;
     end if;
 end process pipRgbwD2P;
+-- RGB.max = max(R, G, B)
+--process (clk) begin
+--    if rising_edge(clk) then
+--    
+--    sHsl.valid <= uFs11Rgb.valid;
+--    sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
+--    sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
+--    
+--        if ((uFs11Rgb.red >= uFs11Rgb.green) and (uFs11Rgb.red >= uFs11Rgb.blue)) then
+--            --if (uFs11Rgb.green >= uFs11Rgb.blue) then
+--            --    sHsl.red   <= std_logic_vector(to_unsigned(2, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
+--            --    sHsl.green <= std_logic_vector(to_unsigned(2, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
+--            --    sHsl.blue  <= std_logic_vector(to_unsigned(2, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
+--            --else
+--                --if (uFs11Rgb.red >= 150) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(uFs11Rgb.red,   8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
+--                --elsif (uFs11Rgb.red >= 130  and uFs11Rgb.red <= 149) then
+--                --    sHsl.red   <= std_logic_vector(to_unsigned(130, 8));
+--                --    sHsl.green <= std_logic_vector(to_unsigned(130, 8));
+--                --    sHsl.blue  <= std_logic_vector(to_unsigned(130, 8));
+--                --elsif (uFs11Rgb.red >= 100  and uFs11Rgb.red <= 129) then
+--                --    sHsl.red   <= std_logic_vector(to_unsigned(110, 8));
+--                --    sHsl.green <= std_logic_vector(to_unsigned(110, 8));
+--                --    sHsl.blue  <= std_logic_vector(to_unsigned(110, 8));
+--                --elsif (uFs11Rgb.red >= 80  and uFs11Rgb.red <= 99) then
+--                --    sHsl.red   <= std_logic_vector(to_unsigned(80, 8));
+--                --    sHsl.green <= std_logic_vector(to_unsigned(80, 8));
+--                --    sHsl.blue  <= std_logic_vector(to_unsigned(80, 8));
+--                --elsif (uFs11Rgb.red >= 40  and uFs11Rgb.red <= 79) then
+--                --    sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
+--                --    sHsl.green <= std_logic_vector(to_unsigned(40, 8));
+--                --    sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
+--                --elsif (uFs11Rgb.red >= 21  and uFs11Rgb.red <= 39) then
+--                --    sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
+--                --    sHsl.green <= std_logic_vector(to_unsigned(30, 8));
+--                --    sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
+--                --elsif (uFs11Rgb.red >= 20 and uFs11Rgb.red <= 0) then
+--                --    sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
+--                --    sHsl.green <= std_logic_vector(to_unsigned(20, 8));
+--                --    sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
+--                --end if;
+--            --end if;
+--        elsif((uFs11Rgb.green >= uFs11Rgb.red) and (uFs11Rgb.green >= uFs11Rgb.blue))then
+--        
+--               if (uFs11Rgb.green >= 150) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(uFs11Rgb.red,   8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
+--                elsif (uFs11Rgb.green >= 130  and uFs11Rgb.green <= 149) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(130, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(130, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(130, 8));
+--                elsif (uFs11Rgb.green >= 100  and uFs11Rgb.green <= 129) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(110, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(110, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(110, 8));
+--                elsif (uFs11Rgb.green >= 80  and uFs11Rgb.green <= 99) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(80, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(80, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(80, 8));
+--                elsif (uFs11Rgb.green >= 40  and uFs11Rgb.green <= 79) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(40, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
+--                elsif (uFs11Rgb.green >= 21  and uFs11Rgb.green <= 39) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(30, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
+--                elsif (uFs11Rgb.green >= 20 and uFs11Rgb.green <= 0) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(20, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
+--                end if;
+--        
+--            --if (uFs11Rgb.blue >= uFs11Rgb.red ) then
+--            --    sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
+--            --    sHsl.green <= std_logic_vector(to_unsigned(0, 1)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 7));
+--            --    sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
+--            --else
+--            --    if (uFs11Rgb.green >= 50) then
+--            --        sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
+--            --        sHsl.green <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
+--            --        sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
+--            --    elsif (uFs11Rgb.green >= 40) then
+--            --        sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
+--            --        sHsl.green <= std_logic_vector(to_unsigned(40, 8));
+--            --        sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
+--            --    elsif (uFs11Rgb.green >= 30) then
+--            --        sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
+--            --        sHsl.green <= std_logic_vector(to_unsigned(30, 8));
+--            --        sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
+--            --    elsif (uFs11Rgb.green >= 20) then
+--            --        sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
+--            --        sHsl.green <= std_logic_vector(to_unsigned(20, 8));
+--            --        sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
+--            --    else
+--            --        sHsl.red   <= std_logic_vector(to_unsigned(10, 8));
+--            --        sHsl.green <= std_logic_vector(to_unsigned(10, 8));
+--            --        sHsl.blue  <= std_logic_vector(to_unsigned(10, 8));
+--            --    end if;
+--            --end if;
+--        else
+--               if (uFs11Rgb.blue >= 150) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(uFs11Rgb.red,   8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(uFs11Rgb.green, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(uFs11Rgb.blue,  8));
+--                elsif (uFs11Rgb.blue >= 130  and uFs11Rgb.blue <= 149) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(130, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(130, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(130, 8));
+--                elsif (uFs11Rgb.blue >= 100  and uFs11Rgb.blue <= 129) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(110, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(110, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(110, 8));
+--                elsif (uFs11Rgb.blue >= 80  and uFs11Rgb.blue <= 99) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(80, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(80, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(80, 8));
+--                elsif (uFs11Rgb.blue >= 40  and uFs11Rgb.blue <= 79) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(40, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
+--                elsif (uFs11Rgb.blue >= 21  and uFs11Rgb.blue <= 39) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(30, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
+--                elsif (uFs11Rgb.blue >= 20 and uFs11Rgb.blue <= 0) then
+--                    sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
+--                    --sHsl.green <= std_logic_vector(to_unsigned(20, 8));
+--                    --sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
+--                end if;
+--        
+--         --if (uFs11Rgb.red  >= uFs11Rgb.green) then
+--         --    sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
+--         --    sHsl.green <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
+--         --    sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
+--         --else
+--         --   if (uFs11Rgb.blue >= 50) then
+--         --        sHsl.red   <= std_logic_vector(to_unsigned(0, 2)) & std_logic_vector(to_unsigned(uFs11Rgb.red,   6));
+--         --        sHsl.green <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.green, 5));
+--         --        sHsl.blue  <= std_logic_vector(to_unsigned(0, 3)) & std_logic_vector(to_unsigned(uFs11Rgb.blue,  5));
+--         --    elsif (uFs11Rgb.blue >= 40) then
+--         --        sHsl.red   <= std_logic_vector(to_unsigned(40, 8));
+--         --        sHsl.green <= std_logic_vector(to_unsigned(40, 8));
+--         --        sHsl.blue  <= std_logic_vector(to_unsigned(40, 8));
+--         --    elsif (uFs11Rgb.blue >= 30) then
+--         --        sHsl.red   <= std_logic_vector(to_unsigned(30, 8));
+--         --        sHsl.green <= std_logic_vector(to_unsigned(30, 8));
+--         --        sHsl.blue  <= std_logic_vector(to_unsigned(30, 8));
+--         --    elsif (uFs11Rgb.blue >= 20) then
+--         --        sHsl.red   <= std_logic_vector(to_unsigned(20, 8));
+--         --        sHsl.green <= std_logic_vector(to_unsigned(20, 8));
+--         --        sHsl.blue  <= std_logic_vector(to_unsigned(20, 8));
+--         --    else
+--         --        sHsl.red   <= std_logic_vector(to_unsigned(10, 8));
+--         --        sHsl.green <= std_logic_vector(to_unsigned(10, 8));
+--         --        sHsl.blue  <= std_logic_vector(to_unsigned(10, 8));
+--         --    end if;
+--         --end if;
+--        end if;
+--    end if;
+--end process;
 end behavioral;

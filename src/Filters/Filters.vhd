@@ -226,9 +226,6 @@ begin
     balance_ccm.k7             <= std_logic_vector(to_unsigned(80,32));
     balance_ccm.k8             <= std_logic_vector(to_unsigned(3,32));
     balance_ccm.k9             <= std_logic_vector(to_unsigned(232,32));
-    
-    
-    
     edgeValid               <= sEdgeValid;
     oRgb                    <= fRgb;
     blur_channels.ditRgb1vx <= ditRgb1vx;
@@ -277,8 +274,6 @@ port map (
     reset              => rst_l,
     iRgb               => iRgb,
     oRgb               => rgb);
-    
-    
 hsvl_ycc_inst  : rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
@@ -300,6 +295,16 @@ port map (
     reset              => rst_l,
     iRgb               => rgbYcbcr,
     oHsl               => rgb_hsvl);
+edge_objectsInst: edge_objects
+generic map (
+    i_data_width       => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => rgb,
+    oRgbRemix          => eObject);
+L_HIS_ENABLE: if (L_HIS = true) generate
+begin
 rgb_histogram_inst: rgb_histogram
 generic map (
     img_width          => img_width,
@@ -310,14 +315,9 @@ port map (
     txCord             => txCord,
     iRgb               => rgb,
     oRgb               => rgb_histo);
-edge_objectsInst: edge_objects
-generic map (
-    i_data_width       => i_data_width)
-port map (                  
-    clk                => clk,
-    rst_l              => rst_l,
-    iRgb               => rgb,
-    oRgbRemix          => eObject);
+end generate L_HIS_ENABLE;
+L_SPC_ENABLE: if (L_SPC = true) generate
+begin
 color_space_limits_inst: color_space_limits
 generic map (
     i_data_width       => 8)
@@ -358,6 +358,7 @@ port map (
     fRgb.space.ch7.green <= color_limits(7).green;
     fRgb.space.ch7.blue  <= color_limits(7).blue;
     fRgb.space.ch7.valid <= color_limits(7).valid;
+end generate L_SPC_ENABLE;
 -- cgainIoIn Input to local cgain module
 -- cgainIoOut Output of local cgain module
 CgainIoP: process (clk) begin
@@ -693,6 +694,8 @@ port map(
     iRgb                => rgbLocFilt.blur,
     oRgb                => rgbLocSynSFilt.blur);
 end generate L_BLU_ENABLE;
+
+
 L_CGA_ENABLE: if (L_CGA = true) generate
 signal ccm1_rgb   : channel;
 signal bbm1_rgb   : channel;
@@ -715,7 +718,6 @@ port map(
     iRgb                => ccm1_rgb,
     als                 => light_ccm,
     oRgb                => bbm1_rgb);
-    
 balance_ccm_inst  : color_correction
 generic map(
     i_k_config_number   => 0)
@@ -725,7 +727,6 @@ port map(
     iRgb                => bbm1_rgb,
     als                 => balance_ccm,
     oRgb                => rgbLocFilt.cgain);
-
 blurSyncr_inst  : sync_frames
 generic map(
     pixelDelay          => 27)
@@ -1096,7 +1097,15 @@ CGAIN_FRAME_ENABLE: if (F_CGA = true) generate begin
     fRgb.cgain <= rgbImageKernel.cgain;
 end generate CGAIN_FRAME_ENABLE;
 HSL_FRAME_ENABLE: if (F_HSL = true) generate
-    fRgb.hsl <= rgbImageKernel.hsl;
+    fRgb.hsl        <= rgbImageKernel.hsl;
+    fRgb.hsl1_range <= rgbImageKernel.hsl1_range;
+    fRgb.hsl2_range <= rgbImageKernel.hsl2_range;
+    fRgb.hsl3_range <= rgbImageKernel.hsl3_range;
+    fRgb.hsl4_range <= rgbImageKernel.hsl4_range;
+    fRgb.hsll1range <= rgbImageKernel.hsll1range;
+    fRgb.hsll2range <= rgbImageKernel.hsll2range;
+    fRgb.hsll3range <= rgbImageKernel.hsll3range;
+    fRgb.hsll4range <= rgbImageKernel.hsll4range;
 end generate HSL_FRAME_ENABLE;
 HSV_FRAME_ENABLE: if (F_HSV = true) generate
     fRgb.hsv <= rgbImageKernel.hsv;
@@ -1186,7 +1195,15 @@ CGAIN_FRAME_DISABLED: if (F_CGA = false) generate
     fRgb.cgain     <= init_channel;
 end generate CGAIN_FRAME_DISABLED;
 HSL_FRAME_DISABLED: if (F_HSL = false) generate
-    fRgb.hsl     <= init_channel;
+    fRgb.hsl        <= init_channel;
+    fRgb.hsl1_range <= init_channel;
+    fRgb.hsl2_range <= init_channel;
+    fRgb.hsl3_range <= init_channel;
+    fRgb.hsl4_range <= init_channel;
+    fRgb.hsll1range <= init_channel;
+    fRgb.hsll2range <= init_channel;
+    fRgb.hsll3range <= init_channel;
+    fRgb.hsll4range <= init_channel;
 end generate HSL_FRAME_DISABLED;
 HSV_FRAME_DISABLED: if (F_HSV = false) generate
     fRgb.hsv     <= init_channel;
