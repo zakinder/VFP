@@ -16,12 +16,26 @@ use work.vpf_records.all;
 use work.ports_package.all;
 entity kernel is
 generic (
+    HSV_1_FRAME        : boolean := false;
+    HSV_2_FRAME        : boolean := false;
+    HSV_3_FRAME        : boolean := false;
+    HSV_4_FRAME        : boolean := false;
+    HSVL1_FRAME        : boolean := false;
+    HSVL2_FRAME        : boolean := false;
+    HSVL3_FRAME        : boolean := false;
+    HSVL4_FRAME        : boolean := false;
+    F_RE1_FRAME        : boolean := false;
+    F_RE2_FRAME        : boolean := false;
+    F_RE3_FRAME        : boolean := false;
+    F_RE4_FRAME        : boolean := false;
+    F_RE5_FRAME        : boolean := false;
+    F_RE6_FRAME        : boolean := false;
+    F_RE7_FRAME        : boolean := false;
+    F_RE8_FRAME        : boolean := false;
     INRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
     RGBTR_FRAME        : boolean := false;
     COHSL_FRAME        : boolean := false;
-    RE1CO_FRAME        : boolean := false;
-    RE2CO_FRAME        : boolean := false;
     SHARP_FRAME        : boolean := false;
     BLURE_FRAME        : boolean := false;
     EMBOS_FRAME        : boolean := false;
@@ -710,14 +724,16 @@ end generate INRGB_FRAME_ENABLE;
 HSV_FRAME_ENABLE: if (HSV_FRAME = true) generate
     signal hsvSyncr    : channel;
 begin
--- hsv_c latency = 9
+-------------------------------------------------------------
+-- HSV
+-------------------------------------------------------------
 hsvInst: hsv_c
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oHsv               => hsvSyncr);
 hsv_syncr_inst  : sync_frames
 generic map(
@@ -731,18 +747,17 @@ end generate HSV_FRAME_ENABLE;
 -----------------------------------------------------------------------------------------------
 --FILTERS: HSL
 -----------------------------------------------------------------------------------------------
-HSL_FRAME_ENABLE: if (HSL_FRAME = true) generate
-
-    
-begin
--- hsl_c latency = 9
+HSL_FRAME_ENABLE: if (HSL_FRAME = true) generate begin
+-------------------------------------------------------------
+-- HSL
+-------------------------------------------------------------
 hslInst: hsl_c
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oHsl               => hslSyncr);
 hsl_syncr_inst  : sync_frames
 generic map(
@@ -752,13 +767,18 @@ port map(
     reset      => rst_l,
     iRgb       => hslSyncr,
     oRgb       => oRgb.hsl);
+end generate HSL_FRAME_ENABLE;
+-------------------------------------------------------------
+-- HSV  1 RANGE HSV_1_FRAME
+-------------------------------------------------------------
+HSV_1_FRAME_ENABLE: if (HSV_1_FRAME = true) generate begin
 hsl_1_range_Inst: hsl_1range
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oHsl               => hsl_1_Syncr);
 hsl_1_syncr_inst  : sync_frames
 generic map(
@@ -769,13 +789,18 @@ port map(
     iRgb       => hsl_1_Syncr,
     oRgb       => hsl_1_range);
     oRgb.hsl1_range <= hsl_1_range;
+end generate HSV_1_FRAME_ENABLE;
+-------------------------------------------------------------
+-- HSV  2 RANGE
+-------------------------------------------------------------
+HSV_2_FRAME_ENABLE: if (HSV_2_FRAME = true) generate begin
 hsl_2_range_inst: hsl_2range
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oHsl               => hsl_2_Syncr);
 hsl_2_syncr_inst  : sync_frames
 generic map(
@@ -785,77 +810,116 @@ port map(
     reset      => rst_l,
     iRgb       => hsl_2_Syncr,
     oRgb       => oRgb.hsl2_range);
+end generate HSV_2_FRAME_ENABLE;
+-------------------------------------------------------------
+-- HSV  3 RANGE
+-------------------------------------------------------------
+HSV_3_FRAME_ENABLE: if (HSV_3_FRAME = true) generate begin
 hsl_3_range_Inst: hsl_3range
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oHsl               => hsl_3_Syncr);
 hsl_3_syncr_inst  : sync_frames
 generic map(
     pixelDelay => 60)
 port map(
-    clk        => clk,
-    reset      => rst_l,
-    iRgb       => hsl_3_Syncr,
-    oRgb       => oRgb.hsl3_range);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => hsl_3_Syncr,
+    oRgb            => oRgb.hsl3_range);
+end generate HSV_3_FRAME_ENABLE;
+-------------------------------------------------------------
+-- HSV  4 RANGE
+-------------------------------------------------------------
+HSV_4_FRAME_ENABLE: if (HSV_4_FRAME = true) generate begin
 hsl_4_range_Inst: hsl_4range
 generic map(
-    i_data_width       => i_data_width)
+    i_data_width    => i_data_width)
 port map(
-    clk                => clk,
-    reset              => rst_l,
-    iRgb               => re1color,
-    oHsl               => hsl_4_Syncr);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => iRgb,
+    oHsl            => hsl_4_Syncr);
 hsl_4_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay      => 60)
 port map(
-    clk        => clk,
-    reset      => rst_l,
-    iRgb       => hsl_4_Syncr,
-    oRgb       => oRgb.hsl4_range);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => hsl_4_Syncr,
+    oRgb            => oRgb.hsl4_range);
+end generate HSV_4_FRAME_ENABLE;
+-------------------------------------------------------------
+-- HSVL 1 RANGE 
+-------------------------------------------------------------
+HSVL1_FRAME_ENABLE: if (HSVL1_FRAME = true) generate 
+signal ccm_hsvl_1_color : channel;
+begin
+ccm_hsvl_1_color_inst  : ccm
+generic map(
+    i_k_config_number   => 0)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => ccm_hsvl_1_color);
 hsvl_1_range_Inst: hsvl_1range
 generic map(
-    i_data_width       => i_data_width)
+    i_data_width    => i_data_width)
 port map(
-    clk                => clk,
-    reset              => rst_l,
-    iRgb               => re1color,
-    oHsl               => hsll1_Syncr);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => ccm_hsvl_1_color,
+    oHsl            => hsll1_Syncr);
 hsvl_1_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay      => 60)
 port map(
-    clk        => clk,
-    reset      => rst_l,
-    iRgb       => hsll1_Syncr,
-    oRgb       => oRgb.hsll1range);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => hsll1_Syncr,
+    oRgb            => oRgb.hsll1range);
+end generate HSVL1_FRAME_ENABLE;
+HSVL2_FRAME_ENABLE: if (HSVL2_FRAME = true) generate begin
 hsvl_2_range_inst: hsvl_2range
 generic map(
-    i_data_width       => i_data_width)
+    i_data_width    => i_data_width)
 port map(
-    clk                => clk,
-    reset              => rst_l,
-    iRgb               => re1color,
-    oHsl               => hsll2_Syncr);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => iRgb,
+    oHsl            => hsll2_Syncr);
 hsvl_2_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay      => 60)
 port map(
-    clk        => clk,
-    reset      => rst_l,
-    iRgb       => hsll2_Syncr,
-    oRgb       => oRgb.hsll2range);
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => hsll2_Syncr,
+    oRgb            => oRgb.hsll2range);
+end generate HSVL2_FRAME_ENABLE;
+HSVL3_FRAME_ENABLE: if (HSVL3_FRAME = true) generate 
+signal ccm_hsvl_3_color : channel;
+begin
+ccm_hsvl_3_color_inst  : ccm
+generic map(
+    i_k_config_number   => 1)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => ccm_hsvl_3_color);
 hsvl_3_range_Inst: hsvl_3range
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => ccm_hsvl_3_color,
     oHsl               => hsll3_Syncr);
 hsvl_3_syncr_inst  : sync_frames
 generic map(
@@ -865,13 +929,25 @@ port map(
     reset      => rst_l,
     iRgb       => hsll3_Syncr,
     oRgb       => oRgb.hsll3range);
+end generate HSVL3_FRAME_ENABLE;
+HSVL4_FRAME_ENABLE: if (HSVL4_FRAME = true) generate 
+signal ccm_hsvl_4_color : channel;
+begin
+ccm_hsvl_4_color_inst  : ccm
+generic map(
+    i_k_config_number   => 2)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => ccm_hsvl_4_color);
 hsvl_4_range_Inst: hsvl_4range
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => ccm_hsvl_4_color,
     oHsl               => hsll4_Syncr);
 hsvl_4_syncr_inst  : sync_frames
 generic map(
@@ -881,7 +957,8 @@ port map(
     reset      => rst_l,
     iRgb       => hsll4_Syncr,
     oRgb       => oRgb.hsll4range);
-end generate HSL_FRAME_ENABLE;
+end generate HSVL4_FRAME_ENABLE;
+
 -----------------------------------------------------------------------------------------------
 --FILTERS: RGBTRIM
 -----------------------------------------------------------------------------------------------
@@ -905,14 +982,14 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => colorhsl);
 end generate RGBCOHSL_FRAME_ENABLE;
 oRgb.colorhsl <= colorhsl;
-RE1COLO_FRAME_ENABLE: if (RE1CO_FRAME = true) generate begin
+F_RE1_FRAME_ENABLE: if (F_RE1_FRAME = true) generate begin
 ccm_inst  : ccm
 generic map(
-    i_k_config_number   => 3)
+    i_k_config_number   => 4)
 port map(
     clk                 => clk,
     rst_l               => rst_l,
@@ -927,9 +1004,9 @@ port map(
     reset              => rst_l,
     iRgb               => ccmcolor,
     oRgb               => re1color);
-end generate RE1COLO_FRAME_ENABLE;
+end generate F_RE1_FRAME_ENABLE;
 oRgb.re1color <= re1color;
-RE2COLO_FRAME_ENABLE: if (RE2CO_FRAME = true) generate begin
+F_RE2_FRAME_ENABLE: if (F_RE2_FRAME = true) generate begin
 recolor_space_2_inst: recolor_space_2
 generic map(
     img_width         => img_width,
@@ -937,8 +1014,10 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => hsl_1_range,
+    iRgb               => iRgb,
     oRgb               => re2color);
+end generate F_RE2_FRAME_ENABLE;
+F_RE3_FRAME_ENABLE: if (F_RE3_FRAME = true) generate begin
 recolor_space_3_inst: recolor_space_3
 generic map(
     img_width         => img_width,
@@ -946,8 +1025,10 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => re3color);
+end generate F_RE3_FRAME_ENABLE;
+F_RE4_FRAME_ENABLE: if (F_RE4_FRAME = true) generate begin
 recolor_space_4_inst: recolor_space_4
 generic map(
     img_width         => img_width,
@@ -955,8 +1036,10 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => re4color);
+end generate F_RE4_FRAME_ENABLE;
+F_RE5_FRAME_ENABLE: if (F_RE5_FRAME = true) generate begin
 recolor_space_5_inst: recolor_space_5
 generic map(
     img_width         => img_width,
@@ -964,8 +1047,10 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => re5color);
+end generate F_RE5_FRAME_ENABLE;
+F_RE6_FRAME_ENABLE: if (F_RE6_FRAME = true) generate begin
 recolor_space_6_inst: recolor_space_6
 generic map(
     img_width         => img_width,
@@ -973,8 +1058,10 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => re6color);
+end generate F_RE6_FRAME_ENABLE;
+F_RE7_FRAME_ENABLE: if (F_RE7_FRAME = true) generate begin
 recolor_space_7_inst: recolor_space_7
 generic map(
     img_width         => img_width,
@@ -982,8 +1069,10 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => re7color);
+end generate F_RE7_FRAME_ENABLE;
+F_RE8_FRAME_ENABLE: if (F_RE8_FRAME = true) generate begin
 recolor_space_8_inst: recolor_space_8
 generic map(
     img_width         => img_width,
@@ -991,9 +1080,9 @@ generic map(
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => re1color,
+    iRgb               => iRgb,
     oRgb               => re8color);
-end generate RE2COLO_FRAME_ENABLE;
+end generate F_RE8_FRAME_ENABLE;
 oRgb.re2color   <= re2color;
 oRgb.re3color   <= re3color;
 oRgb.re4color   <= re4color;
@@ -1035,18 +1124,30 @@ end generate RGBTRIM_FRAME_DISABLED;
 OHS_FRAME_DISABLED: if (COHSL_FRAME = false) generate
     oRgb.colorhsl   <= init_channel;
 end generate OHS_FRAME_DISABLED;
-RE1_FRAME_DISABLED: if (RE1CO_FRAME = false) generate
+F_RE1_FRAME_DISABLED: if (F_RE1_FRAME = false) generate
     oRgb.re1color   <= init_channel;
-end generate RE1_FRAME_DISABLED;
-RE2_FRAME_DISABLED: if (RE2CO_FRAME = false) generate
+end generate F_RE1_FRAME_DISABLED;
+F_RE2_FRAME_DISABLED: if (F_RE2_FRAME = false) generate
     oRgb.re2color   <= init_channel;
+end generate F_RE2_FRAME_DISABLED;
+F_RE3_FRAME_DISABLED: if (F_RE3_FRAME = false) generate
     oRgb.re3color   <= init_channel;
+end generate F_RE3_FRAME_DISABLED;
+F_RE4_FRAME_DISABLED: if (F_RE4_FRAME = false) generate
     oRgb.re4color   <= init_channel;
+end generate F_RE4_FRAME_DISABLED;
+F_RE5_FRAME_DISABLED: if (F_RE5_FRAME = false) generate
     oRgb.re5color   <= init_channel;
+end generate F_RE5_FRAME_DISABLED;
+F_RE6_FRAME_DISABLED: if (F_RE6_FRAME = false) generate
     oRgb.re6color   <= init_channel;
+end generate F_RE6_FRAME_DISABLED;
+F_RE7_FRAME_DISABLED: if (F_RE7_FRAME = false) generate
     oRgb.re7color   <= init_channel;
+end generate F_RE7_FRAME_DISABLED;
+F_RE8_FRAME_DISABLED: if (F_RE8_FRAME = false) generate
     oRgb.re8color   <= init_channel;
-end generate RE2_FRAME_DISABLED;
+end generate F_RE8_FRAME_DISABLED;
 INRGB_FRAME_DISABLED: if (INRGB_FRAME = false) generate
     oRgb.inrgb   <= init_channel;
 end generate INRGB_FRAME_DISABLED;

@@ -50,13 +50,28 @@ use work.vpf_records.all;
 use work.ports_package.all;
 entity filters is
 generic (
+    HSV_L                    : boolean := false;
+    HSV_1                    : boolean := false;
+    HSV_2                    : boolean := false;
+    HSV_3                    : boolean := false;
+    HSV_4                    : boolean := false;
+    HSVL1                    : boolean := false;
+    HSVL2                    : boolean := false;
+    HSVL3                    : boolean := false;
+    HSVL4                    : boolean := false;
+    F_RE1                    : boolean := false;
+    F_RE2                    : boolean := false;
+    F_RE3                    : boolean := false;
+    F_RE4                    : boolean := false;
+    F_RE5                    : boolean := false;
+    F_RE6                    : boolean := false;
+    F_RE7                    : boolean := false;
+    F_RE8                    : boolean := false;
     F_TES                    : boolean := false;
     F_LUM                    : boolean := false;
     F_TRM                    : boolean := false;
     F_RGB                    : boolean := false;
     F_OHS                    : boolean := false;
-    F_RE1                    : boolean := false;
-    F_RE2                    : boolean := false;
     F_SHP                    : boolean := false;
     F_BLU                    : boolean := false;
     F_EMB                    : boolean := false;
@@ -73,7 +88,6 @@ generic (
     L_SHP                    : boolean := false;
     L_D1T                    : boolean := false;
     L_B1T                    : boolean := false;
-    L_HSL                    : boolean := true;
     L_HIS                    : boolean := true;
     L_SPC                    : boolean := true;
     M_SOB_LUM                : boolean := false;
@@ -287,6 +301,7 @@ port map(
     cb                   => rgbYcbcr.green,
     cr                   => rgbYcbcr.blue,
     oValid               => rgbYcbcr.valid);
+HSV_L_ENABLE: if (HSV_L = true) generate begin
 hsv_hsvl_inst: hsvl
 generic map (
     i_data_width       => i_data_width)
@@ -295,6 +310,7 @@ port map (
     reset              => rst_l,
     iRgb               => rgbYcbcr,
     oHsl               => rgb_hsvl);
+end generate HSV_L_ENABLE;
 edge_objectsInst: edge_objects
 generic map (
     i_data_width       => i_data_width)
@@ -303,8 +319,7 @@ port map (
     rst_l              => rst_l,
     iRgb               => rgb,
     oRgbRemix          => eObject);
-L_HIS_ENABLE: if (L_HIS = true) generate
-begin
+L_HIS_ENABLE: if (L_HIS = true) generate begin
 rgb_histogram_inst: rgb_histogram
 generic map (
     img_width          => img_width,
@@ -599,12 +614,26 @@ end generate F_DITH_BLUR_ENABLE;
 --------------------------------------------------------------------------------
 filter_kernel_inst  : kernel
 generic map(
+    HSV_1_FRAME         => HSV_1,
+    HSV_2_FRAME         => HSV_2,
+    HSV_3_FRAME         => HSV_3,
+    HSV_4_FRAME         => HSV_4,
+    HSVL1_FRAME         => HSVL1,
+    HSVL2_FRAME         => HSVL2,
+    HSVL3_FRAME         => HSVL3,
+    HSVL4_FRAME         => HSVL4,
+    F_RE1_FRAME         => F_RE1,
+    F_RE2_FRAME         => F_RE2,
+    F_RE3_FRAME         => F_RE3,
+    F_RE4_FRAME         => F_RE4,
+    F_RE5_FRAME         => F_RE5,
+    F_RE6_FRAME         => F_RE6,
+    F_RE7_FRAME         => F_RE7,
+    F_RE8_FRAME         => F_RE8,
     INRGB_FRAME         => F_RGB,
     RGBLP_FRAME         => F_LUM,
     RGBTR_FRAME         => F_TRM,
     COHSL_FRAME         => F_OHS,
-    RE1CO_FRAME         => F_RE1,
-    RE2CO_FRAME         => F_RE2,
     SHARP_FRAME         => F_SHP,
     BLURE_FRAME         => F_BLU,
     EMBOS_FRAME         => F_EMB,
@@ -1098,18 +1127,34 @@ CGAIN_FRAME_ENABLE: if (F_CGA = true) generate begin
 end generate CGAIN_FRAME_ENABLE;
 HSL_FRAME_ENABLE: if (F_HSL = true) generate
     fRgb.hsl        <= rgbImageKernel.hsl;
-    fRgb.hsl1_range <= rgbImageKernel.hsl1_range;
-    fRgb.hsl2_range <= rgbImageKernel.hsl2_range;
-    fRgb.hsl3_range <= rgbImageKernel.hsl3_range;
-    fRgb.hsl4_range <= rgbImageKernel.hsl4_range;
-    fRgb.hsll1range <= rgbImageKernel.hsll1range;
-    fRgb.hsll2range <= rgbImageKernel.hsll2range;
-    fRgb.hsll3range <= rgbImageKernel.hsll3range;
-    fRgb.hsll4range <= rgbImageKernel.hsll4range;
 end generate HSL_FRAME_ENABLE;
 HSV_FRAME_ENABLE: if (F_HSV = true) generate
     fRgb.hsv <= rgbImageKernel.hsv;
 end generate HSV_FRAME_ENABLE;
+HSV_1_FRAME_ENABLE: if (HSV_1 = true) generate
+    fRgb.hsl1_range <= rgbImageKernel.hsl1_range;
+end generate HSV_1_FRAME_ENABLE;
+HSV_2_FRAME_ENABLE: if (HSV_2 = true) generate
+    fRgb.hsl2_range <= rgbImageKernel.hsl2_range;
+end generate HSV_2_FRAME_ENABLE;
+HSV_3_FRAME_ENABLE: if (HSV_3 = true) generate
+    fRgb.hsl3_range <= rgbImageKernel.hsl3_range;
+end generate HSV_3_FRAME_ENABLE;
+HSV_4_FRAME_ENABLE: if (HSV_4 = true) generate
+    fRgb.hsl4_range <= rgbImageKernel.hsl4_range;
+end generate HSV_4_FRAME_ENABLE;
+HSVL1_FRAME_ENABLE: if (HSVL1 = true) generate
+    fRgb.hsll1range <= rgbImageKernel.hsll1range;
+end generate HSVL1_FRAME_ENABLE;
+HSVL2_FRAME_ENABLE: if (HSVL2 = true) generate
+    fRgb.hsll2range <= rgbImageKernel.hsll2range;
+end generate HSVL2_FRAME_ENABLE;
+HSVL3_FRAME_ENABLE: if (HSVL3 = true) generate
+    fRgb.hsll3range <= rgbImageKernel.hsll3range;
+end generate HSVL3_FRAME_ENABLE;
+HSVL4_FRAME_ENABLE: if (HSVL4 = true) generate
+    fRgb.hsll4range <= rgbImageKernel.hsll4range;
+end generate HSVL4_FRAME_ENABLE;
 LUM_FRAME_ENABLE: if (F_LUM = true) generate
     fRgb.colorLmp <= rgbImageKernel.colorLmp;
 end generate LUM_FRAME_ENABLE;
@@ -1196,14 +1241,6 @@ CGAIN_FRAME_DISABLED: if (F_CGA = false) generate
 end generate CGAIN_FRAME_DISABLED;
 HSL_FRAME_DISABLED: if (F_HSL = false) generate
     fRgb.hsl        <= init_channel;
-    fRgb.hsl1_range <= init_channel;
-    fRgb.hsl2_range <= init_channel;
-    fRgb.hsl3_range <= init_channel;
-    fRgb.hsl4_range <= init_channel;
-    fRgb.hsll1range <= init_channel;
-    fRgb.hsll2range <= init_channel;
-    fRgb.hsll3range <= init_channel;
-    fRgb.hsll4range <= init_channel;
 end generate HSL_FRAME_DISABLED;
 HSV_FRAME_DISABLED: if (F_HSV = false) generate
     fRgb.hsv     <= init_channel;
