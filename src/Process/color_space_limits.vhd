@@ -17,6 +17,7 @@ use work.fixed_pkg.all;
 use work.float_pkg.all;
 
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
@@ -121,8 +122,8 @@ process (clk) begin
     end if;
 end process;
 
-R_MinMFValue <= max(R_MinValueRow,rMrm) when rgbFedgeSync = hi;
-R_MinFValue  <= min(R_MinValueRow,rMr) when rgbFedgeSync = hi;
+R_MinMFValue <= max_select(R_MinValueRow,rMrm) when rgbFedgeSync = hi;
+R_MinFValue  <= min_select(R_MinValueRow,rMr) when rgbFedgeSync = hi;
 
 process (clk) begin
     if rising_edge(clk) then

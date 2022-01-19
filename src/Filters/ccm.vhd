@@ -30,6 +30,10 @@ architecture Behavioral of ccm is
   signal ccRgb                : ccRgbRecord;
   signal threshold            : sfixed(9 downto 0) := "0100000000";
   signal rgbSyncValid         : std_logic_vector(7 downto 0) := x"00";
+  signal ccm1                 : channel;
+  signal ccm2                 : channel;
+  signal ccm3                 : channel;
+  signal ccm4                 : channel;
 begin
 rgbToSf_P: process (clk,rst_l)begin
     if rst_l = '0' then
@@ -52,13 +56,12 @@ syncValid_P: process (clk,rst_l)begin
       rgbSyncValid(5) <= rgbSyncValid(4);
       rgbSyncValid(6) <= rgbSyncValid(5);
       rgbSyncValid(7) <= rgbSyncValid(6);
-      oRgb.valid      <= rgbSyncValid(7);
     end if;
 end process syncValid_P;
 ccSfConfig_P: process (clk,rst_l)begin
     if rst_l = '0' then
         cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50
-        cc.ccSf.k2           <= to_sfixed(-0.250,4,-3); -- -0.25
+        cc.ccSf.k2           <= to_sfixed(-0.125,4,-3); -- -0.25
         cc.ccSf.k3           <= to_sfixed(-0.125,4,-3); -- -0.125
         cc.ccSf.k4           <= to_sfixed(-0.125,4,-3); -- -0.125
         cc.ccSf.k5           <= to_sfixed(1.500,4,-3);  --  1.50
@@ -69,7 +72,7 @@ ccSfConfig_P: process (clk,rst_l)begin
     elsif rising_edge(clk) then
     if(i_k_config_number = 0) then
         cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50
-        cc.ccSf.k2           <= to_sfixed(-0.250,4,-3); -- -0.25
+        cc.ccSf.k2           <= to_sfixed(-0.125,4,-3); -- -0.25
         cc.ccSf.k3           <= to_sfixed(-0.125,4,-3); -- -0.125
         cc.ccSf.k4           <= to_sfixed(-0.125,4,-3); -- -0.125
         cc.ccSf.k5           <= to_sfixed(1.500,4,-3);  --  1.50
@@ -81,9 +84,9 @@ ccSfConfig_P: process (clk,rst_l)begin
         cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50
         cc.ccSf.k2           <= to_sfixed(-0.250,4,-3); -- -0.25
         cc.ccSf.k3           <= to_sfixed(-0.250,4,-3); -- -0.125
-        cc.ccSf.k4           <= to_sfixed(-0.250,4,-3); -- -0.125
+        cc.ccSf.k4           <= to_sfixed(-0.125,4,-3); -- -0.125
         cc.ccSf.k5           <= to_sfixed(1.500,4,-3);  --  1.50
-        cc.ccSf.k6           <= to_sfixed(-0.250,4,-3); -- -0.25
+        cc.ccSf.k6           <= to_sfixed(-0.125,4,-3); -- -0.25
         cc.ccSf.k7           <= to_sfixed(-0.250,4,-3); -- -0.125
         cc.ccSf.k8           <= to_sfixed(-0.250,4,-3); -- -0.25
         cc.ccSf.k9           <= to_sfixed(1.500,4,-3);  --  1.50
@@ -96,7 +99,7 @@ ccSfConfig_P: process (clk,rst_l)begin
         cc.ccSf.k6           <= to_sfixed(-0.125,4,-3); -- -0.25
         cc.ccSf.k7           <= to_sfixed(-0.125,4,-3); -- -0.125
         cc.ccSf.k8           <= to_sfixed(-0.125,4,-3); -- -0.25
-        cc.ccSf.k9           <= to_sfixed(1.500,4,-3);  --  1.50
+        cc.ccSf.k9           <= to_sfixed(1.725,4,-3);  --  1.50
     elsif(i_k_config_number = 3)then
         cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50
         cc.ccSf.k2           <= to_sfixed(-0.500,4,-3); -- -0.25
@@ -107,6 +110,16 @@ ccSfConfig_P: process (clk,rst_l)begin
         cc.ccSf.k7           <= to_sfixed(-0.500,4,-3); -- -0.125
         cc.ccSf.k8           <= to_sfixed(-0.125,4,-3); -- -0.25
         cc.ccSf.k9           <= to_sfixed(1.500,4,-3);  --  1.50
+    elsif(i_k_config_number = 4)then
+        cc.ccSf.k1           <= to_sfixed(1.125,4,-3);  --  1.50
+        cc.ccSf.k2           <= to_sfixed(-0.125,4,-3); -- -0.25
+        cc.ccSf.k3           <= to_sfixed(-0.250,4,-3); -- -0.125
+        cc.ccSf.k4           <= to_sfixed(-0.250,4,-3); -- -0.125
+        cc.ccSf.k5           <= to_sfixed(1.125,4,-3);  --  1.50
+        cc.ccSf.k6           <= to_sfixed(-0.125,4,-3); -- -0.25
+        cc.ccSf.k7           <= to_sfixed(-0.125,4,-3); -- -0.125
+        cc.ccSf.k8           <= to_sfixed(-0.250,4,-3); -- -0.25
+        cc.ccSf.k9           <= to_sfixed(1.125,4,-3);  --  1.50
     end if;
     end if;
 end process ccSfConfig_P;
@@ -180,31 +193,45 @@ end process ccRgbSum_P;
 rgbSnSumTr_P : process (clk, rst_l)
   begin
     if rst_l = '0' then
-      oRgb.red    <= (others => '0');
-      oRgb.green  <= (others => '0');
-      oRgb.blue   <= (others => '0');
+      ccm1.red    <= (others => '0');
+      ccm1.green  <= (others => '0');
+      ccm1.blue   <= (others => '0');
     elsif clk'event and clk = '1' then
       if ccRgb.rgbSnSumTr.red(ROUND_RESULT_WIDTH-1) = '1' then
-        oRgb.red <= (others => '0');
+        ccm1.red <= (others => '0');
       elsif unsigned(ccRgb.rgbSnSumTr.red(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= 0 then
-        oRgb.red <= (others => '1');
+        ccm1.red <= (others => '1');
       else
-        oRgb.red <= std_logic_vector(ccRgb.rgbSnSumTr.red(i_data_width-1 downto 0));
+        ccm1.red <= std_logic_vector(ccRgb.rgbSnSumTr.red(i_data_width-1 downto 0));
       end if;
       if ccRgb.rgbSnSumTr.green(ROUND_RESULT_WIDTH-1) = '1' then
-        oRgb.green <= (others => '0');
+        ccm1.green <= (others => '0');
       elsif unsigned(ccRgb.rgbSnSumTr.green(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= 0 then
-        oRgb.green <= (others => '1');
+        ccm1.green <= (others => '1');
       else
-        oRgb.green <= std_logic_vector(ccRgb.rgbSnSumTr.green(i_data_width-1 downto 0));
+        ccm1.green <= std_logic_vector(ccRgb.rgbSnSumTr.green(i_data_width-1 downto 0));
       end if;
       if ccRgb.rgbSnSumTr.blue(ROUND_RESULT_WIDTH-1) = '1' then
-        oRgb.blue <= (others => '0');
+        ccm1.blue <= (others => '0');
       elsif unsigned(ccRgb.rgbSnSumTr.blue(ROUND_RESULT_WIDTH-2 downto i_data_width)) /= 0 then
-        oRgb.blue <= (others => '1');
+        ccm1.blue <= (others => '1');
       else
-        oRgb.blue <= std_logic_vector(ccRgb.rgbSnSumTr.blue(i_data_width-1 downto 0));
+        ccm1.blue <= std_logic_vector(ccRgb.rgbSnSumTr.blue(i_data_width-1 downto 0));
       end if;
     end if;
 end process rgbSnSumTr_P;
+
+process (clk,rst_l)begin
+    if rising_edge(clk) then
+        ccm2       <= ccm1;
+        ccm3       <= ccm2;
+        ccm4       <= ccm3;
+        oRgb.red   <= ccm4.red;
+        oRgb.green <= ccm4.green;
+        oRgb.blue  <= ccm4.blue;
+        oRgb.valid <= rgbSyncValid(7);
+    end if;
+end process;
+
+
 end Behavioral;

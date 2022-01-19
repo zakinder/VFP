@@ -8,13 +8,28 @@ use work.vpf_records.all;
 package ports_package is
 component filters is
 generic (
+    HSV_L                 : boolean := false;
+    HSV_1                 : boolean := false;
+    HSV_2                 : boolean := false;
+    HSV_3                 : boolean := false;
+    HSV_4                 : boolean := false;
+    HSVL1                 : boolean := false;
+    HSVL2                 : boolean := false;
+    HSVL3                 : boolean := false;
+    HSVL4                 : boolean := false;
+    F_RE1                 : boolean := false;
+    F_RE2                 : boolean := false;
+    F_RE3                 : boolean := false;
+    F_RE4                 : boolean := false;
+    F_RE5                 : boolean := false;
+    F_RE6                 : boolean := false;
+    F_RE7                 : boolean := false;
+    F_RE8                 : boolean := false;
     F_TES                 : boolean := false;
     F_LUM                 : boolean := false;
     F_TRM                 : boolean := false;
     F_RGB                 : boolean := false;
     F_OHS                 : boolean := false;
-    F_RE1                 : boolean := false;
-    F_RE2                 : boolean := false;
     F_SHP                 : boolean := false;
     F_BLU                 : boolean := false;
     F_EMB                 : boolean := false;
@@ -31,7 +46,6 @@ generic (
     L_SHP                 : boolean := false;
     L_D1T                 : boolean := false;
     L_B1T                 : boolean := false;
-    L_HSL                 : boolean := true;
     L_HIS                 : boolean := true;
     L_SPC                 : boolean := true;
     M_SOB_LUM             : boolean := false;
@@ -113,12 +127,26 @@ port (
 end component rgbAssertion;
 component kernel is
 generic (
+    HSV_1_FRAME        : boolean := false;
+    HSV_2_FRAME        : boolean := false;
+    HSV_3_FRAME        : boolean := false;
+    HSV_4_FRAME        : boolean := false;
+    HSVL1_FRAME        : boolean := false;
+    HSVL2_FRAME        : boolean := false;
+    HSVL3_FRAME        : boolean := false;
+    HSVL4_FRAME        : boolean := false;
+    F_RE1_FRAME        : boolean := false;
+    F_RE2_FRAME        : boolean := false;
+    F_RE3_FRAME        : boolean := false;
+    F_RE4_FRAME        : boolean := false;
+    F_RE5_FRAME        : boolean := false;
+    F_RE6_FRAME        : boolean := false;
+    F_RE7_FRAME        : boolean := false;
+    F_RE8_FRAME        : boolean := false;
     inRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
     RGBTR_FRAME        : boolean := false;
     COHSL_FRAME        : boolean := false;
-    RE1CO_FRAME        : boolean := false;
-    RE2CO_FRAME        : boolean := false;
     SHARP_FRAME        : boolean := false;
     BLURE_FRAME        : boolean := false;
     EMBOS_FRAME        : boolean := false;
@@ -466,15 +494,16 @@ port (
 end component vfp_m_axis;
 component camera_raw_data is
 generic (
-    img_width                   : integer:= 0);
+    dataWidth         : integer := 12;
+    img_width         : integer := 8);
 port (
-    m_axis_aclk                 : in std_logic;
-    m_axis_aresetn              : in std_logic;
-    pixclk                      : in std_logic;
-    ifval                       : in std_logic;
-    ilval                       : in std_logic;
-    idata                       : in std_logic_vector(11 downto 0);
-    oRawData                    : out rData);
+    m_axis_aclk       : in std_logic;
+    m_axis_aresetn    : in std_logic;
+    pixclk            : in std_logic;
+    ifval             : in std_logic;
+    ilval             : in std_logic;
+    idata             : in std_logic_vector(dataWidth-1 downto 0);
+    oRawData          : out r2xData);
 end component camera_raw_data;
 component camera_raw_to_rgb is
 generic (
@@ -642,7 +671,7 @@ end component data_taps;
 component read_kernel2_coefs is
 generic (
     s_data_width  : integer := 16;
-    input_file    : string  := (others => NUL));
+    input_file    : string  := "Null");
 port (
     clk             : in std_logic;
     reset           : in std_logic;
@@ -1236,4 +1265,42 @@ port (
     oKcoeff        : out kernelCoeff;
     oCoeffProd     : out kCoefFiltFloat);
 end component coef_mult;
+component imageRead is
+generic (
+    i_data_width                : integer := 8;
+    img_frames_cnt_bmp          : integer := 2;
+    img_width_bmp               : integer := 400;
+    img_height_bmp              : integer := 300;
+    input_file                  : string  := "input_image");
+port (                
+    clk                : in  std_logic;
+    reset              : in  std_logic;
+    readyToRead        : in  std_logic;
+    fvalid             : out std_logic;
+    lvalid             : out std_logic;
+    oRgb               : out channel;
+    oFileCont          : out cord;
+    oCord              : out coord;
+    endOfFrame         : out std_logic);
+end component imageRead;
+component imageWrite is
+generic (
+    enImageText                 : boolean := false;
+    enImageIndex                : boolean := false;
+    i_data_width                : integer := 8;
+    img_width_bmp               : integer := 400;
+    img_height_bmp              : integer := 300;
+    input_file                  : string  := "input_image";
+    output_file                 : string  := "output_image");
+port (                
+    clk                         : in  std_logic;
+    iFile                       : in  channel;
+    iFileCont                   : in  cord;
+    pixclk                      : in  std_logic;
+    enableWrite                 : in  std_logic;
+    doneWrite                   : out std_logic;
+    oFrameEnable                : out std_logic;
+    oCord                       : out coord;
+    iRgb                        : in  channel);
+end component imageWrite;
 end package;

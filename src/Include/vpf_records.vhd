@@ -479,6 +479,8 @@ type rgb_sumprod is record
   sumprod_An        : t14b4ksn;
   sumprod_Bn        : t14b4ksn;
   sumprod_Cn        : t14b4ksn;
+  
+  
   add_12            : sfixed(17 downto -2);
   add_s12           : sfixed(17 downto -2);
   add_16            : sfixed(17 downto -2);
@@ -613,7 +615,7 @@ type rgb_sum_prod is record
   sumprod_An        : k16natrual;
   sumprod_Bn        : k16natrual;
   sumprod_Cn        : k16natrual;
-  result            : std_logic_vector(12 downto 0);
+  result            : std_logic_vector(13 downto 0);
 end record;
 type rgb_add_range is record
   add_256            : natural;
@@ -627,6 +629,9 @@ type rgb_add_range is record
   add_s1316          : natural;
   add_141316         : natural;
   add_s141316        : natural;
+  add_12345678       : natural;
+  add_9ABCDEFF       : natural;
+  add_123456789ABCDEFF : natural;
   add_12             : natural;
   add_34             : natural;
   add_56             : natural;
@@ -995,9 +1000,9 @@ type m9xChannel is record
     blue             : unsigned(15 downto 0);
 end record;
 type intChannel is record
-    red              : integer;
-    green            : integer;
-    blue             : integer;
+    red              : natural;
+    green            : natural;
+    blue             : natural;
     valid            : std_logic;
 end record;
 type blurchannel is record
@@ -1415,5 +1420,13 @@ type kCoefFiltFloat is record
     kCoeffEmbos    : kernelCoeDWord;
     kCoefXSobel    : kernelCoeDWord;
     kCoefYSobel    : kernelCoeDWord;
+end record;
+type r2xData is record
+    pEof             : std_logic;
+    pSof             : std_logic;
+    valid            : std_logic;
+    data             : std_logic_vector(11 downto 0);
+    dita             : std_logic_vector(24 downto 0);
+    cord             : coord;
 end record;
 end package;

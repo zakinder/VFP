@@ -14,6 +14,7 @@ use ieee.numeric_std.all;
 use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 entity hsvl_2range is
@@ -35,6 +36,7 @@ architecture behavioral of hsvl_2range is
     signal rgbDelta      : natural;
     --H
     signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
+    signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
     signal uFiXhueTop    : integer := zero;
@@ -142,23 +144,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 20;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 81;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 20;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 81;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 60;
+            hueDeg <= 40;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 20;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 81;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 20;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 81;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 120;
+            hueDeg <= 80;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 20;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 121;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 20;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 121;
         end if;
     end if;
   end if;
@@ -179,7 +181,8 @@ end process hueBottomP;
 uuFiXhueTop   <= to_ufixed(uFiXhueTop,uuFiXhueTop);
 uuFiXhueBot   <= to_ufixed(uFiXhueBot,uuFiXhueBot);
 uuFiXhueQuot  <= (uuFiXhueTop / uuFiXhueBot);
-uFiXhueQuot   <= to_integer(unsigned(uuFiXhueQuot));
+hue_quot      <= resize(uuFiXhueQuot,hue_quot);
+uFiXhueQuot   <= to_integer(unsigned(hue_quot));
 hueDegreeP: process (clk) begin
     if rising_edge(clk) then
         hueDeg1x       <= hueDeg;
@@ -187,7 +190,7 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        hueQuot1x <= (uFiXhueQuot mod 45900) /255;
+                hueQuot1x <= uFiXhueQuot;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin
@@ -201,7 +204,7 @@ end process hueValueP;
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgbMax /= 0)then
-            s1value <= to_unsigned((255*rgbDelta)/rgbMax,8);
+            s1value <= to_unsigned((rgbDelta),8);
         else
             s1value <= to_unsigned(0, 8);
         end if;

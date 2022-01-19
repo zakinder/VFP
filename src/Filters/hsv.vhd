@@ -14,6 +14,7 @@ use ieee.numeric_std.all;
 use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 entity hsv_c is
@@ -35,6 +36,7 @@ architecture behavioral of hsv_c is
     signal rgb2Max       : natural;
     signal rgbMin        : natural;
     signal maxValue      : natural;
+    signal minValue      : natural;
     signal rgbDelta      : natural;
     --H
     signal hue_quot      : ufixed(17 downto 0) :=(others => '0');
@@ -119,6 +121,7 @@ end process rgbMinP;
 pipRgbMaxUfD1P: process (clk) begin
     if rising_edge(clk) then
         maxValue          <= rgbMax;
+        minValue          <= rgbMin;
     end if;
 end process pipRgbMaxUfD1P;
 -- RGB.∆ = RGB.max − RGB.min
@@ -145,23 +148,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 140;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 121;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 100;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 121;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
             hueDeg <= 60;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 255;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 61;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 255;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 61;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
             hueDeg <= 120;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 255;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 61;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 255;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 61;
         end if;
     end if;
   end if;
@@ -205,7 +208,7 @@ end process hueValueP;
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgbMax /= 0)then
-            s1value <= to_unsigned((255*rgbDelta)/rgbMax,8);
+            s1value <= to_unsigned((rgbDelta),8);
         else
             s1value <= to_unsigned(0, 8);
         end if;

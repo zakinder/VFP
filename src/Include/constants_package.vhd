@@ -143,19 +143,19 @@ package constants_package is
     constant STREAM_TESTPATTERN7                : integer :=7;
     constant STREAM_TESTPATTERN8                : integer :=8;
     -------------------------------------------------------------------------
-    constant blurMacKernel_1                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_2                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_3                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_4                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_5                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_6                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_7                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_8                    : unsigned(i_data_width-1 downto 0) :=x"01";
-    constant blurMacKernel_9                    : unsigned(i_data_width-1 downto 0) :=x"01";
+    constant blurMacKernel_1                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_2                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_3                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_4                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_5                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_6                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_7                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_8                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blurMacKernel_9                    : unsigned(i_data_width-1 downto 0)         :=x"01";
     constant white                              : std_logic_vector(i_data_width-1 downto 0) :=x"FF";
     constant black                              : std_logic_vector(i_data_width-1 downto 0) :=x"00";
-    constant whiteUn                            : unsigned(i_data_width-1 downto 0) :=x"FF";
-    constant blackUn                            : unsigned(i_data_width-1 downto 0) :=x"00";
+    constant whiteUn                            : unsigned(i_data_width-1 downto 0)         :=x"FF";
+    constant blackUn                            : unsigned(i_data_width-1 downto 0)         :=x"00";
     -------------------------------------------------------------------------
     constant FONT_WIDTH                         : integer := 8;
     constant FONT_HEIGHT                        : integer := 16;
@@ -168,116 +168,12 @@ package constants_package is
     constant ROUND_RESULT_WIDTH                 : natural := ADD_RESULT_WIDTH - FRAC_BITS_TO_KEEP;
     constant ROUND                              : signed(ADD_RESULT_WIDTH-1 downto 0) := to_signed(0, ADD_RESULT_WIDTH-FRAC_BITS_TO_KEEP)&'1' & to_signed(0, FRAC_BITS_TO_KEEP-1);
     -------------------------------------------------------------------------
+    constant pixclk_freq                        : real    := 150.00e6;
+    constant aclk_freq                          : real    := 150.00e6;
+    constant mm2s_aclk                          : real    := 150.00e6;
+    constant maxis_aclk                         : real    := 150.00e6;
+    constant saxis_aclk                         : real    := 150.00e6;
     subtype rgb_u8bits is std_logic_vector (7 downto 0);
     subtype rgb_u24bits is std_logic_vector (23 downto 0);
-    
-    function iCrdDelta(L, R: integer)   return integer;
-    function max(L, R: integer) return integer;
-    function min(L, R: integer) return integer;
-    function maxthr(L, M : INTEGER) return INTEGER;
-    function maxthr(L, M, R: INTEGER) return INTEGER;
-    function maxthr(L, M, R, E: INTEGER) return INTEGER;
-    function SelFrame(L, R: boolean) return boolean;
-    function SelFrame(L, R, M: boolean) return boolean;
-    function Per_Frame(L, R: INTEGER) return boolean;
-    function PerFrame(L,R, M: boolean) return boolean;
     -------------------------------------------------------------------------
 end package;
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-use work.fixed_pkg.all;
-use work.float_pkg.all;
-package body constants_package is
-
-
-    function maxthr(L, M: INTEGER) return INTEGER is
-    begin
-       if L > M then
-           return L;
-       else
-           return M;
-       end if;
-    end;
-
-    function maxthr(L, M, R: INTEGER) return INTEGER is
-    begin
-       if L > R and L > M then
-           return L;
-       elsif M > L and M > R then
-           return M;
-       else
-           return R;
-       end if;
-    end;
-    
-    function maxthr(L, M, R, E : INTEGER) return INTEGER is
-    begin
-       if L > R and L > M and L > E then
-           return L;
-       elsif M > L and M > R and M > E then
-           return M;
-       elsif R > L and R > M and R > E then
-           return R;
-       else
-           return E;
-       end if;
-    end;
-    
-    function Per_Frame(L, R: INTEGER) return boolean is
-    begin
-        if (L = R) then
-            return TRUE;
-        else
-            return FALSE;
-        end if;
-    end;
-    
-    function PerFrame(L, R, M: boolean) return boolean is
-        begin
-        if (L = TRUE) and (R = TRUE) and (M = TRUE) then
-            return TRUE;
-        else
-            return FALSE;
-        end if;
-    end;
-    
-    function SelFrame(L, R: boolean) return boolean is
-    begin
-        if (L = TRUE) and (R = TRUE) then
-            return TRUE;
-        else
-            return FALSE;
-        end if;
-    end;
-
-    function SelFrame(L, R, M: boolean) return boolean is
-        begin
-        if (L = TRUE) and (R = TRUE) and (M = TRUE) then
-            return TRUE;
-        else
-            return FALSE;
-        end if;
-    end;
-
-    function max(L, R: integer) return integer is
-        begin
-        if L > R then
-            return L;
-        else
-            return R;
-        end if;
-    end;
-    function min(L, R: integer) return integer is
-        begin
-        if L < R then
-            return L;
-        else
-            return R;
-        end if;
-    end;
-    function iCrdDelta(L, R: integer) return integer is
-        begin
-            return (L-R);
-    end;
-end package body;

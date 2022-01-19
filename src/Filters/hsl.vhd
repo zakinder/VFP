@@ -14,6 +14,7 @@ use ieee.numeric_std.all;
 use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 entity hsl_c is
@@ -131,9 +132,9 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 60;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * maxValue;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 140;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * maxValue;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
             hueDeg <= 120;
@@ -191,7 +192,7 @@ end process hueValueP;
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgbMax /= 0)then
-            s1value <= to_unsigned((255*rgbDelta)/rgbMax,8);
+            s1value <= to_unsigned((rgbDelta),8);
         else
             s1value <= to_unsigned(0, 8);
         end if;

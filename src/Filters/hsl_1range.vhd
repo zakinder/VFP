@@ -15,6 +15,7 @@ use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
 use work.vpf_records.all;
+use work.vfp_pkg.all;
 use work.ports_package.all;
 entity hsl_1range is
 generic (
@@ -30,6 +31,7 @@ architecture behavioral of hsl_1range is
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
     signal rgbMax        : natural;
+    signal rgbMaxMinAvg  : natural;
     signal rgbMin        : natural;
     signal maxValue      : natural;
     signal rgbDelta      : natural;
@@ -65,8 +67,6 @@ architecture behavioral of hsl_1range is
     signal valid7_rgb    : std_logic := '0';
     signal valid8_rgb    : std_logic := '0';
     signal ycbcr         : channel;
-    
-    
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
@@ -134,23 +134,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 140;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 81;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 140;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 81;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 60;
+            hueDeg <= 40;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 140;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 41;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 140;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 41;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 120;
+            hueDeg <= 80;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 140;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 41;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 140;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 41;
         end if;
     end if;
   end if;
@@ -181,7 +181,7 @@ end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
         if (uFs3Rgb.red  = maxValue) then
-            hueQuot1x <= uFiXhueQuot;
+            hueQuot1x <= (uFiXhueQuot) mod 360;
         else
             hueQuot1x <= uFiXhueQuot;
         end if;
@@ -199,7 +199,7 @@ end process hueValueP;
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgbMax /= 0)then
-            s1value <= to_unsigned((255*rgbDelta)/rgbMax,8);
+            s1value <= to_unsigned((maxValue+rgbDelta),8);
         else
             s1value <= to_unsigned(0, 8);
         end if;
@@ -208,9 +208,10 @@ end process satValueP;
 -------------------------------------------------
 -- VALUE
 -------------------------------------------------
+rgbMaxMinAvg <= (rgbMax+rgbMin)/2;
 valValueP: process (clk) begin
     if rising_edge(clk) then
-        v1value <= to_unsigned(rgbMax, 8);
+        v1value <= to_unsigned(rgbMaxMinAvg, 8);
     end if;
 end process valValueP;
 pipValidP: process (clk) begin
@@ -229,7 +230,6 @@ end process pipValidP;
         sHsl.green <= std_logic_vector(s1value);
         sHsl.blue  <= std_logic_vector(v1value);
         sHsl.valid <= valid3_rgb;
-        
 l_ycc_inst  : rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
@@ -243,7 +243,6 @@ port map(
     cb                   => ycbcr.green,
     cr                   => ycbcr.blue,
     oValid               => ycbcr.valid);
-        
 rgb_ool1_inst: sync_frames
 generic map(
     pixelDelay => 2)

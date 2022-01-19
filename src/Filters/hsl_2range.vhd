@@ -15,6 +15,7 @@ use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
 use work.vpf_records.all;
+use work.vfp_pkg.all;
 use work.ports_package.all;
 entity hsl_2range is
 generic (
@@ -131,23 +132,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 200;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 81;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 200;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 81;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 60;
+            hueDeg <= 40;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 20;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 41;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 20;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 41;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 120;
+            hueDeg <= 80;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 20;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 41;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 20;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 41;
         end if;
     end if;
   end if;
@@ -196,7 +197,7 @@ end process hueValueP;
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgbMax /= 0)then
-            s1value <= to_unsigned((255*rgbDelta)/rgbMax,8);
+            s1value <= to_unsigned((rgbDelta),8);
         else
             s1value <= to_unsigned(0, 8);
         end if;

@@ -17,6 +17,7 @@ use work.fixed_pkg.all;
 use work.float_pkg.all;
 
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 
@@ -128,22 +129,22 @@ end process;
 process (clk) begin
     if rising_edge(clk) then
 	
-        rgbRed12Max <= max(int1Rgb.red,int2Rgb.red);
-        rgbGre12Max <= max(int1Rgb.green,int2Rgb.green);
-        rgbBlu12Max <= max(int1Rgb.blue,int2Rgb.blue);
+        rgbRed12Max <= max_select(int1Rgb.red,int2Rgb.red);
+        rgbGre12Max <= max_select(int1Rgb.green,int2Rgb.green);
+        rgbBlu12Max <= max_select(int1Rgb.blue,int2Rgb.blue);
 		
-        rgbRed12Min <= min(int1Rgb.red,int2Rgb.red);
-        rgbGre12Min <= min(int1Rgb.green,int2Rgb.green);
-        rgbBlu12Min <= min(int1Rgb.blue,int2Rgb.blue);
+        rgbRed12Min <= min_select(int1Rgb.red,int2Rgb.red);
+        rgbGre12Min <= min_select(int1Rgb.green,int2Rgb.green);
+        rgbBlu12Min <= min_select(int1Rgb.blue,int2Rgb.blue);
 		
 		
-        rgbRed13Max <= max(int1Rgb.red,int3Rgb.red);
-        rgbGre13Max <= max(int1Rgb.green,int3Rgb.green);
-        rgbBlu13Max <= max(int1Rgb.blue,int3Rgb.blue);
+        rgbRed13Max <= max_select(int1Rgb.red,int3Rgb.red);
+        rgbGre13Max <= max_select(int1Rgb.green,int3Rgb.green);
+        rgbBlu13Max <= max_select(int1Rgb.blue,int3Rgb.blue);
 		
-        rgbRed13Min <= min(int1Rgb.red,int3Rgb.red);
-        rgbGre13Min <= min(int1Rgb.green,int3Rgb.green);
-        rgbBlu13Min <= min(int1Rgb.blue,int3Rgb.blue);
+        rgbRed13Min <= min_select(int1Rgb.red,int3Rgb.red);
+        rgbGre13Min <= min_select(int1Rgb.green,int3Rgb.green);
+        rgbBlu13Min <= min_select(int1Rgb.blue,int3Rgb.blue);
 		
     end if;
 end process;

@@ -14,6 +14,7 @@ use ieee.numeric_std.all;
 use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 entity hsvl is
@@ -29,12 +30,13 @@ architecture behavioral of hsvl is
     signal uFs1Rgb       : intChannel;
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
-    signal rgbMax        : natural;
-    signal rgbMin        : natural;
-    signal maxValue      : natural;
-    signal rgbDelta      : natural;
+    signal rgbMax        : integer;
+    signal rgbMin        : integer;
+    signal maxValue      : integer;
+    signal rgbDelta      : integer;
     --H
     signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
+    signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
     signal uFiXhueTop    : integer := zero;
@@ -128,23 +130,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 120;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * maxValue;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 120;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * maxValue;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 120;
+            hueDeg <= 60;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 30;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * maxValue;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 30;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * maxValue;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 240;
+            hueDeg <= 120;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 30;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * maxValue;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 30;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * maxValue;
         end if;
     end if;
   end if;
@@ -165,7 +167,8 @@ end process hueBottomP;
 uuFiXhueTop   <= to_ufixed(uFiXhueTop,uuFiXhueTop);
 uuFiXhueBot   <= to_ufixed(uFiXhueBot,uuFiXhueBot);
 uuFiXhueQuot  <= (uuFiXhueTop / uuFiXhueBot);
-uFiXhueQuot   <= to_integer(unsigned(uuFiXhueQuot));
+hue_quot      <= resize(uuFiXhueQuot,hue_quot);
+uFiXhueQuot   <= to_integer(unsigned(hue_quot));
 hueDegreeP: process (clk) begin
     if rising_edge(clk) then
         hueDeg1x       <= hueDeg;
@@ -173,7 +176,7 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        hueQuot1x <= (uFiXhueQuot mod 45900) /255;
+        hueQuot1x <= uFiXhueQuot;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin

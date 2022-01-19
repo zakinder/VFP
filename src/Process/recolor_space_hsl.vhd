@@ -188,7 +188,7 @@ begin
 
 
 --================================================================================================
-hsvInst: hsl_c
+hsvInst: hsvl_1range
 generic map(
     i_data_width       => i_data_width)
 port map(

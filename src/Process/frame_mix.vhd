@@ -102,7 +102,7 @@ begin
 --synYcbcr          : channel;
 --synLcobj          : channel;
 --synRgbag          : channel;
-oRgb <= d1Rgb;
+--oRgb <= d1Rgb;
 
 -- frame_mix_h_cb_cr    [hu_cb_cr ]
 -- frame_mix_s_cb_cr    [sa_cb_cr ]
@@ -113,214 +113,214 @@ oRgb <= d1Rgb;
 -- frame_mix_ccr_h_cr   [ccr_hu_cr]
 -- frame_mix_ccr_h_s    [ccr_hu_sa]
 
-
-process (clk) begin  --frame_mix_h_cb_cr
-    if rising_edge(clk) then
-        d1Rgb.red    <= iRgb.colorhsl.red;
-        d1Rgb.green  <= iRgb.ycbcr.red;
-        d1Rgb.blue   <= iRgb.colorhsl.blue;
-        d1Rgb.valid  <= iRgb.ycbcr.valid;
-    end if;
-end process;
-process (clk) begin  --frame_mix_s_cb_cr
-    if rising_edge(clk) then 
-        d2Rgb.red    <= iRgb.colorhsl.green;
-        d2Rgb.green  <= iRgb.ycbcr.green;
-        d2Rgb.blue   <= iRgb.colorhsl.blue;
-        d2Rgb.valid  <= iRgb.ycbcr.valid;
-    end if;
-end process;
-process (clk) begin  --frame_mix_l_cb_cr
-    if rising_edge(clk) then 
-        d3Rgb.red    <= iRgb.colorhsl.blue;
-        d3Rgb.green  <= iRgb.ycbcr.blue;
-        d3Rgb.blue   <= iRgb.colorhsl.blue;
-        d3Rgb.valid  <= iRgb.ycbcr.valid;
-    end if;
-end process;
-process (clk) begin  --frame_mix_h_cb_l
-    if rising_edge(clk) then 
-        d4Rgb.red    <= iRgb.colorhsl.red;
-        d4Rgb.green  <= iRgb.hsl.red;
-        d4Rgb.blue   <= iRgb.colorhsl.blue;
-        d4Rgb.valid  <= iRgb.ycbcr.valid;
-    end if;
-end process;
-process (clk) begin  --frame_mix_h_s_cr
-    if rising_edge(clk) then 
-        d5Rgb.red    <= iRgb.colorhsl.red;
-        d5Rgb.green  <= iRgb.hsl.green;
-        d5Rgb.blue   <= iRgb.colorhsl.blue;
-        d5Rgb.valid  <= iRgb.ycbcr.valid;
-    end if;
-end process;
-process (clk) begin  --frame_mix_ccr_h_cb
-    if rising_edge(clk) then 
-        d6Rgb.red    <= iRgb.colorhsl.red;
-        d6Rgb.green  <= iRgb.hsl.blue;
-        d6Rgb.blue   <= iRgb.colorhsl.blue;
-        d6Rgb.valid  <= iRgb.ycbcr.valid;
-    end if;
-end process;
-process (clk) begin  --frame_mix_ccr_h_cr
-    if rising_edge(clk) then
-        d7Rgb.red    <= iRgb.colorhsl.red;
-        d7Rgb.green  <= iRgb.inrgb.red;
-        d7Rgb.blue   <= iRgb.colorhsl.green;
-        d7Rgb.valid  <= iRgb.ycbcr.valid
-    end if;
-end process;
-process (clk) begin  --frame_mix_ccr_h_s
-    if rising_edge(clk) then
-        d8Rgb.red    <= iRgb.colorhsl.red;
-        d8Rgb.green  <= iRgb.inrgb.green;
-        d8Rgb.blue   <= iRgb.colorhsl.blue;
-        d8Rgb.valid  <= iRgb.ycbcr.valid
-    end if;
-end process;
-process (clk) begin  --frame_mix_ccr_h_s
-    if rising_edge(clk) then
-        d11Rgb.red    <= iRgb.colorhsl.red;
-        d11Rgb.green  <= iRgb.inrgb.blue;
-        d11Rgb.blue   <= iRgb.colorhsl.blue;
-        d11Rgb.valid  <= iRgb.cgain.valid
-    end if;
-end process;
-process (clk) begin  --frame_mix_ccr_h_s
-    if rising_edge(clk) then
-        d12Rgb.red    <= iRgb.inrgb.red;
-        d12Rgb.green  <= iRgb.inrgb.green;
-        d12Rgb.blue   <= iRgb.colorhsl.blue;
-        d12Rgb.valid  <= iRgb.cgain.valid
-    end if;
-end process;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-frame_mix_ccr_chslr_chslb_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "chslr_chslb1")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d11Rgb);
-frame_mix_ccr_chslr_chslb2_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "chslr_chslb2")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d12Rgb);
-frame_mix_h_cb_cr_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_h_cb_cr")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d1Rgb);
-frame_mix_s_cb_cr_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_s_cb_cr")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d2Rgb);
-frame_mix_l_cb_cr_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_l_cb_cr")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d3Rgb);
-frame_mix_h_cb_l_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_h_cb_l")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d4Rgb);
-frame_mix_h_s_cr_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_h_s_cr")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d5Rgb);
-frame_mix_ccr_h_cb_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_ccr_h_cb")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d6Rgb);
-frame_mix_ccr_h_cr_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_ccr_h_cr")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d7Rgb);
-frame_mix_ccr_h_s_inst: write_image
-generic map (
-    enImageText           => true,
-    enImageIndex          => true,
-    i_data_width          => i_data_width,
-    test                  => testFolder,
-    input_file            => readbmp,
-    output_file           => "frame_mix_ccr_h_s")
-port map (                  
-    pixclk                => clk,
-    iRgb                  => d8Rgb);
-    
+--
+--process (clk) begin  --frame_mix_h_cb_cr
+--    if rising_edge(clk) then
+--        d1Rgb.red    <= iRgb.colorhsl.red;
+--        d1Rgb.green  <= iRgb.ycbcr.red;
+--        d1Rgb.blue   <= iRgb.colorhsl.blue;
+--        d1Rgb.valid  <= iRgb.ycbcr.valid;
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_s_cb_cr
+--    if rising_edge(clk) then 
+--        d2Rgb.red    <= iRgb.colorhsl.green;
+--        d2Rgb.green  <= iRgb.ycbcr.green;
+--        d2Rgb.blue   <= iRgb.colorhsl.blue;
+--        d2Rgb.valid  <= iRgb.ycbcr.valid;
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_l_cb_cr
+--    if rising_edge(clk) then 
+--        d3Rgb.red    <= iRgb.colorhsl.blue;
+--        d3Rgb.green  <= iRgb.ycbcr.blue;
+--        d3Rgb.blue   <= iRgb.colorhsl.blue;
+--        d3Rgb.valid  <= iRgb.ycbcr.valid;
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_h_cb_l
+--    if rising_edge(clk) then 
+--        d4Rgb.red    <= iRgb.colorhsl.red;
+--        d4Rgb.green  <= iRgb.hsl.red;
+--        d4Rgb.blue   <= iRgb.colorhsl.blue;
+--        d4Rgb.valid  <= iRgb.ycbcr.valid;
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_h_s_cr
+--    if rising_edge(clk) then 
+--        d5Rgb.red    <= iRgb.colorhsl.red;
+--        d5Rgb.green  <= iRgb.hsl.green;
+--        d5Rgb.blue   <= iRgb.colorhsl.blue;
+--        d5Rgb.valid  <= iRgb.ycbcr.valid;
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_ccr_h_cb
+--    if rising_edge(clk) then 
+--        d6Rgb.red    <= iRgb.colorhsl.red;
+--        d6Rgb.green  <= iRgb.hsl.blue;
+--        d6Rgb.blue   <= iRgb.colorhsl.blue;
+--        d6Rgb.valid  <= iRgb.ycbcr.valid;
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_ccr_h_cr
+--    if rising_edge(clk) then
+--        d7Rgb.red    <= iRgb.colorhsl.red;
+--        d7Rgb.green  <= iRgb.inrgb.red;
+--        d7Rgb.blue   <= iRgb.colorhsl.green;
+--        d7Rgb.valid  <= iRgb.ycbcr.valid
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_ccr_h_s
+--    if rising_edge(clk) then
+--        d8Rgb.red    <= iRgb.colorhsl.red;
+--        d8Rgb.green  <= iRgb.inrgb.green;
+--        d8Rgb.blue   <= iRgb.colorhsl.blue;
+--        d8Rgb.valid  <= iRgb.ycbcr.valid
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_ccr_h_s
+--    if rising_edge(clk) then
+--        d11Rgb.red    <= iRgb.colorhsl.red;
+--        d11Rgb.green  <= iRgb.inrgb.blue;
+--        d11Rgb.blue   <= iRgb.colorhsl.blue;
+--        d11Rgb.valid  <= iRgb.cgain.valid
+--    end if;
+--end process;
+--process (clk) begin  --frame_mix_ccr_h_s
+--    if rising_edge(clk) then
+--        d12Rgb.red    <= iRgb.inrgb.red;
+--        d12Rgb.green  <= iRgb.inrgb.green;
+--        d12Rgb.blue   <= iRgb.colorhsl.blue;
+--        d12Rgb.valid  <= iRgb.cgain.valid
+--    end if;
+--end process;
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--frame_mix_ccr_chslr_chslb_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "chslr_chslb1")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d11Rgb);
+--frame_mix_ccr_chslr_chslb2_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "chslr_chslb2")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d12Rgb);
+--frame_mix_h_cb_cr_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_h_cb_cr")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d1Rgb);
+--frame_mix_s_cb_cr_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_s_cb_cr")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d2Rgb);
+--frame_mix_l_cb_cr_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_l_cb_cr")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d3Rgb);
+--frame_mix_h_cb_l_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_h_cb_l")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d4Rgb);
+--frame_mix_h_s_cr_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_h_s_cr")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d5Rgb);
+--frame_mix_ccr_h_cb_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_ccr_h_cb")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d6Rgb);
+--frame_mix_ccr_h_cr_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_ccr_h_cr")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d7Rgb);
+--frame_mix_ccr_h_s_inst: write_image
+--generic map (
+--    enImageText           => true,
+--    enImageIndex          => true,
+--    i_data_width          => i_data_width,
+--    test                  => testFolder,
+--    input_file            => readbmp,
+--    output_file           => "frame_mix_ccr_h_s")
+--port map (                  
+--    pixclk                => clk,
+--    iRgb                  => d8Rgb);
+--    
     
 --EBLACK_ENABLED: if (eBlack = true) generate
 --    process (clk) begin
