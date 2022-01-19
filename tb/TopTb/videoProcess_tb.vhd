@@ -7,6 +7,7 @@ use std.textio.all;
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
+use work.vfp_pkg.all;
 use work.tbPackage.all;
 use work.dutPortsPackage.all;
 entity video_process_tb is
@@ -51,45 +52,61 @@ architecture behavioral of video_process_tb is
     -------------------------------------------------
     constant vChannelSelect              : integer := FILTER_K_CGA;
     -------------------------------------------------
+    constant F_HSV                       : boolean := false;
+    constant F_HSL                       : boolean := false;
+    constant HSV_L                       : boolean := false;
+    constant HSV_1                       : boolean := false;
+    constant HSV_2                       : boolean := false;
+    constant HSV_3                       : boolean := false;
+    constant HSV_4                       : boolean := false;
+    constant HSVL1                       : boolean := false;
+    constant HSVL2                       : boolean := false;
+    constant HSVL3                       : boolean := false;
+    constant HSVL4                       : boolean := false;
+    -------------------------------------------------
+    constant F_RE1                       : boolean := false;
+    constant F_RE2                       : boolean := false;
+    constant F_RE3                       : boolean := false;
+    constant F_RE4                       : boolean := false;
+    constant F_RE5                       : boolean := false;
+    constant F_RE6                       : boolean := false;
+    constant F_RE7                       : boolean := false;
+    constant F_RE8                       : boolean := false;
+    -------------------------------------------------
     constant F_TES                       : boolean := false;
     constant F_LUM                       : boolean := false;
     constant F_TRM                       : boolean := false;
-    constant F_OHS                       : boolean := false;
-    constant F_RE1                       : boolean := true;
-    constant F_RE2                       : boolean := true;
+    constant F_OHS                       : boolean := false;--colorhsl
     constant L_AVG                       : boolean := false;
     constant L_OBJ                       : boolean := false;
-    constant L_HSL                       : boolean := true;
     constant L_HIS                       : boolean := false;
     constant L_SPC                       : boolean := false;
     -------------------------------------------------
-    constant F_RGB                       : boolean := false;   -- 58
-    constant F_SHP                       : boolean := true;   -- 36
-    constant F_BLU                       : boolean := false;  -- 58
-    constant F_EMB                       : boolean := true;   -- 58
-    constant F_YCC                       : boolean := false;  -- 58
-    constant F_SOB                       : boolean := false;  -- 58
-    constant F_CGA                       : boolean := true;   -- 58
-    constant F_HSV                       : boolean := false;   -- 58
-    constant F_HSL                       : boolean := false;   -- 58
-    constant L_BLU                       : boolean := false;  -- 8 synBlur
-    constant L_SHP                       : boolean := false;  -- 9 synSharp
-    constant L_CGA                       : boolean := false;   -- 9 synCgain
-    constant L_YCC                       : boolean := false;  -- 5
-    constant L_D1T                       : boolean := false;  -- 1
-    constant L_B1T                       : boolean := false;  -- 9
+    constant F_RGB                       : boolean := false;
+    constant F_SHP                       : boolean := false;
+    constant F_BLU                       : boolean := false;
+    constant F_EMB                       : boolean := false;
+    constant F_YCC                       : boolean := false;
+    constant F_SOB                       : boolean := false;
+    constant F_CGA                       : boolean := false;
+    constant L_BLU                       : boolean := false;-- synBlur
+    constant L_SHP                       : boolean := false;-- synSharp
+    constant L_CGA                       : boolean := false;-- synCgain
+    constant L_YCC                       : boolean := false; 
+    constant L_D1T                       : boolean := false; 
+    constant L_B1T                       : boolean := false; 
     -------------------------------------------------
     constant MASK_TRUE                   : boolean := true;
     constant MASK_FLSE                   : boolean := false;
-    constant M_SOB_LUM                   : boolean := SelFrame(F_SOB,F_TRM,MASK_FLSE);
-    constant M_SOB_TRM                   : boolean := SelFrame(F_SOB,F_TRM,MASK_FLSE);
-    constant M_SOB_RGB                   : boolean := SelFrame(F_SOB,F_RGB,MASK_TRUE);
-    constant M_SOB_SHP                   : boolean := SelFrame(F_SOB,F_SHP,MASK_FLSE);
-    constant M_SOB_BLU                   : boolean := SelFrame(F_SOB,F_TRM,MASK_FLSE);
-    constant M_SOB_YCC                   : boolean := SelFrame(F_SOB,F_YCC,MASK_FLSE);
-    constant M_SOB_CGA                   : boolean := SelFrame(F_SOB,F_CGA,MASK_FLSE);
-    constant M_SOB_HSV                   : boolean := SelFrame(F_SOB,F_HSV,MASK_FLSE);
-    constant M_SOB_HSL                   : boolean := SelFrame(F_SOB,F_HSL,MASK_FLSE);
+    constant M_SOB_LUM                   : boolean := selframe(F_SOB,F_TRM,MASK_FLSE);
+    constant M_SOB_TRM                   : boolean := selframe(F_SOB,F_TRM,MASK_FLSE);
+    constant M_SOB_RGB                   : boolean := selframe(F_SOB,F_RGB,MASK_TRUE);
+    constant M_SOB_SHP                   : boolean := selframe(F_SOB,F_SHP,MASK_FLSE);
+    constant M_SOB_BLU                   : boolean := selframe(F_SOB,F_TRM,MASK_FLSE);
+    constant M_SOB_YCC                   : boolean := selframe(F_SOB,F_YCC,MASK_FLSE);
+    constant M_SOB_CGA                   : boolean := selframe(F_SOB,F_CGA,MASK_FLSE);
+    constant M_SOB_HSV                   : boolean := selframe(F_SOB,F_HSV,MASK_FLSE);
+    constant M_SOB_HSL                   : boolean := selframe(F_SOB,F_HSL,MASK_FLSE);
     -------------------------------------------------
     constant PER_FRE_TRUE                : boolean := PerFrame(Per_Frame(vChannelSelect,FILTER_K_CGA),F_CGA,F_SHP);
     constant F_CGA_TO_CGA                : boolean := PER_FRE_TRUE;--IF:FILTER_K_CGA = F_KCGA_TO_LCGA
@@ -218,13 +235,28 @@ port map (
     oCord                => sCordValues);
 FiltersInst: filters
 generic map(
+    HSV_L                 =>  HSV_L,
+    HSV_1                 =>  HSV_1,
+    HSV_2                 =>  HSV_2,
+    HSV_3                 =>  HSV_3,
+    HSV_4                 =>  HSV_4,
+    HSVL1                 =>  HSVL1,
+    HSVL2                 =>  HSVL2,
+    HSVL3                 =>  HSVL3,
+    HSVL4                 =>  HSVL4,
+    F_RE1                 =>  F_RE1,
+    F_RE2                 =>  F_RE2,
+    F_RE3                 =>  F_RE3,
+    F_RE4                 =>  F_RE4,
+    F_RE5                 =>  F_RE5,
+    F_RE6                 =>  F_RE6,
+    F_RE7                 =>  F_RE7,
+    F_RE8                 =>  F_RE8,
     F_TES                 =>  F_TES,
     F_LUM                 =>  F_LUM,
     F_TRM                 =>  F_TRM,
     F_RGB                 =>  F_RGB,
     F_OHS                 =>  F_OHS,
-    F_RE1                 =>  F_RE1,
-    F_RE2                 =>  F_RE2,
     F_SHP                 =>  F_SHP,
     F_BLU                 =>  F_BLU,
     F_EMB                 =>  F_EMB,
@@ -241,7 +273,6 @@ generic map(
     L_B1T                 =>  L_B1T,
     L_CGA                 =>  L_CGA,
     L_YCC                 =>  L_YCC,
-    L_HSL                 =>  L_HSL,
     L_HIS                 =>  L_HIS,
     L_SPC                 =>  L_SPC,
     M_SOB_LUM             =>  M_SOB_LUM,
@@ -1031,9 +1062,7 @@ port map (
     pixclk                => clk,
     iRgb                  => rgbImageFilters.sharp);
 end generate F_SHP_TEST_ENABLED;
-F_HSV_TEST_ENABLED : if (F_HSV = true) generate
-signal hvl      : channel;
-begin 
+F_HSV_TEST_ENABLED : if (F_HSV = true) generate begin 
 hsv_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1045,6 +1074,8 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsv);
+end generate F_HSV_TEST_ENABLED;
+HSV_L_TEST_ENABLED : if (HSV_L = true) generate begin 
 hvl_inst: write_image
 generic map (
     enImageText           => true,
@@ -1052,13 +1083,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hvl1")
+    output_file           => "hsvl")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsvl);
-end generate F_HSV_TEST_ENABLED;
-F_HSL_TEST_ENABLED : if (F_HSL = true) generate 
-begin 
+end generate HSV_L_TEST_ENABLED;
+F_HSL_TEST_ENABLED : if (F_HSL = true) generate begin 
 hsl_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1070,6 +1100,8 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsl);
+end generate F_HSL_TEST_ENABLED;
+HSV_1_TEST_ENABLED : if (HSV_1 = true) generate begin 
 hsl1_range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1077,10 +1109,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsl1_range")
+    output_file           => "hsl_1range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsl1_range);
+end generate HSV_1_TEST_ENABLED;
+HSV_2_TEST_ENABLED : if (HSV_2 = true) generate begin 
 hsl2_range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1088,10 +1122,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsl2_range")
+    output_file           => "hsl_2range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsl2_range);
+end generate HSV_2_TEST_ENABLED;
+HSV_3_TEST_ENABLED : if (HSV_3 = true) generate begin 
 hsl3_range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1099,10 +1135,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsl3_range")
+    output_file           => "hsl_3range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsl3_range);
+end generate HSV_3_TEST_ENABLED;
+HSV_4_TEST_ENABLED : if (HSV_4 = true) generate begin 
 hsl4_range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1110,10 +1148,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsl4_range")
+    output_file           => "hsl_4range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsl4_range);
+end generate HSV_4_TEST_ENABLED;
+HSVL1_TEST_ENABLED : if (HSVL1 = true) generate begin 
 hsll1range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1121,10 +1161,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsll1range")
+    output_file           => "hsvl_1range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsll1range);
+end generate HSVL1_TEST_ENABLED;
+HSVL2_TEST_ENABLED : if (HSVL2 = true) generate begin 
 hsll2range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1132,10 +1174,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsll2range")
+    output_file           => "hsvl_2range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsll2range);
+end generate HSVL2_TEST_ENABLED;
+HSVL3_TEST_ENABLED : if (HSVL3 = true) generate begin 
 hsll3range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1143,10 +1187,12 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsll3range")
+    output_file           => "hsvl_3range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsll3range);
+end generate HSVL3_TEST_ENABLED;
+HSVL4_TEST_ENABLED : if (HSVL4 = true) generate begin 
 hsll4range_image_inst: write_image
 generic map (
     enImageText           => true,
@@ -1154,11 +1200,11 @@ generic map (
     i_data_width          => i_data_width,
     test                  => testFolder,
     input_file            => readbmp,
-    output_file           => "hsll4range")
+    output_file           => "hsvl_4range")
 port map (                  
     pixclk                => clk,
     iRgb                  => rgbImageFilters.hsll4range);
-end generate F_HSL_TEST_ENABLED;
+end generate HSVL4_TEST_ENABLED;
 F_EMB_TEST_ENABLED : if (F_EMB = true) generate 
 begin 
 embos_image_inst: write_image
