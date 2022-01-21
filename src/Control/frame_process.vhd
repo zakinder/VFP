@@ -12,6 +12,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.constants_package.all;
+use work.vfp_pkg.all;
 use work.vpf_records.all;
 use work.ports_package.all;
 entity frame_process is
@@ -59,6 +60,26 @@ port (
     oGridLockData           : out std_logic_vector(b_data_width-1 downto 0));
 end entity;
 architecture arch of frame_process is
+    -------------------------------------------------
+    constant HSV_L          : boolean := false;
+    constant HSV_1          : boolean := false;
+    constant HSV_2          : boolean := false;
+    constant HSV_3          : boolean := false;
+    constant HSV_4          : boolean := false;
+    constant HSVL1          : boolean := false;
+    constant HSVL2          : boolean := false;
+    constant HSVL3          : boolean := false;
+    constant HSVL4          : boolean := false;
+    -------------------------------------------------
+    constant F_RE1          : boolean := false;
+    constant F_RE2          : boolean := false;
+    constant F_RE3          : boolean := false;
+    constant F_RE4          : boolean := false;
+    constant F_RE5          : boolean := false;
+    constant F_RE6          : boolean := false;
+    constant F_RE7          : boolean := false;
+    constant F_RE8          : boolean := false;
+    -------------------------------------------------
     constant L_BLU          : boolean := false;  -- 8
     constant L_SHP          : boolean := false;  -- 9
     constant L_CGA          : boolean := false;  -- 9
@@ -67,12 +88,9 @@ architecture arch of frame_process is
     constant L_B1T          : boolean := false;  -- 9
     constant L_AVG          : boolean := false;  -- 7
     constant L_OBJ          : boolean := false;  -- 4
-    constant F_OHS          : boolean := true;
-    constant F_RE1          : boolean := true;
-    constant F_RE2          : boolean := true;
-    constant L_HSL          : boolean := true;
-    constant L_HIS          : boolean := true;
-    constant L_SPC          : boolean := true;
+    constant F_OHS          : boolean := false;
+    constant L_HIS          : boolean := false;
+    constant L_SPC          : boolean := false;
     constant MASK_TRUE      : boolean := true;
     constant MASK_FLSE      : boolean := false;
     constant M_SOB_LUM      : boolean := SelFrame(F_SOB,F_LUM,MASK_FLSE);
@@ -189,32 +207,46 @@ end process pipCoordP;
     iKcoeff.kSet <= iKls.config;
 FiltersInst: filters
 generic map(
-    F_TES               =>  F_TES,
-    F_LUM               =>  F_LUM,
-    F_TRM               =>  F_TRM,
-    F_RGB               =>  F_RGB,
-    F_OHS               =>  F_OHS,
-    F_RE1               =>  F_RE1,
-    F_RE2               =>  F_RE2,
-    F_SHP               =>  F_SHP,
-    F_BLU               =>  F_BLU,
-    F_EMB               =>  F_EMB,
-    F_YCC               =>  F_YCC,
-    F_SOB               =>  F_SOB,
-    F_CGA               =>  F_CGA,
-    F_HSV               =>  F_HSV,
-    F_HSL               =>  F_HSL,
-    L_BLU               =>  L_BLU,
-    L_SHP               =>  L_SHP,
-    L_AVG               =>  L_AVG,
-    L_OBJ               =>  L_OBJ,
-    L_D1T               =>  L_D1T,
-    L_B1T               =>  L_B1T,
-    L_CGA               =>  L_CGA,
-    L_YCC               =>  L_YCC,
-    L_HSL               =>  L_HSL,
-    L_HIS               =>  L_HIS,
-    L_SPC               =>  L_SPC,
+    HSV_L                 =>  HSV_L,
+    HSV_1                 =>  HSV_1,
+    HSV_2                 =>  HSV_2,
+    HSV_3                 =>  HSV_3,
+    HSV_4                 =>  HSV_4,
+    HSVL1                 =>  HSVL1,
+    HSVL2                 =>  HSVL2,
+    HSVL3                 =>  HSVL3,
+    HSVL4                 =>  HSVL4,
+    F_RE1                 =>  F_RE1,
+    F_RE2                 =>  F_RE2,
+    F_RE3                 =>  F_RE3,
+    F_RE4                 =>  F_RE4,
+    F_RE5                 =>  F_RE5,
+    F_RE6                 =>  F_RE6,
+    F_RE7                 =>  F_RE7,
+    F_RE8                 =>  F_RE8,
+    F_TES                 =>  F_TES,
+    F_LUM                 =>  F_LUM,
+    F_TRM                 =>  F_TRM,
+    F_RGB                 =>  F_RGB,
+    F_OHS                 =>  F_OHS,
+    F_SHP                 =>  F_SHP,
+    F_BLU                 =>  F_BLU,
+    F_EMB                 =>  F_EMB,
+    F_YCC                 =>  F_YCC,
+    F_SOB                 =>  F_SOB,
+    F_CGA                 =>  F_CGA,
+    F_HSV                 =>  F_HSV,
+    F_HSL                 =>  F_HSL,
+    L_BLU                 =>  L_BLU,
+    L_SHP                 =>  L_SHP,
+    L_AVG                 =>  L_AVG,
+    L_OBJ                 =>  L_OBJ,
+    L_D1T                 =>  L_D1T,
+    L_B1T                 =>  L_B1T,
+    L_CGA                 =>  L_CGA,
+    L_YCC                 =>  L_YCC,
+    L_HIS                 =>  L_HIS,
+    L_SPC                 =>  L_SPC,
     M_SOB_LUM           =>  M_SOB_LUM,
     M_SOB_TRM           =>  M_SOB_TRM,
     M_SOB_RGB           =>  M_SOB_RGB,

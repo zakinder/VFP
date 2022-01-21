@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : hsvl_4range.vhd
+-- Filename    : hsl_1range.vhd
 -- Create Date : 05062019 [05-06-2019]
 -- Author      : Zakinder
 --
 -- Description:
 -- This file instantiation
--- p ← RGB2HSV(p)
+--
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -14,77 +14,59 @@ use ieee.numeric_std.all;
 use work.fixed_pkg.all;
 use work.float_pkg.all;
 use work.constants_package.all;
-use work.vfp_pkg.all;
 use work.vpf_records.all;
+use work.vfp_pkg.all;
 use work.ports_package.all;
-entity hsvl_4range is
+entity hsl_1range is
 generic (
-    i_data_width   : natural := 8);
+    i_data_width   : integer := 8);
 port (
     clk            : in  std_logic;
     reset          : in  std_logic;
     iRgb           : in channel;
     oHsl           : out channel);
-end hsvl_4range;
-architecture behavioral of hsvl_4range is
+end hsl_1range;
+architecture behavioral of hsl_1range is
     signal uFs1Rgb       : intChannel;
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
     signal rgbMax        : natural;
+    signal rgbMaxMinAvg  : natural;
     signal rgbMin        : natural;
     signal maxValue      : natural;
-    signal minValue      : natural;
     signal rgbDelta      : natural;
     --H
     signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
     signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
-    signal uFiXhueTop    : natural := zero;
-    signal uFiXhueBot    : natural := zero;
-    signal uFiXhueQuot   : natural := zero;
-    signal hueQuot1x     : natural := zero;
-    signal hueDeg        : natural := zero;
-    signal hueDeg1x      : natural := zero;
-    signal h_value       : natural := zero;
+    signal uFiXhueTop    : integer := zero;
+    signal uFiXhueBot    : integer := zero;
+    signal uFiXhueQuot   : integer := zero;
+    signal hueQuot1x     : integer := zero;
+    signal hueDeg        : integer := zero;
+    signal hueDeg1x      : integer := zero;
+    signal h_value       : integer := zero;
     --S
     signal s1value       : unsigned(7 downto 0);
-    signal s2value       : unsigned(7 downto 0);
-    signal s3value       : unsigned(7 downto 0);
-    signal s4value       : unsigned(7 downto 0);
-    signal s5value       : unsigned(7 downto 0);
-    signal s6value       : unsigned(7 downto 0);
-    signal s7value       : unsigned(7 downto 0);
-    signal s8value       : unsigned(7 downto 0);
     --V
     signal v1value       : unsigned(7 downto 0);
-    signal v2value       : unsigned(7 downto 0);
-    signal v3value       : unsigned(7 downto 0);
-    signal v4value       : unsigned(7 downto 0);
-    signal v5value       : unsigned(7 downto 0);
-    signal v6value       : unsigned(7 downto 0);
-    signal v7value       : unsigned(7 downto 0);
-    signal v8value       : unsigned(7 downto 0);
-
     --Valid
     signal valid1_rgb    : std_logic := '0';
     signal valid2_rgb    : std_logic := '0';
     signal valid3_rgb    : std_logic := '0';
+    signal sHsl          : channel;
+    signal rgb_ool4      : channel;
+    signal rgb_colo      : rgbToSfRecord;
+    signal rgb_oolo      : rgbToSfRecord;
+    signal rgb_ool2      : rgbToSf12Record;
+    signal rgb_ool3      : rgbToSfRecord;
     signal valid4_rgb    : std_logic := '0';
     signal valid5_rgb    : std_logic := '0';
     signal valid6_rgb    : std_logic := '0';
     signal valid7_rgb    : std_logic := '0';
     signal valid8_rgb    : std_logic := '0';
-    
-    signal sHsl          : channel;
-    signal rgb_ool4      : channel;
-    signal rgb_colo      : rgbToSfRecord;
-    signal rgb_oolo      : rgbToSfRecord;
-    signal rgb_ool1      : rgbToSfRecord;
-    signal rgb_ool2      : rgbToSf12Record;
-    signal rgb_ool3      : rgbToSfRecord;
-
-    
+    signal ycbcr         : channel;
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
@@ -126,7 +108,6 @@ end process rgbMinP;
 pipRgbMaxUfD1P: process (clk) begin
     if rising_edge(clk) then
         maxValue          <= rgbMax;
-        minValue          <= rgbMin;
     end if;
 end process pipRgbMaxUfD1P;
 -- RGB.∆ = RGB.max − RGB.min
@@ -199,7 +180,12 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        hueQuot1x <= uFiXhueQuot;
+        if (uFs3Rgb.red  = maxValue) then
+            hueQuot1x <= (uFiXhueQuot) mod 360;
+        else
+            hueQuot1x <= uFiXhueQuot;
+        end if;
+        --hueQuot1x <= (uFiXhueQuot mod 45900) /255;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin
@@ -213,36 +199,19 @@ end process hueValueP;
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgbMax /= 0)then
-            s1value <= to_unsigned((rgbDelta),8);
+            s1value <= to_unsigned((maxValue+rgbDelta),8);
         else
             s1value <= to_unsigned(0, 8);
         end if;
     end if;
 end process satValueP; 
-process (clk) begin
-    if rising_edge(clk) then
-        s2value <= s1value;
-        s3value <= s2value;
-        s4value <= s3value;
-        s5value <= s4value;
-        s6value <= s5value;
-        s7value <= s6value;
-        s8value <= s7value;
-        v2value <= v1value;
-        v3value <= v2value;
-        v4value <= v3value;
-        v5value <= v4value;
-        v6value <= v5value;
-        v7value <= v6value;
-        v8value <= v7value;
-    end if;
-end process;
 -------------------------------------------------
 -- VALUE
 -------------------------------------------------
+rgbMaxMinAvg <= (rgbMax+rgbMin)/2;
 valValueP: process (clk) begin
     if rising_edge(clk) then
-        v1value <= to_unsigned(rgbMax, 8);
+        v1value <= to_unsigned(rgbMaxMinAvg, 8);
     end if;
 end process valValueP;
 pipValidP: process (clk) begin
@@ -250,96 +219,64 @@ pipValidP: process (clk) begin
         valid1_rgb    <= uFs3Rgb.valid;
         valid2_rgb    <= valid1_rgb;
         valid3_rgb    <= valid2_rgb;
-        valid4_rgb    <= valid3_rgb;
+        valid4_rgb    <= rgb_ool4.valid;
         valid5_rgb    <= valid4_rgb;
         valid6_rgb    <= valid5_rgb;
         valid7_rgb    <= valid6_rgb;
         valid8_rgb    <= valid7_rgb;
     end if;
 end process pipValidP;
-
+        sHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
+        sHsl.green <= std_logic_vector(s1value);
+        sHsl.blue  <= std_logic_vector(v1value);
+        sHsl.valid <= valid3_rgb;
+l_ycc_inst  : rgb_ycbcr
+generic map(
+    i_data_width         => i_data_width,
+    i_precision          => 12,
+    i_full_range         => TRUE)
+port map(
+    clk                  => clk,
+    rst_l                => reset,
+    iRgb                 => iRgb,
+    y                    => ycbcr.red,
+    cb                   => ycbcr.green,
+    cr                   => ycbcr.blue,
+    oValid               => ycbcr.valid);
 rgb_ool1_inst: sync_frames
 generic map(
-    pixelDelay => 5)
+    pixelDelay => 2)
 port map(
     clk        => clk,
     reset      => reset,
-    iRgb       => iRgb,
+    iRgb       => ycbcr,
     oRgb       => rgb_ool4);
-
-    sHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
-    sHsl.green <= std_logic_vector(s3value);
-    sHsl.blue  <= std_logic_vector(v5value);
-    sHsl.valid <= valid3_rgb;
-
-process (clk,reset)begin
+process (clk) begin
     if rising_edge(clk) then
-        if(h_value <= 42)then
-            oHsl.red    <= sHsl.red;
-            oHsl.green  <= sHsl.green;
-            oHsl.blue   <= sHsl.blue;
-        else
-            oHsl.red    <= sHsl.red;
-            oHsl.green  <= sHsl.green;
-            oHsl.blue   <= sHsl.blue;
-        end if;
-        oHsl.valid  <= valid3_rgb;
+        rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);
+        rgb_colo.green  <= to_sfixed("00" & sHsl.green,rgb_colo.green);
+        rgb_colo.blue   <= to_sfixed("00" & sHsl.blue,rgb_colo.blue);
+        rgb_oolo.red    <= to_sfixed("00" & rgb_ool4.red,rgb_oolo.red);
+        rgb_oolo.green  <= to_sfixed("00" & rgb_ool4.green,rgb_oolo.green);
+        rgb_oolo.blue   <= to_sfixed("00" & rgb_ool4.blue,rgb_oolo.blue);
     end if;
 end process;
-
-        --oHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
-        --oHsl.green <= std_logic_vector(s4value);
-        --oHsl.blue  <= std_logic_vector(v6value);
-        --oHsl.valid <= valid3_rgb;
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
---rgb_ool1_inst: sync_frames
---generic map(
---    pixelDelay => 7)
---port map(
---    clk        => clk,
---    reset      => reset,
---    iRgb       => iRgb,
---    oRgb       => rgb_ool4);
---process (clk) begin
---    if rising_edge(clk) then
---        rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);
---        rgb_colo.green  <= to_sfixed("00" & sHsl.green,rgb_colo.green);
---        rgb_colo.blue   <= to_sfixed("00" & sHsl.blue,rgb_colo.blue);
---        rgb_oolo.red    <= to_sfixed("00" & rgb_ool4.red,rgb_oolo.red);
---        rgb_oolo.green  <= to_sfixed("00" & rgb_ool4.green,rgb_oolo.green);
---        rgb_oolo.blue   <= to_sfixed("00" & rgb_ool4.blue,rgb_oolo.blue);
---    end if;
---end process;
---process (clk) begin
---    if rising_edge(clk) then
---        rgb_ool2.red   <= abs(rgb_oolo.red - rgb_colo.red);
---        rgb_ool2.green <= abs(rgb_oolo.green - rgb_colo.green);
---        rgb_ool2.blue  <= abs(rgb_oolo.blue - rgb_colo.blue);
---        rgb_ool3.red   <= resize(rgb_ool2.red,rgb_ool3.red);
---        rgb_ool3.green <= resize(rgb_ool2.green,rgb_ool3.green);
---        rgb_ool3.blue  <= resize(rgb_ool2.blue,rgb_ool3.blue);
---    end if;
---end process;
---pipRgbwD2P: process (clk) begin
---    if rising_edge(clk) then
---        oHsl.red   <= std_logic_vector(rgb_ool3.red(i_data_width-1 downto 0));
---        oHsl.green <= std_logic_vector(rgb_ool3.green(i_data_width-1 downto 0));
---        oHsl.blue  <= std_logic_vector(rgb_ool3.blue(i_data_width-1 downto 0));
---        oHsl.valid <= valid8_rgb;
---    end if;
---end process pipRgbwD2P;
+process (clk) begin
+    if rising_edge(clk) then
+        rgb_ool2.red   <= abs(rgb_oolo.red - rgb_colo.red);
+        rgb_ool2.green <= abs(rgb_oolo.green - rgb_colo.green);
+        rgb_ool2.blue  <= abs(rgb_oolo.blue - rgb_colo.blue);
+        rgb_ool3.red   <= resize(rgb_ool2.red,rgb_ool3.red);
+        rgb_ool3.green <= resize(rgb_ool2.green,rgb_ool3.green);
+        rgb_ool3.blue  <= resize(rgb_ool2.blue,rgb_ool3.blue);
+    end if;
+end process;
+pipRgbwD2P: process (clk) begin
+    if rising_edge(clk) then
+        oHsl.red   <= std_logic_vector(rgb_ool3.red(i_data_width-1 downto 0));
+        oHsl.green <= std_logic_vector(rgb_ool3.green(i_data_width-1 downto 0));
+        oHsl.blue  <= std_logic_vector(rgb_ool3.blue(i_data_width-1 downto 0));
+        oHsl.valid <= valid8_rgb;
+    end if;
+end process pipRgbwD2P;
 end behavioral;

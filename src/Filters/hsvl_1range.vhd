@@ -19,7 +19,7 @@ use work.vpf_records.all;
 use work.ports_package.all;
 entity hsvl_1range is
 generic (
-    i_data_width   : integer := 8);
+    i_data_width   : natural := 8);
 port (
     clk            : in  std_logic;
     reset          : in  std_logic;
@@ -30,23 +30,23 @@ architecture behavioral of hsvl_1range is
     signal uFs1Rgb       : intChannel;
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
-    signal rgbMax        : integer := zero;
-    signal rgbMin        : integer := zero;
-    signal maxValue      : integer := zero;
-    signal rgbDelta      : integer := zero;
-    signal rgbDeltaSum   : integer := zero;
+    signal rgbMax        : natural := zero;
+    signal rgbMin        : natural := zero;
+    signal maxValue      : natural := zero;
+    signal rgbDelta      : natural := zero;
+    signal rgbDeltaSum   : natural := zero;
     --H
     signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
     signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
-    signal uFiXhueTop    : integer := zero;
-    signal uFiXhueBot    : integer := zero;
-    signal uFiXhueQuot   : integer := zero;
-    signal hueQuot1x     : integer := zero;
-    signal hueDeg        : integer := zero;
-    signal hueDeg1x      : integer := zero;
-    signal h_value       : integer := zero;
+    signal uFiXhueTop    : natural := zero;
+    signal uFiXhueBot    : natural := zero;
+    signal uFiXhueQuot   : natural := zero;
+    signal hueQuot1x     : natural := zero;
+    signal hueDeg        : natural := zero;
+    signal hueDeg1x      : natural := zero;
+    signal h_value       : natural := zero;
     --S
     signal s1value       : unsigned(7 downto 0);
     signal s2value       : unsigned(7 downto 0);

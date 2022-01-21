@@ -1161,15 +1161,7 @@ type rTp is record
     taps             : tp;
     cord             : coord;
 end record;
-type rRgb is record
-    pEof             : std_logic;
-    pSof             : std_logic;
-    valid            : std_logic;
-    red              : std_logic_vector(7 downto 0);
-    green            : std_logic_vector(7 downto 0);
-    blue             : std_logic_vector(7 downto 0);
-    cord             : coord;
-end record;
+
 type w_pixels is record
     pix1 : unsigned(i_data_width downto 0);
     pix2 : unsigned(i_data_width downto 0);
@@ -1420,6 +1412,15 @@ type kCoefFiltFloat is record
     kCoeffEmbos    : kernelCoeDWord;
     kCoefXSobel    : kernelCoeDWord;
     kCoefYSobel    : kernelCoeDWord;
+end record;
+type rRgb is record
+    pEof             : std_logic;
+    pSof             : std_logic;
+    valid            : std_logic;
+    red              : std_logic_vector(7 downto 0);
+    green            : std_logic_vector(7 downto 0);
+    blue             : std_logic_vector(7 downto 0);
+    cord             : coord;
 end record;
 type r2xData is record
     pEof             : std_logic;

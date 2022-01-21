@@ -19,7 +19,7 @@ use work.vpf_records.all;
 use work.ports_package.all;
 entity hsvl is
 generic (
-    i_data_width   : integer := 8);
+    i_data_width   : natural := 8);
 port (
     clk            : in  std_logic;
     reset          : in  std_logic;
@@ -30,22 +30,22 @@ architecture behavioral of hsvl is
     signal uFs1Rgb       : intChannel;
     signal uFs2Rgb       : intChannel;
     signal uFs3Rgb       : intChannel;
-    signal rgbMax        : integer;
-    signal rgbMin        : integer;
-    signal maxValue      : integer;
-    signal rgbDelta      : integer;
+    signal rgbMax        : natural;
+    signal rgbMin        : natural;
+    signal maxValue      : natural;
+    signal rgbDelta      : natural;
     --H
     signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
     signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
     signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
-    signal uFiXhueTop    : integer := zero;
-    signal uFiXhueBot    : integer := zero;
-    signal uFiXhueQuot   : integer := zero;
-    signal hueQuot1x     : integer := zero;
-    signal hueDeg        : integer := zero;
-    signal hueDeg1x      : integer := zero;
-    signal h_value       : integer := zero;
+    signal uFiXhueTop    : natural := zero;
+    signal uFiXhueBot    : natural := zero;
+    signal uFiXhueQuot   : natural := zero;
+    signal hueQuot1x     : natural := zero;
+    signal hueDeg        : natural := zero;
+    signal hueDeg1x      : natural := zero;
+    signal h_value       : natural := zero;
     --S
     signal s1value       : unsigned(7 downto 0);
     --V
@@ -55,12 +55,12 @@ architecture behavioral of hsvl is
     signal valid2_rgb    : std_logic := '0';
     signal valid3_rgb    : std_logic := '0';
     signal sHsl          : channel;
-    signal rgb_ool4                : channel;
-    signal rgb_colo                : rgbToSfRecord;
-    signal rgb_oolo                : rgbToSfRecord;
-    signal rgb_ool1                : rgbToSfRecord;
-    signal rgb_ool2                : rgbToSf12Record;
-    signal rgb_ool3                : rgbToSfRecord;
+    signal rgb_ool4      : channel;
+    signal rgb_colo      : rgbToSfRecord;
+    signal rgb_oolo      : rgbToSfRecord;
+    signal rgb_ool1      : rgbToSfRecord;
+    signal rgb_ool2      : rgbToSf12Record;
+    signal rgb_ool3      : rgbToSfRecord;
 
     
 begin

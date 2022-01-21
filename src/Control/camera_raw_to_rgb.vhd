@@ -36,11 +36,14 @@ architecture arch_imp of camera_raw_to_rgb is
 
     signal rawTp            : rTp;
     signal rawData          : rData;
-
+    signal rgbSet           : rRgb;
+    signal raw2xData        : r2xData;
+    signal raw1xData        : rData;
 begin
 
 CameraRawDataInst: camera_raw_data
 generic map(
+    dataWidth            => dataWidth,
     img_width            => img_width)
 port map(
     m_axis_aclk          => m_axis_mm2s_aclk,
@@ -49,16 +52,20 @@ port map(
     ifval                => ifval,
     ilval                => ilval,
     idata                => idata,
-    oRawData             => rawData);
-
+    oRawData             => raw2xData);
+    raw1xData.valid      <= raw2xData.valid;
+    raw1xData.pEof       <= raw2xData.pEof;
+    raw1xData.pSof       <= raw2xData.pSof;
+    raw1xData.cord       <= raw2xData.cord;
+    raw1xData.data       <= raw2xData.data;
 dataTapsInst: data_taps
 generic map(
     img_width            => img_width,
-    dataWidth            => dataWidth,
+    dataWidth            => 12,
     addrWidth            => addrWidth)
 port map(
     aclk                 => m_axis_mm2s_aclk,
-    iRawData             => rawData,
+    iRawData             => raw1xData,
     oTpData              => rawTp);
 
 RawToRgbInst: raw_to_rgb
@@ -66,6 +73,20 @@ port map(
     clk                  => m_axis_mm2s_aclk,
     rst_l                => m_axis_mm2s_aresetn,
     iTpData              => rawTp,
-    oRgbSet              => oRgbSet);
-
+    oRgbSet              => rgbSet);
+channelOutP: process (m_axis_mm2s_aclk) begin
+    if rising_edge(m_axis_mm2s_aclk) then
+        if (dataWidth = 12) then
+            oRgbSet  <= rgbSet;
+        else
+            oRgbSet.valid  <= raw2xData.valid;
+            oRgbSet.pEof   <= raw2xData.pEof;
+            oRgbSet.pSof   <= raw2xData.pSof;
+            oRgbSet.cord   <= raw2xData.cord;
+            oRgbSet.red    <= std_logic_vector(raw2xData.dita(23 downto 16));
+            oRgbSet.green  <= std_logic_vector(raw2xData.dita(15 downto 8));
+            oRgbSet.blue   <= std_logic_vector(raw2xData.dita(7 downto 0));
+        end if;
+    end if;
+end process channelOutP;
 end arch_imp;

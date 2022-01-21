@@ -35,6 +35,7 @@ use work.ports_package.all;
 
 entity camera_raw_data is
 generic (
+    dataWidth         : integer := 12;
     img_width         : integer := 8);
 port (
     m_axis_aclk       : in std_logic;
@@ -42,8 +43,8 @@ port (
     pixclk            : in std_logic;
     ifval             : in std_logic;
     ilval             : in std_logic;
-    idata             : in std_logic_vector(11 downto 0);
-    oRawData          : out rData);
+    idata             : in std_logic_vector(dataWidth-1 downto 0);
+    oRawData          : out r2xData);
 end camera_raw_data;
 
 architecture arch_imp of camera_raw_data is
@@ -65,14 +66,14 @@ architecture arch_imp of camera_raw_data is
     signal iFvalSy2       : std_logic :=lo;
     signal pEolBufferFull : std_logic :=lo;
     ----
-    signal pRdData        : std_logic_vector(11 downto 0):= (others => lo);
+    signal pRdData        : std_logic_vector(dataWidth-1 downto 0):= (others => lo);
     signal rLine          : std_logic :=lo;
     type d5mSt is (rLnSt,eolSt,eofSt,sofSt);
     signal d5mStates      : d5mSt;
     signal cordx          : integer :=zero;
     signal cordy          : integer :=zero;
     signal imgWidth       : integer := 3071;
-    type pLnRm is array (0 to img_width) of std_logic_vector (11 downto 0);
+    type pLnRm is array (0 to img_width) of std_logic_vector (dataWidth-1 downto 0);
     signal d5mLnBuffer    : pLnRm := (others => (others => lo));
 
 begin
@@ -182,7 +183,8 @@ d5mP: process (m_axis_aclk) begin
         oRawData.cord.x <= std_logic_vector(to_unsigned(cordx, 16));
         oRawData.cord.y <= std_logic_vector(to_unsigned(cordy, 16));
         if (rLine = hi) then
-            oRawData.data <= pRdData;
+            oRawData.data  <= pRdData(11 downto 0);
+            oRawData.dita <= std_logic_vector(resize(unsigned(pRdData), oRawData.dita'length));
         else
             oRawData.data <= (others =>lo);
         end if;
