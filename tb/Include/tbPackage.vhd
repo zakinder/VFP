@@ -19,7 +19,7 @@ package tbPackage is
     --       [619_479  = 304 us]
     --       [770_580  = 452 us]
     --       [1012_606 = 622 us]
-    constant readbmp             : string  := "128_128";
+    constant readbmp             : string  := "1012_606";
     constant Histrograms         : string  := "Histrograms";
     constant img_width           : integer := image_size_width(readbmp);
     constant img_height          : integer := image_size_height(readbmp);
@@ -30,7 +30,7 @@ package tbPackage is
     constant line_hight          : integer := 5;  
     constant adwrWidth           : integer := 16;
     constant addrWidth           : integer := 12;
-    constant SLOT_NUM            : integer := 100;
+    constant SLOT_NUM            : integer := 108;
     constant wImgFolder          : string := "K:/ZEDBOARD/simulations/images/write";
     constant rImgFolder          : string := "K:/ZEDBOARD/simulations/images/read";
     constant bSlash              : string := "\";

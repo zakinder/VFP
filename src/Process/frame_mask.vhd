@@ -29,7 +29,7 @@ port (
     oRgb           : out channel);
 end frame_mask;
 architecture behavioral of frame_mask is
-    signal d1Rgb     : channel;
+    signal d1Rgb           : channel;
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
 begin
 process (clk) begin
@@ -55,7 +55,7 @@ end process;
 
 SyncFrames32Inst: sync_frames
 generic map(
-    pixelDelay => 0) --LATENCY 32
+    pixelDelay => 6) --LATENCY 32
 port map(
     clk        => clk,
     reset      => reset,
@@ -80,16 +80,16 @@ end generate EBLACK_ENABLED;
 EBLACK_DISABLED: if (eBlack = false) generate
     process (clk) begin
         if rising_edge(clk) then
-            if (rgbSyncValid(4) = hi) then
-                oRgb.red   <= i1Rgb.red;
-                oRgb.green <= i1Rgb.green;
-                oRgb.blue  <= i1Rgb.blue;
+            if (iEdgeValid = hi) then
+                oRgb.red   <= black;
+                oRgb.green <= black;
+                oRgb.blue  <= black;
             else
                 oRgb.red   <= d1Rgb.red;
                 oRgb.green <= d1Rgb.green;
                 oRgb.blue  <= d1Rgb.blue;
             end if;
-                oRgb.valid <= i1Rgb.valid;
+                oRgb.valid <= d1Rgb.valid;
         end if;
     end process;
 end generate EBLACK_DISABLED;

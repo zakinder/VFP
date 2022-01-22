@@ -88,8 +88,8 @@ generic (
     L_SHP                    : boolean := false;
     L_D1T                    : boolean := false;
     L_B1T                    : boolean := false;
-    L_HIS                    : boolean := true;
-    L_SPC                    : boolean := true;
+    L_HIS                    : boolean := false;
+    L_SPC                    : boolean := false;
     M_SOB_LUM                : boolean := false;
     M_SOB_TRM                : boolean := false;
     M_SOB_RGB                : boolean := false;
@@ -948,7 +948,7 @@ port map(
 end generate MASK_SOB_TRM_FRAME_ENABLE;
 MASK_SOB_HSL_FRAME_ENABLE: if (M_SOB_HSL = true) generate
     signal dSobHsl           : channel;
-    constant sobHslPiDelay   : integer := 18;
+    constant sobHslPiDelay   : integer := 1;
 begin
 sob_hsv_syncr_inst  : sync_frames
 generic map(
@@ -960,7 +960,7 @@ port map(
     oRgb       => dSobHsl);
 frame_masking_inst  : frame_mask
 generic map (
-    eBlack       => true)
+    eBlack       => false)
 port map(
     clk         => clk,
     reset       => rst_l,

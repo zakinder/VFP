@@ -535,6 +535,7 @@ SOBEL_FRAME_ENABLE: if (SOBEL_FRAME = true) generate
 signal osobelX        : channel;
 signal osobelY        : channel;
 signal sobel          : channel;
+signal sobel_rgb      : channel;
 signal kCoefXSobel    : kernelCoeDWord;
 signal kCoefYSobel    : kernelCoeDWord;
 signal mx             : unsigned(15 downto 0)         := (others => '0');
@@ -552,6 +553,14 @@ begin
 -----------------------------------------------------------------------------------------------
 -- taps_controller
 -----------------------------------------------------------------------------------------------
+----------------------------------------------------------
+-- Used HSL 1 range color space for better edge detection.
+----------------------------------------------------------
+sobel_rgb.red     <= hsl_1_Syncr.green;
+sobel_rgb.green   <= hsl_1_Syncr.green;
+sobel_rgb.blue    <= hsl_1_Syncr.green;
+sobel_rgb.valid   <= hsl_1_Syncr.valid;
+----------------------------------------------------------
 TapsControllerInst: taps_controller
 generic map(
     img_width    => img_width,
@@ -559,7 +568,7 @@ generic map(
 port map(
     clk          => clk,
     rst_l        => rst_l,
-    iRgb         => iRgb,
+    iRgb         => sobel_rgb,
     tpValid      => tpValid,
     tp0          => tp0,
     tp1          => tp1,
@@ -761,7 +770,7 @@ port map(
     oHsl               => hslSyncr);
 hsl_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay => 66)
 port map(
     clk        => clk,
     reset      => rst_l,
