@@ -100,6 +100,9 @@ architecture Behavioral of kernel is
     signal hsll2_range     : channel;
     signal hsll3_range     : channel;
     signal hsll4_range     : channel;
+    signal rgb_invert      : channel;
+    
+    
 begin
 -----------------------------------------------------------------------------------------------
 --coef_mult
@@ -206,7 +209,7 @@ port map(
     oRgb           => ycbcrSyncr);
 ycbcr_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 39)
+    pixelDelay => 43)
 port map(
     clk        => clk,
     reset      => rst_l,
@@ -252,7 +255,7 @@ port map(
     oRgb           => cgain1Syncr);
 cgain1syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 39)
+    pixelDelay => 53)
 port map(
     clk        => clk,
     reset      => rst_l,
@@ -536,6 +539,7 @@ signal osobelX        : channel;
 signal osobelY        : channel;
 signal sobel          : channel;
 signal sobel_rgb      : channel;
+signal sobel_hsl      : channel;
 signal kCoefXSobel    : kernelCoeDWord;
 signal kCoefYSobel    : kernelCoeDWord;
 signal mx             : unsigned(15 downto 0)         := (others => '0');
@@ -556,10 +560,18 @@ begin
 ----------------------------------------------------------
 -- Used HSL 1 range color space for better edge detection.
 ----------------------------------------------------------
-sobel_rgb.red     <= hsl_1_Syncr.green;
-sobel_rgb.green   <= hsl_1_Syncr.green;
-sobel_rgb.blue    <= hsl_1_Syncr.green;
-sobel_rgb.valid   <= hsl_1_Syncr.valid;
+sobel_hsl_1_range_Inst: hsl_1range
+generic map(
+    i_data_width => i_data_width)
+port map(
+    clk          => clk,
+    reset        => rst_l,
+    iRgb         => iRgb,
+    oHsl         => sobel_hsl);
+sobel_rgb.red    <= sobel_hsl.green;
+sobel_rgb.green  <= sobel_hsl.green;
+sobel_rgb.blue   <= sobel_hsl.green;
+sobel_rgb.valid  <= sobel_hsl.valid;
 ----------------------------------------------------------
 TapsControllerInst: taps_controller
 generic map(
@@ -746,7 +758,7 @@ port map(
     oHsv               => hsvSyncr);
 hsv_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay => 70)
 port map(
     clk        => clk,
     reset      => rst_l,
@@ -770,7 +782,7 @@ port map(
     oHsl               => hslSyncr);
 hsl_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 66)
+    pixelDelay => 75)
 port map(
     clk        => clk,
     reset      => rst_l,
@@ -791,7 +803,7 @@ port map(
     oHsl               => hsl_1_Syncr);
 hsl_1_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay => 70)
 port map(
     clk        => clk,
     reset      => rst_l,
@@ -803,17 +815,26 @@ end generate HSV_1_FRAME_ENABLE;
 -- HSV  2 RANGE
 -------------------------------------------------------------
 HSV_2_FRAME_ENABLE: if (HSV_2_FRAME = true) generate begin
-hsl_2_range_inst: hsl_2range
+
+rgb_inverted_inst: rgb_inverted
 generic map(
     i_data_width       => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    oRgb               => rgb_invert);
+hsl_2_range_inst: hsl_2range
+generic map(
+    i_data_width       => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => rgb_invert,
     oHsl               => hsl_2_Syncr);
 hsl_2_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay => 66)
 port map(
     clk        => clk,
     reset      => rst_l,
@@ -834,7 +855,7 @@ port map(
     oHsl               => hsl_3_Syncr);
 hsl_3_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay => 74)
 port map(
     clk             => clk,
     reset           => rst_l,
@@ -855,7 +876,7 @@ port map(
     oHsl            => hsl_4_Syncr);
 hsl_4_syncr_inst  : sync_frames
 generic map(
-    pixelDelay      => 60)
+    pixelDelay      => 74)
 port map(
     clk             => clk,
     reset           => rst_l,
@@ -904,7 +925,7 @@ port map(
     oHsl            => hsll2_Syncr);
 hsvl_2_syncr_inst  : sync_frames
 generic map(
-    pixelDelay      => 60)
+    pixelDelay      => 69)
 port map(
     clk             => clk,
     reset           => rst_l,
@@ -960,7 +981,7 @@ port map(
     oHsl               => hsll4_Syncr);
 hsvl_4_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 60)
+    pixelDelay => 63)
 port map(
     clk        => clk,
     reset      => rst_l,

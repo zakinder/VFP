@@ -130,7 +130,7 @@ end generate BLURE_FRAME_ENABLED;
 EMBOS_FRAME_ENABLED: if (EMBOS_FRAME = TRUE) generate
 embos_valid_inst: d_valid
 generic map (
-    pixelDelay   => 30)
+    pixelDelay   => 35)
 port map(
     clk      => clk,
     iRgb     => rgb,

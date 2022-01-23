@@ -59,17 +59,17 @@ architecture behavioral of hsl_1range is
     signal valid1_rgb    : std_logic := '0';
     signal valid2_rgb    : std_logic := '0';
     signal valid3_rgb    : std_logic := '0';
+    signal valid4_rgb    : std_logic := '0';
+    signal valid5_rgb    : std_logic := '0';
+    signal valid6_rgb    : std_logic := '0';
+    signal valid7_rgb    : std_logic := '0';
+    signal valid8_rgb    : std_logic := '0';
     signal sHsl          : channel;
     signal rgb_ool4      : channel;
     signal rgb_colo      : rgbToSfRecord;
     signal rgb_oolo      : rgbToSfRecord;
     signal rgb_ool2      : rgbToSf12Record;
     signal rgb_ool3      : rgbToSfRecord;
-    signal valid4_rgb    : std_logic := '0';
-    signal valid5_rgb    : std_logic := '0';
-    signal valid6_rgb    : std_logic := '0';
-    signal valid7_rgb    : std_logic := '0';
-    signal valid8_rgb    : std_logic := '0';
     signal ycbcr         : channel;
 begin
 rgbToUfP: process (clk,reset)begin
@@ -263,7 +263,6 @@ pipValidP: process (clk) begin
         valid8_rgb    <= valid7_rgb;
     end if;
 end process pipValidP;
-    
 process (clk) begin
     if rising_edge(clk) then
         rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);

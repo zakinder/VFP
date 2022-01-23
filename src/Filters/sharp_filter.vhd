@@ -44,11 +44,25 @@ architecture arch of sharp_filter is
     signal d3en             : std_logic;
     signal d4en             : std_logic;
     signal d5en             : std_logic;
+    signal d6en             : std_logic;
     signal rCountAddress    : integer;
     signal rAddress         : std_logic_vector(15 downto 0);
     signal rgb1x            : channel;
     signal rgb2x            : channel;
     signal d2RGB            : std_logic_vector(23 downto 0) := (others => '0');
+    signal valid1_rgb       : std_logic := '0';
+    signal valid2_rgb       : std_logic := '0';
+    signal valid3_rgb       : std_logic := '0';
+    signal valid4_rgb       : std_logic := '0';
+    signal valid5_rgb       : std_logic := '0';
+    signal valid6_rgb       : std_logic := '0';
+    signal valid7_rgb       : std_logic := '0';
+    signal valid8_rgb       : std_logic := '0';
+    signal valid9_rgb       : std_logic := '0';
+    signal valid10rgb       : std_logic := '0';
+    signal valid11rgb       : std_logic := '0';
+    signal valid12rgb       : std_logic := '0';
+    signal valid13rgb       : std_logic := '0';
 ---------------------------------------------------------------------------------
 begin
 tapValidAdressP: process(clk)begin
@@ -104,6 +118,24 @@ port map(
     vTap2x          => vTapRGB2x(i_data_width-1 downto 0),
     kls             => kls,
     DataO           => oRgb.blue);
+pipValidP: process (clk) begin
+    if rising_edge(clk) then
+        valid1_rgb    <= rgb2x.valid;
+        valid2_rgb    <= valid1_rgb;
+        valid3_rgb    <= valid2_rgb;
+        valid4_rgb    <= valid3_rgb;
+        valid5_rgb    <= valid4_rgb;
+        valid6_rgb    <= valid5_rgb;
+        valid7_rgb    <= valid6_rgb;
+        valid8_rgb    <= valid7_rgb;
+        valid9_rgb    <= valid8_rgb;
+        valid10rgb    <= valid9_rgb;
+        valid11rgb    <= valid10rgb;
+        valid12rgb    <= valid11rgb;
+        valid13rgb    <= valid12rgb;
+        oRgb.valid    <= valid11rgb;
+    end if;
+end process pipValidP;
 tapSignedP : process (clk) begin
     if rising_edge(clk) then
         rgb1x      <= iRgb;
@@ -114,16 +146,10 @@ tapSignedP : process (clk) begin
         d3en       <= d2en;
         d4en       <= d3en;
         d5en       <= d4en;
-        oRgb.valid <= d5en;
-        if(enable = '1') then
-            vTapRGB0x <=v1TapRGB0x;
-            vTapRGB1x <=v1TapRGB1x;
-            vTapRGB2x <=v1TapRGB2x;
-        else
-            vTapRGB0x <=(others => '0');
-            vTapRGB1x <=(others => '0');
-            vTapRGB2x <=(others => '0');
-        end if;
+        d6en       <= d5en;
+        vTapRGB0x  <=v1TapRGB0x;
+        vTapRGB1x  <=v1TapRGB1x;
+        vTapRGB2x  <=v1TapRGB2x;
   end if;
 end process tapSignedP;
 end arch;

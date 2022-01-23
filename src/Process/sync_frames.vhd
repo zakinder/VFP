@@ -27,7 +27,7 @@ port (
     oRgb           : out channel);
 end sync_frames;
 architecture behavioral of sync_frames is
-    signal rgbDelays      : rgbArray(0 to 70);
+    signal rgbDelays      : rgbArray(0 to 80);
 begin
 oRgb <= rgbDelays(pixelDelay).rgb;
 process (clk) begin
@@ -103,6 +103,16 @@ process (clk) begin
         rgbDelays(68)         <= rgbDelays(67);
         rgbDelays(69)         <= rgbDelays(68);
         rgbDelays(70)         <= rgbDelays(69);
+        rgbDelays(71)         <= rgbDelays(70);
+        rgbDelays(72)         <= rgbDelays(71);
+        rgbDelays(73)         <= rgbDelays(72);
+        rgbDelays(74)         <= rgbDelays(73);
+        rgbDelays(75)         <= rgbDelays(74);
+        rgbDelays(76)         <= rgbDelays(75);
+        rgbDelays(77)         <= rgbDelays(76);
+        rgbDelays(78)         <= rgbDelays(77);
+        rgbDelays(79)         <= rgbDelays(78);
+        rgbDelays(80)         <= rgbDelays(79);
     end if;
 end process;
 end behavioral;

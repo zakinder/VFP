@@ -70,17 +70,12 @@ architecture behavioral of hsl_4range is
     signal valid1_rgb    : std_logic := '0';
     signal valid2_rgb    : std_logic := '0';
     signal valid3_rgb    : std_logic := '0';
-    signal sHsl          : channel;
-    signal rgb_ool4      : channel;
-    signal rgb_colo      : rgbToSfRecord;
-    signal rgb_oolo      : rgbToSfRecord;
-    signal rgb_ool2      : rgbToSf12Record;
-    signal rgb_ool3      : rgbToSfRecord;
     signal valid4_rgb    : std_logic := '0';
     signal valid5_rgb    : std_logic := '0';
     signal valid6_rgb    : std_logic := '0';
     signal valid7_rgb    : std_logic := '0';
     signal valid8_rgb    : std_logic := '0';
+    signal sHsl          : channel;
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
@@ -247,7 +242,7 @@ pipValidP: process (clk) begin
         valid1_rgb    <= uFs3Rgb.valid;
         valid2_rgb    <= valid1_rgb;
         valid3_rgb    <= valid2_rgb;
-        valid4_rgb    <= rgb_ool4.valid;
+        valid4_rgb    <= valid3_rgb;
         valid5_rgb    <= valid4_rgb;
         valid6_rgb    <= valid5_rgb;
         valid7_rgb    <= valid6_rgb;
@@ -257,41 +252,5 @@ end process pipValidP;
     oHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
     oHsl.green <= std_logic_vector(s3value);
     oHsl.blue  <= std_logic_vector(v5value);
-    oHsl.valid <= valid3_rgb;
---rgb_ool1_inst: sync_frames
---generic map(
---    pixelDelay => 5)
---port map(
---    clk        => clk,
---    reset      => reset,
---    iRgb       => iRgb,
---    oRgb       => rgb_ool4);
---process (clk) begin
---    if rising_edge(clk) then
---        rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);
---        rgb_colo.green  <= to_sfixed("00" & sHsl.green,rgb_colo.green);
---        rgb_colo.blue   <= to_sfixed("00" & sHsl.blue,rgb_colo.blue);
---        rgb_oolo.red    <= to_sfixed("00" & rgb_ool4.red,rgb_oolo.red);
---        rgb_oolo.green  <= to_sfixed("00" & rgb_ool4.green,rgb_oolo.green);
---        rgb_oolo.blue   <= to_sfixed("00" & rgb_ool4.blue,rgb_oolo.blue);
---    end if;
---end process;
---process (clk) begin
---    if rising_edge(clk) then
---        rgb_ool2.red   <= abs(rgb_oolo.red - rgb_colo.red);
---        rgb_ool2.green <= abs(rgb_oolo.green - rgb_colo.green);
---        rgb_ool2.blue  <= abs(rgb_oolo.blue - rgb_colo.blue);
---        rgb_ool3.red   <= resize(rgb_ool2.red,rgb_ool3.red);
---        rgb_ool3.green <= resize(rgb_ool2.green,rgb_ool3.green);
---        rgb_ool3.blue  <= resize(rgb_ool2.blue,rgb_ool3.blue);
---    end if;
---end process;
---pipRgbwD2P: process (clk) begin
---    if rising_edge(clk) then
---        oHsl.red   <= std_logic_vector(rgb_ool3.red(i_data_width-1 downto 0));
---        oHsl.green <= std_logic_vector(rgb_ool3.green(i_data_width-1 downto 0));
---        oHsl.blue  <= std_logic_vector(rgb_ool3.blue(i_data_width-1 downto 0));
---        oHsl.valid <= valid6_rgb;
---    end if;
---end process pipRgbwD2P;
+    oHsl.valid <= valid5_rgb;
 end behavioral;

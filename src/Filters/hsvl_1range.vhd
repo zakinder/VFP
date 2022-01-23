@@ -81,8 +81,7 @@ architecture behavioral of hsvl_1range is
     signal rgb_ool1      : rgbToSfRecord;
     signal rgb_ool2      : rgbToSf12Record;
     signal rgb_ool3      : rgbToSfRecord;
-
-    
+    signal ycbcr         : channel;
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
@@ -243,20 +242,31 @@ valValueP: process (clk) begin
         v1value <= to_unsigned(rgbMax, 8);
     end if;
 end process valValueP;
-
         sHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
         sHsl.green <= std_logic_vector(s4value);
         sHsl.blue  <= std_logic_vector(v4value);
         sHsl.valid <= valid3_rgb;
+l_ycc_inst  : rgb_ycbcr
+generic map(
+    i_data_width         => i_data_width,
+    i_precision          => 12,
+    i_full_range         => TRUE)
+port map(
+    clk                  => clk,
+    rst_l                => reset,
+    iRgb                 => iRgb,
+    y                    => ycbcr.red,
+    cb                   => ycbcr.green,
+    cr                   => ycbcr.blue,
+    oValid               => ycbcr.valid);
 rgb_ool1_inst: sync_frames
 generic map(
-    pixelDelay => 5)
+    pixelDelay => 1)
 port map(
     clk        => clk,
     reset      => reset,
-    iRgb       => iRgb,
+    iRgb       => ycbcr,
     oRgb       => rgb_ool4);
-    
 pipValidP: process (clk) begin
     if rising_edge(clk) then
         valid1_rgb    <= rgb_ool4.valid;
@@ -269,7 +279,6 @@ pipValidP: process (clk) begin
         valid8_rgb    <= valid7_rgb;
     end if;
 end process pipValidP;
-    
 process (clk) begin
     if rising_edge(clk) then
         rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);

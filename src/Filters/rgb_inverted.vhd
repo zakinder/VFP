@@ -32,7 +32,7 @@ end rgb_inverted;
 architecture behavioral of rgb_inverted is
     --RGB Floating
     signal uFs1Rgb       : rgbToUfRecord;
-    signal uFs2Rgb       : rgbToUfRecord;
+    signal uFs2Rgb       : rgbToUf1Record;
     signal uFs3Rgb       : rgbToUfRecord;
     signal rgbMaxVal     : ufixed(7 downto 0) :=(others => '0');
 begin

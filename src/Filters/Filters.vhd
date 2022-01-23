@@ -163,6 +163,7 @@ architecture Behavioral of filters is
     signal vh2s                : channel;
     signal vh3s                : channel;
     signal rgb_hsvl            : channel;
+    signal rgb_hsvl_sync       : channel;
     signal rgb_histo           : channel;
     signal eObject             : channel;
     signal color_limits        : type_RgbArray(0 to 7);
@@ -187,15 +188,15 @@ begin
     --    | -0.500 | -0.250 | +1.250 |
     --    |--------|--------|--------|
     dark_ccm.config           <= 1;
-    dark_ccm.k1               <= std_logic_vector(to_unsigned(3,32));   --  1.000
+    dark_ccm.k1               <= std_logic_vector(to_unsigned(6,32));   --  1.000
     dark_ccm.k2               <= std_logic_vector(to_unsigned(255,32)); -- -0.500
     dark_ccm.k3               <= std_logic_vector(to_unsigned(255,32)); -- -0.250
     dark_ccm.k4               <= std_logic_vector(to_unsigned(255,32));
-    dark_ccm.k5               <= std_logic_vector(to_unsigned(3,32));
+    dark_ccm.k5               <= std_logic_vector(to_unsigned(6,32));
     dark_ccm.k6               <= std_logic_vector(to_unsigned(255,32));
     dark_ccm.k7               <= std_logic_vector(to_unsigned(255,32));
     dark_ccm.k8               <= std_logic_vector(to_unsigned(255,32));
-    dark_ccm.k9               <= std_logic_vector(to_unsigned(3,32));
+    dark_ccm.k9               <= std_logic_vector(to_unsigned(6,32));
     -- 30  = 3.75
     -- 35  = 4.75
     -- 40  = 5.00
@@ -233,9 +234,9 @@ begin
     balance_ccm.config         <= 3;
     balance_ccm.k1             <= std_logic_vector(to_unsigned(4,32));
     balance_ccm.k2             <= std_logic_vector(to_unsigned(3,32));
-    balance_ccm.k3             <= std_logic_vector(to_unsigned(1,32));
+    balance_ccm.k3             <= std_logic_vector(to_unsigned(80,32));
     balance_ccm.k4             <= std_logic_vector(to_unsigned(2,32));
-    balance_ccm.k5             <= std_logic_vector(to_unsigned(5,32));
+    balance_ccm.k5             <= std_logic_vector(to_unsigned(80,32));
     balance_ccm.k6             <= std_logic_vector(to_unsigned(1,32));
     balance_ccm.k7             <= std_logic_vector(to_unsigned(80,32));
     balance_ccm.k8             <= std_logic_vector(to_unsigned(3,32));
@@ -309,7 +310,15 @@ port map (
     clk                => clk,
     reset              => rst_l,
     iRgb               => rgbYcbcr,
-    oHsl               => rgb_hsvl);
+    oHsl               => rgb_hsvl_sync);
+hsv_hsvl_syncr_inst  : sync_frames
+generic map(
+    pixelDelay      => 67)
+port map(
+    clk             => clk,
+    reset           => rst_l,
+    iRgb            => rgb_hsvl_sync,
+    oRgb            => rgb_hsvl);
 end generate HSV_L_ENABLE;
 edge_objectsInst: edge_objects
 generic map (

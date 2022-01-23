@@ -27,101 +27,101 @@ port (
     oHsl           : out channel);
 end hsl_c;
 architecture behavioral of hsl_c is
-    signal uFs1Rgb       : intChannel;
-    signal uFs2Rgb       : intChannel;
-    signal uFs3Rgb       : intChannel;
-    signal rgbMax        : natural;
-    signal rgbMin        : natural;
-    signal maxValue      : natural;
-    signal rgbDelta      : natural;
+    signal rgb_sync_1    : intChannel;
+    signal rgb_sync_2    : intChannel;
+    signal rgb_sync_3    : intChannel;
+    signal rgb_max       : natural;
+    signal rgb_min       : natural;
+    signal rgb_max_value : natural;
+    signal rgb_delta     : natural;
     --H
-    signal uuFiXhueQuot  : ufixed(17 downto -9) :=(others => '0');
-    signal hue_quot      : ufixed(17 downto 0)  :=(others => '0');
-    signal uuFiXhueTop   : ufixed(17 downto 0)  :=(others => '0');
-    signal uuFiXhueBot   : ufixed(8 downto 0)   :=(others => '0');
-    signal uFiXhueTop    : natural := zero;
-    signal uFiXhueBot    : natural := zero;
-    signal uFiXhueQuot   : natural := zero;
-    signal hueQuot1x     : natural := zero;
-    signal hueDeg        : natural := zero;
-    signal hueDeg1x      : natural := zero;
-    signal h_value       : natural := zero;
+    signal hue_quotient       : ufixed(17 downto -9) :=(others => '0');
+    signal hue_numerator      : natural := zero;
+    signal hue_denominator    : natural := zero;
+    signal hue_quot           : ufixed(17 downto 0)  :=(others => '0');
+    signal uuFiXhueTop        : ufixed(17 downto 0)  :=(others => '0');
+    signal uuFiXhueBot        : ufixed(8 downto 0)   :=(others => '0');
+    signal uFiXhueQuot        : natural := zero;
+    signal hue_quotient_value : natural := zero;
+    signal hue_degree         : natural := zero;
+    signal hue_degree_sync    : natural := zero;
+    signal hue                : natural := zero;
     --S
-    signal s1value       : unsigned(7 downto 0);
-    signal s2value       : unsigned(7 downto 0);
-    signal s3value       : unsigned(7 downto 0);
+    signal saturate           : unsigned(7 downto 0);
+    signal saturate_sync1     : unsigned(7 downto 0);
+    signal saturate_sync2     : unsigned(7 downto 0);
     --V
-    signal v1value       : unsigned(7 downto 0);
-    signal v2value       : unsigned(7 downto 0);
-    signal v3value       : unsigned(7 downto 0);
+    signal luminosity         : natural;
+    signal luminosity_sync1   : unsigned(7 downto 0);
+    signal luminosity_sync2   : unsigned(7 downto 0);
     --Valid
-    signal valid1_rgb    : std_logic := '0';
-    signal valid2_rgb    : std_logic := '0';
-    signal valid3_rgb    : std_logic := '0';
-    signal sHsl          : channel;
-    signal rgb_ool4      : channel;
-    signal rgb_colo      : rgbToSfRecord;
-    signal rgb_oolo      : rgbToSfRecord;
-    signal rgb_ool2      : rgbToSf12Record;
-    signal rgb_ool3      : rgbToSfRecord;
-    signal valid4_rgb    : std_logic := '0';
-    signal valid5_rgb    : std_logic := '0';
-    signal valid6_rgb    : std_logic := '0';
-    signal valid7_rgb    : std_logic := '0';
-    signal valid8_rgb    : std_logic := '0';
+    signal valid1_rgb         : std_logic := '0';
+    signal valid2_rgb         : std_logic := '0';
+    signal valid3_rgb         : std_logic := '0';
+    signal sHsl               : channel;
+    signal rgb_ool4           : channel;
+    signal rgb_colo           : rgbToSfRecord;
+    signal rgb_oolo           : rgbToSfRecord;
+    signal rgb_ool2           : rgbToSf12Record;
+    signal rgb_ool3           : rgbToSfRecord;
+    signal valid4_rgb         : std_logic := '0';
+    signal valid5_rgb         : std_logic := '0';
+    signal valid6_rgb         : std_logic := '0';
+    signal valid7_rgb         : std_logic := '0';
+    signal valid8_rgb         : std_logic := '0';
 begin
 rgbToUfP: process (clk,reset)begin
     if (reset = lo) then
-        uFs1Rgb.red    <= zero;
-        uFs1Rgb.green  <= zero;
-        uFs1Rgb.blue   <= zero;
+        rgb_sync_1.red    <= zero;
+        rgb_sync_1.green  <= zero;
+        rgb_sync_1.blue   <= zero;
     elsif rising_edge(clk) then
-        uFs1Rgb.red    <= to_integer(unsigned(iRgb.red));
-        uFs1Rgb.green  <= to_integer(unsigned(iRgb.green));
-        uFs1Rgb.blue   <= to_integer(unsigned(iRgb.blue));
-        uFs1Rgb.valid  <= iRgb.valid;
+        rgb_sync_1.red    <= to_integer(unsigned(iRgb.red));
+        rgb_sync_1.green  <= to_integer(unsigned(iRgb.green));
+        rgb_sync_1.blue   <= to_integer(unsigned(iRgb.blue));
+        rgb_sync_1.valid  <= iRgb.valid;
     end if;
 end process rgbToUfP;
 -- RGB.max = max(R, G, B)
 rgbMaxP: process (clk) begin
     if rising_edge(clk) then
-        if ((uFs1Rgb.red >= uFs1Rgb.green) and (uFs1Rgb.red >= uFs1Rgb.blue)) then
-            rgbMax <= uFs1Rgb.red;
-        elsif((uFs1Rgb.green >= uFs1Rgb.red) and (uFs1Rgb.green >= uFs1Rgb.blue))then
-            rgbMax <= uFs1Rgb.green;
+        if ((rgb_sync_1.red >= rgb_sync_1.green) and (rgb_sync_1.red >= rgb_sync_1.blue)) then
+            rgb_max <= rgb_sync_1.red;
+        elsif((rgb_sync_1.green >= rgb_sync_1.red) and (rgb_sync_1.green >= rgb_sync_1.blue))then
+            rgb_max <= rgb_sync_1.green;
         else
-            rgbMax <= uFs1Rgb.blue;
+            rgb_max <= rgb_sync_1.blue;
         end if;
     end if;
 end process rgbMaxP;
 --RGB.min = min(R, G, B)
 rgbMinP: process (clk) begin
     if rising_edge(clk) then
-        if ((uFs1Rgb.red <= uFs1Rgb.green) and (uFs1Rgb.red <= uFs1Rgb.blue)) then
-            rgbMin <= uFs1Rgb.red;
-        elsif((uFs1Rgb.green <= uFs1Rgb.red) and (uFs1Rgb.green <= uFs1Rgb.blue)) then
-            rgbMin <= uFs1Rgb.green;
+        if ((rgb_sync_1.red <= rgb_sync_1.green) and (rgb_sync_1.red <= rgb_sync_1.blue)) then
+            rgb_min <= rgb_sync_1.red;
+        elsif((rgb_sync_1.green <= rgb_sync_1.red) and (rgb_sync_1.green <= rgb_sync_1.blue)) then
+            rgb_min <= rgb_sync_1.green;
         else
-            rgbMin <= uFs1Rgb.blue;
+            rgb_min <= rgb_sync_1.blue;
         end if;
     end if;
 end process rgbMinP;
 -- RGB.∆ = RGB.max − RGB.min
 pipRgbMaxUfD1P: process (clk) begin
     if rising_edge(clk) then
-        maxValue          <= rgbMax;
+        rgb_max_value    <= rgb_max;
     end if;
 end process pipRgbMaxUfD1P;
 -- RGB.∆ = RGB.max − RGB.min
 rgbDeltaP: process (clk) begin
     if rising_edge(clk) then
-        rgbDelta      <= rgbMax - rgbMin;
+        rgb_delta      <= rgb_max - rgb_min;
     end if;
 end process rgbDeltaP;
 pipRgbD2P: process (clk) begin
     if rising_edge(clk) then
-        uFs2Rgb <= uFs1Rgb;
-        uFs3Rgb <= uFs2Rgb;
+        rgb_sync_2 <= rgb_sync_1;
+        rgb_sync_3 <= rgb_sync_2;
     end if;
 end process pipRgbD2P;
 -------------------------------------------------
@@ -133,26 +133,26 @@ end process pipRgbD2P;
 -------------------------------------------------
 hueP: process (clk) begin
   if rising_edge(clk) then
-    if (uFs3Rgb.red  = maxValue) then
-            hueDeg <= 0;
-        if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * maxValue;
+    if (rgb_sync_3.red  = rgb_max_value) then
+            hue_degree <= 0;
+        if (rgb_sync_3.green >= rgb_sync_3.blue) then
+            hue_numerator        <= (rgb_sync_3.green - rgb_sync_3.blue) * 60;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * maxValue;
+            hue_numerator        <= (rgb_sync_3.blue - rgb_sync_3.green) * 60;
         end if;
-    elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 120;
-        if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 60;
+    elsif(rgb_sync_3.green = rgb_max_value)  then
+            hue_degree <= 75;
+        if (rgb_sync_3.blue >= rgb_sync_3.red ) then
+            hue_numerator       <= (rgb_sync_3.blue - rgb_sync_3.red ) * 60;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 140;
+            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.blue) * 60;
         end if;
-    elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 200;
-        if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 60;
+    elsif(rgb_sync_3.blue = rgb_max_value)  then
+            hue_degree <= 150;
+        if (rgb_sync_3.red  >= rgb_sync_3.green) then
+            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.green) * 60;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 140;
+            hue_numerator       <= (rgb_sync_3.green - rgb_sync_3.red ) * 60;
         end if;
     end if;
   end if;
@@ -163,31 +163,35 @@ end process hueP;
 -------------------------------------------------
 hueBottomP: process (clk) begin
     if rising_edge(clk) then
-        if (rgbDelta > 0) then
-            uFiXhueBot <= rgbDelta;
+        if (rgb_delta > 0) then
+            hue_denominator <= rgb_delta;
         else
-            uFiXhueBot <= 6;
+            hue_denominator <= 6;
         end if;
     end if;
 end process hueBottomP;
-uuFiXhueTop   <= to_ufixed(uFiXhueTop,uuFiXhueTop);
-uuFiXhueBot   <= to_ufixed(uFiXhueBot,uuFiXhueBot);
-uuFiXhueQuot  <= (uuFiXhueTop / uuFiXhueBot);
-hue_quot      <= resize(uuFiXhueQuot,hue_quot);
+-------------------------------------------------
+-- HUE DIVISION
+-------------------------------------------------
+uuFiXhueTop   <= to_ufixed(hue_numerator,uuFiXhueTop);
+uuFiXhueBot   <= to_ufixed(hue_denominator,uuFiXhueBot);
+hue_quotient  <= (uuFiXhueTop / uuFiXhueBot);
+hue_quot      <= resize(hue_quotient,hue_quot);
 uFiXhueQuot   <= to_integer(unsigned(hue_quot));
+-------------------------------------------------
 hueDegreeP: process (clk) begin
     if rising_edge(clk) then
-        hueDeg1x       <= hueDeg;
+        hue_degree_sync  <= hue_degree;
     end if;
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        hueQuot1x <= uFiXhueQuot;
+        hue_quotient_value <= uFiXhueQuot;
     end if;
 end process hueDividerResizeP;
 hueValueP: process (clk) begin
     if rising_edge(clk) then
-        h_value <= hueQuot1x + hueDeg1x;
+        hue <= hue_quotient_value + hue_degree_sync;
     end if;
 end process hueValueP;    
 -------------------------------------------------
@@ -195,10 +199,10 @@ end process hueValueP;
 -------------------------------------------------     
 satValueP: process (clk) begin
     if rising_edge(clk) then
-        if(rgbMax /= 0)then
-            s1value <= to_unsigned((rgbDelta),8);
+        if(rgb_max /= 0)then
+            saturate <= to_unsigned((rgb_delta),8);
         else
-            s1value <= to_unsigned(0, 8);
+            saturate <= to_unsigned(0, 8);
         end if;
     end if;
 end process satValueP; 
@@ -207,12 +211,19 @@ end process satValueP;
 -------------------------------------------------
 valValueP: process (clk) begin
     if rising_edge(clk) then
-        v1value <= to_unsigned(rgbMax, 8);
+        luminosity <= (rgb_max + rgb_min) /2;
     end if;
 end process valValueP;
+
+process (clk) begin
+    if rising_edge(clk) then
+        luminosity_sync1 <= to_unsigned(luminosity, 8);
+    end if;
+end process;
+
 pipValidP: process (clk) begin
     if rising_edge(clk) then
-        valid1_rgb    <= uFs3Rgb.valid;
+        valid1_rgb    <= rgb_sync_3.valid;
         valid2_rgb    <= valid1_rgb;
         valid3_rgb    <= valid2_rgb;
         valid4_rgb    <= valid3_rgb;
@@ -225,51 +236,15 @@ end process pipValidP;
 
 process (clk) begin
     if rising_edge(clk) then
-        v2value <= v1value;
-        v3value <= v2value;
-        s2value <= s1value;
-        s3value <= s2value;
+        luminosity_sync2        <= luminosity_sync1;
+        saturate_sync1          <= saturate;
+        saturate_sync2          <= saturate_sync1;
     end if;
 end process;
 
-        oHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
-        oHsl.green <= std_logic_vector(s3value);
-        oHsl.blue  <= std_logic_vector(v3value);
-        oHsl.valid <= valid4_rgb;
---rgb_ool1_inst: sync_frames
---generic map(
---    pixelDelay => 2)
---port map(
---    clk        => clk,
---    reset      => reset,
---    iRgb       => iRgb,
---    oRgb       => rgb_ool4);
---process (clk) begin
---    if rising_edge(clk) then
---        rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);
---        rgb_colo.green  <= to_sfixed("00" & sHsl.green,rgb_colo.green);
---        rgb_colo.blue   <= to_sfixed("00" & sHsl.blue,rgb_colo.blue);
---        rgb_oolo.red    <= to_sfixed("00" & rgb_ool4.red,rgb_oolo.red);
---        rgb_oolo.green  <= to_sfixed("00" & rgb_ool4.green,rgb_oolo.green);
---        rgb_oolo.blue   <= to_sfixed("00" & rgb_ool4.blue,rgb_oolo.blue);
---    end if;
---end process;
---process (clk) begin
---    if rising_edge(clk) then
---        rgb_ool2.red   <= abs(rgb_oolo.red - rgb_colo.red);
---        rgb_ool2.green <= abs(rgb_oolo.green - rgb_colo.green);
---        rgb_ool2.blue  <= abs(rgb_oolo.blue - rgb_colo.blue);
---        rgb_ool3.red   <= resize(rgb_ool2.red,rgb_ool3.red);
---        rgb_ool3.green <= resize(rgb_ool2.green,rgb_ool3.green);
---        rgb_ool3.blue  <= resize(rgb_ool2.blue,rgb_ool3.blue);
---    end if;
---end process;
---pipRgbwD2P: process (clk) begin
---    if rising_edge(clk) then
---        oHsl.red   <= std_logic_vector(rgb_ool3.red(i_data_width-1 downto 0));
---        oHsl.green <= std_logic_vector(rgb_ool3.green(i_data_width-1 downto 0));
---        oHsl.blue  <= std_logic_vector(rgb_ool3.blue(i_data_width-1 downto 0));
---        oHsl.valid <= valid8_rgb;
---    end if;
---end process pipRgbwD2P;
+oHsl.red   <= std_logic_vector(to_unsigned(hue, 8));
+oHsl.green <= std_logic_vector(saturate_sync2);
+oHsl.blue  <= std_logic_vector(luminosity_sync2);
+oHsl.valid <= valid4_rgb;
+        
 end behavioral;
