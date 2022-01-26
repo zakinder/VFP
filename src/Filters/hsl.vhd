@@ -136,23 +136,23 @@ hueP: process (clk) begin
     if (rgb_sync_3.red  = rgb_max_value) then
             hue_degree <= 0;
         if (rgb_sync_3.green >= rgb_sync_3.blue) then
-            hue_numerator        <= (rgb_sync_3.green - rgb_sync_3.blue) * 60;
+            hue_numerator        <= (rgb_sync_3.green - rgb_sync_3.blue) * 85;
         else
-            hue_numerator        <= (rgb_sync_3.blue - rgb_sync_3.green) * 60;
+            hue_numerator        <= (rgb_sync_3.blue - rgb_sync_3.green) * 85;
         end if;
     elsif(rgb_sync_3.green = rgb_max_value)  then
-            hue_degree <= 75;
+            hue_degree <= 86;
         if (rgb_sync_3.blue >= rgb_sync_3.red ) then
-            hue_numerator       <= (rgb_sync_3.blue - rgb_sync_3.red ) * 60;
+            hue_numerator       <= (rgb_sync_3.blue - rgb_sync_3.red ) * 84;
         else
-            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.blue) * 60;
+            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.blue) * 84;
         end if;
     elsif(rgb_sync_3.blue = rgb_max_value)  then
-            hue_degree <= 150;
+            hue_degree <= 171;
         if (rgb_sync_3.red  >= rgb_sync_3.green) then
-            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.green) * 60;
+            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.green) * 84;
         else
-            hue_numerator       <= (rgb_sync_3.green - rgb_sync_3.red ) * 60;
+            hue_numerator       <= (rgb_sync_3.green - rgb_sync_3.red ) * 84;
         end if;
     end if;
   end if;

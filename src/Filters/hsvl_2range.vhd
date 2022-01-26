@@ -147,23 +147,23 @@ hueP: process (clk) begin
     if (uFs3Rgb.red  = maxValue) then
             hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 81;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 85;
         else
-            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 81;
+            uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 85;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 40;
+            hueDeg <= 86;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 81;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 84;
         else
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 81;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 84;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 80;
+            hueDeg <= 171;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 121;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 84;
         else
-            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 121;
+            uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 84;
         end if;
     end if;
   end if;

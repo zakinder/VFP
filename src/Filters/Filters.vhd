@@ -289,6 +289,9 @@ port map (
     reset              => rst_l,
     iRgb               => iRgb,
     oRgb               => rgb);
+    
+    
+    
 hsvl_ycc_inst  : rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,

@@ -166,9 +166,9 @@ process (clk) begin
     end if;
 end process;
 
- oRgb.red   <= std_logic_vector(to_unsigned(i2Rgb.red, 8));
- oRgb.green <= std_logic_vector(to_unsigned(i2Rgb.green, 8));
- oRgb.blue  <= std_logic_vector(to_unsigned(i2Rgb.blue, 8));
- oRgb.valid <= i3Rgb.valid;
+ oRgb.red   <= std_logic_vector(to_unsigned(i1Rgb.red, 8));
+ oRgb.green <= std_logic_vector(to_unsigned(i1Rgb.green, 8));
+ oRgb.blue  <= std_logic_vector(to_unsigned(i1Rgb.blue, 8));
+ oRgb.valid <= i1Rgb.valid;
  
 end Behavioral;
