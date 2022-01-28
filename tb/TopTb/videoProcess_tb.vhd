@@ -53,7 +53,7 @@ architecture behavioral of video_process_tb is
     constant vChannelSelect              : integer := FILTER_K_CGA;
     -------------------------------------------------
     constant F_HSV                       : boolean := false;
-    constant F_HSL                       : boolean := true;
+    constant F_HSL                       : boolean := false;
     constant HSV_L                       : boolean := false;
     constant HSV_1                       : boolean := false;
     constant HSV_2                       : boolean := false;
@@ -87,7 +87,7 @@ architecture behavioral of video_process_tb is
     constant F_BLU                       : boolean := false;
     constant F_EMB                       : boolean := false;
     constant F_SOB                       : boolean := false;
-    constant L_BLU                       : boolean := false;-- synBlur
+    constant L_BLU                       : boolean := true;-- synBlur
     constant L_D1T                       : boolean := false; 
     constant L_B1T                       : boolean := false;
     -------------------------------------------------

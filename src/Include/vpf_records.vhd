@@ -1173,6 +1173,30 @@ type w_pixels is record
     pix8 : unsigned(i_data_width downto 0);
     pix9 : unsigned(i_data_width downto 0);
 end record;
+
+type w_4_by_4_pixels is record
+    k1  : unsigned(i_data_width downto 0);
+    k2  : unsigned(i_data_width downto 0);
+    k3  : unsigned(i_data_width downto 0);
+    k4  : unsigned(i_data_width downto 0);
+    k5  : unsigned(i_data_width downto 0);
+    k6  : unsigned(i_data_width downto 0);
+    k7  : unsigned(i_data_width downto 0);
+    k8  : unsigned(i_data_width downto 0);
+    k9  : unsigned(i_data_width downto 0);
+    k10 : unsigned(i_data_width downto 0);
+    k11 : unsigned(i_data_width downto 0);
+    k12 : unsigned(i_data_width downto 0);
+    k13 : unsigned(i_data_width downto 0);
+    k14 : unsigned(i_data_width downto 0);
+    k15 : unsigned(i_data_width downto 0);
+    k16 : unsigned(i_data_width downto 0);
+end record;
+
+
+
+
+
 type itaps is record
     iTap1  : unsigned(i_data_width downto 0);
     iTap2  : unsigned(i_data_width downto 0);
@@ -1184,6 +1208,16 @@ type unsig_pixel_mac is record
     m3      : unsigned (16 downto 0);
     mac     : unsigned (i_data_width+3 downto 0);
 end record;
+
+type unsig_pixel_4by4mac is record
+    m1      : unsigned (16 downto 0);
+    m2      : unsigned (16 downto 0);
+    m3      : unsigned (16 downto 0);
+    m4      : unsigned (16 downto 0);
+    mac     : unsigned (i_data_width+3 downto 0);
+end record;
+
+
 type fcolors is record
     sobel             : channel;
     embos             : channel;
