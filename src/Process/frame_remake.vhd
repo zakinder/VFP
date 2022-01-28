@@ -30,7 +30,17 @@ architecture behavioral of frame_remake is
     signal ycbcr            : channel;
     signal synYcbcr         : channel;
     signal iRgb_hsl1_range  : channel;
+    signal iRgb_hsl2_range  : channel;
+    signal iRgb_hsl3_range  : channel;
+    signal iRgb_hsl4_range  : channel;
+
     signal iRgb_hsll1range  : channel;
+    signal iRgb_hsll2range  : channel;
+    signal iRgb_hsll3range  : channel;
+    signal iRgb_hsll4range  : channel;
+    
+    signal iRgb_colorhsl    : channel;
+    
     signal d1Rgb            : channel;
     signal d2Rgb            : channel;
     signal d3Rgb            : channel;
@@ -39,14 +49,38 @@ architecture behavioral of frame_remake is
     signal d6Rgb            : channel;
     signal d7Rgb            : channel;
     signal d8Rgb            : channel;
-    signal d21Rgb           : channel;
+    
+    
+
     signal d22Rgb           : channel;
     signal d23Rgb           : channel;
-    signal d24Rgb           : channel;
     signal d25Rgb           : channel;
     signal d26Rgb           : channel;
     signal d27Rgb           : channel;
     signal d28Rgb           : channel;
+    
+    signal d32Rgb           : channel;
+    signal d33Rgb           : channel;
+    signal d35Rgb           : channel;
+    signal d36Rgb           : channel;
+    signal d37Rgb           : channel;
+    signal d38Rgb           : channel;
+    
+    signal d42Rgb           : channel;
+    signal d43Rgb           : channel;
+    signal d45Rgb           : channel;
+    signal d46Rgb           : channel;
+    signal d47Rgb           : channel;
+    signal d48Rgb           : channel;
+    
+    signal d52Rgb           : channel;
+    signal d53Rgb           : channel;
+    signal d55Rgb           : channel;
+    signal d56Rgb           : channel;
+    signal d57Rgb           : channel;
+    signal d58Rgb           : channel;
+    
+    
 begin
 --sobel             : channel;
 --embos             : channel;
@@ -141,6 +175,7 @@ port map(
     iRgb                 => ycbcr,
     oRgb                 => synYcbcr);
 
+
 iRgb_hsl1_range_inst  : sync_frames
 generic map(
     pixelDelay           => 1)
@@ -149,6 +184,35 @@ port map(
     reset                => reset,
     iRgb                 => iRgb.hsl1_range,
     oRgb                 => iRgb_hsl1_range);
+    
+hsl2_range_range_inst  : sync_frames
+generic map(
+    pixelDelay           => 1)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.hsl2_range,
+    oRgb                 => iRgb_hsl2_range);
+    
+hsl3_range_range_inst  : sync_frames
+generic map(
+    pixelDelay           => 1)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.hsl3_range,
+    oRgb                 => iRgb_hsl3_range);
+    
+hsl4_range_range_inst  : sync_frames
+generic map(
+    pixelDelay           => 1)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.hsl4_range,
+    oRgb                 => iRgb_hsl4_range);
+    
+    
 iRgb_hsll1range_inst  : sync_frames
 generic map(
     pixelDelay           => 0)
@@ -157,6 +221,43 @@ port map(
     reset                => reset,
     iRgb                 => iRgb.hsll1range,
     oRgb                 => iRgb_hsll1range);
+
+iRgb_hsll2range_inst  : sync_frames
+generic map(
+    pixelDelay           => 0)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.hsll2range,
+    oRgb                 => iRgb_hsll2range);
+    
+iRgb_hsll3range_inst  : sync_frames
+generic map(
+    pixelDelay           => 0)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.hsll3range,
+    oRgb                 => iRgb_hsll3range);
+    
+iRgb_hsll4range_inst  : sync_frames
+generic map(
+    pixelDelay           => 0)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.hsll4range,
+    oRgb                 => iRgb_hsll4range);
+    
+iRgb_colorhsl_inst  : sync_frames
+generic map(
+    pixelDelay           => 0)
+port map(
+    clk                  => clk,
+    reset                => reset,
+    iRgb                 => iRgb.colorhsl,
+    oRgb                 => iRgb_colorhsl);
+    
     
 process (clk) begin  --frame_remake_h_cb_cr
     if rising_edge(clk) then
@@ -222,6 +323,9 @@ process (clk) begin  --frame_remake_ccr_h_s
         d8Rgb.valid  <= iRgb_hsl1_range.valid;
     end if;
 end process;
+
+
+
 process (clk) begin  --fframe_remake_s_cb_cr
     if rising_edge(clk) then 
         d22Rgb.red    <= iRgb_hsll1range.green;
@@ -270,6 +374,157 @@ process (clk) begin  --fframe_remake_ccr_s_l
         d28Rgb.valid  <= iRgb_hsll1range.valid;
     end if;
 end process;
+
+process (clk) begin  --fframe_remake_s_cb_cr
+    if rising_edge(clk) then 
+        d32Rgb.red    <= iRgb_hsll2range.green;
+        d32Rgb.green  <= synYcbcr.green;
+        d32Rgb.blue   <= synYcbcr.blue;
+        d32Rgb.valid  <= iRgb_hsll2range.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_l_cb_cr
+    if rising_edge(clk) then 
+        d33Rgb.red    <= iRgb_hsll2range.blue;
+        d33Rgb.green  <= synYcbcr.green;
+        d33Rgb.blue   <= synYcbcr.blue;
+        d33Rgb.valid  <= iRgb_hsll2range.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_s_l_cr
+    if rising_edge(clk) then 
+        d35Rgb.red    <= iRgb_hsll2range.green;
+        d35Rgb.green  <= iRgb_hsll2range.blue;
+        d35Rgb.blue   <= synYcbcr.blue;
+        d35Rgb.valid  <= iRgb_hsll2range.valid;
+    end if;
+end process;
+process (clk) begin --fframe_remake_ccr_s_cb
+    if rising_edge(clk) then 
+        d36Rgb.red    <= iRgb.cgain.red;
+        d36Rgb.green  <= iRgb_hsll2range.green;
+        d36Rgb.blue   <= synYcbcr.blue;
+        d36Rgb.valid  <= iRgb_hsll2range.valid;
+    end if;
+end process;
+process (clk) begin --fframe_remake_ccr_s_cr
+    if rising_edge(clk) then 
+        d37Rgb.red    <= iRgb.cgain.red;
+        d37Rgb.green  <= iRgb_hsll2range.green;
+        d37Rgb.blue   <= synYcbcr.blue;
+        d37Rgb.valid  <= iRgb_hsll2range.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_ccr_s_l
+    if rising_edge(clk) then 
+        d38Rgb.red    <= iRgb.cgain.red;
+        d38Rgb.green  <= iRgb_hsll2range.green;
+        d38Rgb.blue   <= iRgb_hsll2range.blue;
+        d38Rgb.valid  <= iRgb_hsll2range.valid;
+    end if;
+end process;
+---------------------------------------------------------------------
+
+process (clk) begin  --fframe_remake_s_cb_cr
+    if rising_edge(clk) then 
+        d42Rgb.red    <= iRgb_colorhsl.green;
+        d42Rgb.green  <= synYcbcr.green;
+        d42Rgb.blue   <= synYcbcr.blue;
+        d42Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_l_cb_cr
+    if rising_edge(clk) then 
+        d43Rgb.red    <= iRgb_colorhsl.blue;
+        d43Rgb.green  <= synYcbcr.green;
+        d43Rgb.blue   <= synYcbcr.blue;
+        d43Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_s_l_cr
+    if rising_edge(clk) then 
+        d45Rgb.red    <= iRgb_colorhsl.green;
+        d45Rgb.green  <= iRgb_colorhsl.blue;
+        d45Rgb.blue   <= synYcbcr.blue;
+        d45Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin --fframe_remake_ccr_s_cb
+    if rising_edge(clk) then 
+        d46Rgb.red    <= iRgb.cgain.red;
+        d46Rgb.green  <= iRgb_colorhsl.green;
+        d46Rgb.blue   <= synYcbcr.blue;
+        d46Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin --fframe_remake_ccr_s_cr
+    if rising_edge(clk) then 
+        d47Rgb.red    <= iRgb.cgain.red;
+        d47Rgb.green  <= iRgb_colorhsl.green;
+        d47Rgb.blue   <= synYcbcr.blue;
+        d47Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_ccr_s_l
+    if rising_edge(clk) then 
+        d48Rgb.red    <= iRgb.cgain.red;
+        d48Rgb.green  <= iRgb_colorhsl.green;
+        d48Rgb.blue   <= iRgb_colorhsl.blue;
+        d48Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+
+---------------------------------------------------------------------
+process (clk) begin  --fframe_remake_s_cb_cr
+    if rising_edge(clk) then 
+        d52Rgb.red    <= iRgb_colorhsl.green;
+        d52Rgb.green  <= iRgb_hsll1range.green;
+        d52Rgb.blue   <= iRgb_hsll1range.blue;
+        d52Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_l_cb_cr
+    if rising_edge(clk) then 
+        d53Rgb.red    <= iRgb_colorhsl.blue;
+        d53Rgb.green  <= iRgb_hsll1range.green;
+        d53Rgb.blue   <= iRgb_hsll1range.blue;
+        d53Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_s_l_cr
+    if rising_edge(clk) then 
+        d55Rgb.red    <= iRgb_colorhsl.green;
+        d55Rgb.green  <= iRgb_colorhsl.blue;
+        d55Rgb.blue   <= iRgb_hsll1range.blue;
+        d55Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin --fframe_remake_ccr_s_cb
+    if rising_edge(clk) then 
+        d56Rgb.red    <= iRgb.cgain.red;
+        d56Rgb.green  <= iRgb_colorhsl.green;
+        d56Rgb.blue   <= iRgb_hsll1range.blue;
+        d56Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin --fframe_remake_ccr_s_cr
+    if rising_edge(clk) then 
+        d57Rgb.red    <= iRgb.cgain.red;
+        d57Rgb.green  <= iRgb_colorhsl.green;
+        d57Rgb.blue   <= iRgb_hsll1range.blue;
+        d57Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+process (clk) begin  --fframe_remake_ccr_s_l
+    if rising_edge(clk) then 
+        d58Rgb.red    <= iRgb.cgain.red;
+        d58Rgb.green  <= iRgb_colorhsl.green;
+        d58Rgb.blue   <= iRgb_colorhsl.blue;
+        d58Rgb.valid  <= iRgb_colorhsl.valid;
+    end if;
+end process;
+---------------------------------------------------------------------
+
 fframe_remake_s_cb_cr_inst: write_image
 generic map (
     enImageText           => true,
@@ -336,6 +591,149 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => d28Rgb);
+    
+
+    
+    
+fframe_colorhsl_s_cb_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_colorhsl_s_cb_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d42Rgb);
+fframe_colorhsl_l_cb_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_colorhsl_l_cb_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d43Rgb);
+fframe_colorhsl_s_l_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_colorhsl_s_l_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d45Rgb);
+fframe_colorhsl_ccr_s_cb_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_colorhsl_ccr_s_cb")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d46Rgb);
+fframe_colorhsl_ccr_s_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_colorhsl_ccr_s_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d47Rgb);
+fframe_colorhsl_ccr_s_l_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_colorhsl_ccr_s_l")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d48Rgb);
+    
+    
+fframe_hsll2range_s_cb_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_hsll2range_s_cb_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d32Rgb);
+fframe_hsll2range_l_cb_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_hsll2range_l_cb_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d33Rgb);
+fframe_hsll2range_s_l_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_hsll2range_s_l_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d35Rgb);
+fframe_hsll2range_ccr_s_cb_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_hsll2range_ccr_s_cb")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d36Rgb);
+fframe_hsll2range_ccr_s_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_hsll2range_ccr_s_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d37Rgb);
+fframe_hsll2range_ccr_s_l_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "fframe_hsll2range_ccr_s_l")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d38Rgb);
+    
+    
+    
+    
+    
 frame_remake_h_cb_cr_inst: write_image
 generic map (
     enImageText           => true,
@@ -424,4 +822,72 @@ generic map (
 port map (                  
     pixclk                => clk,
     iRgb                  => d8Rgb);
+    
+hsll1range_colorhsl_s_cb_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "hsll1range_colorhsl_s_cb_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d52Rgb);
+hsll1range_colorhsl_l_cb_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "hsll1range_colorhsl_l_cb_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d53Rgb);
+hsll1range_colorhsl_s_l_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "hsll1range_colorhsl_s_l_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d55Rgb);
+hsll1range_colorhsl_ccr_s_cb_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "hsll1range_colorhsl_ccr_s_cb")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d56Rgb);
+hsll1range_colorhsl_ccr_s_cr_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "hsll1range_colorhsl_ccr_s_cr")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d57Rgb);
+hsll1range_colorhsl_ccr_s_l_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => "testFolder",
+    input_file            => readbmp,
+    output_file           => "hsll1range_colorhsl_ccr_s_l")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => d58Rgb);
+    
 end behavioral;

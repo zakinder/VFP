@@ -51,6 +51,8 @@ package body vfp_pkg is
            return 255;
        elsif bmp = "255_127" then
            return 255;
+       elsif bmp = "258_200" then
+           return 258;
        elsif bmp = "272_416" then
            return 272;
        elsif bmp = "272_832" then
@@ -98,6 +100,8 @@ package body vfp_pkg is
            return 255;
        elsif bmp = "255_127" then
            return 127;
+       elsif bmp = "258_200" then
+           return 200;
        elsif bmp = "272_416" then
            return 416;
        elsif bmp = "272_832" then

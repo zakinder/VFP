@@ -136,24 +136,27 @@ end process pipRgbD2P;
 hueP: process (clk) begin
   if rising_edge(clk) then
     if (uFs3Rgb.red  = maxValue) then
-            hueDeg <= 0;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 85;
+            hueDeg <= 0;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 44;
         else
+            hueDeg <= 0;
             uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 85;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 86;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 84;
+            hueDeg <= 129;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 43;
         else
+            hueDeg <= 86;
             uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 84;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 171;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 84;
+            hueDeg <= 212;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 43;
         else
+            hueDeg <= 171;
             uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 84;
         end if;
     end if;
@@ -192,11 +195,9 @@ hueDividerResizeP: process (clk) begin
         --hueQuot1x <= (uFiXhueQuot mod 45900) /255;
     end if;
 end process hueDividerResizeP;
-hueValueP: process (clk) begin
-    if rising_edge(clk) then
-        h_value <= hueQuot1x + hueDeg1x;
-    end if;
-end process hueValueP;    
+
+    h_value <= hueQuot1x + hueDeg1x;
+ 
 -------------------------------------------------
 -- SATURATE
 -------------------------------------------------     
@@ -226,10 +227,12 @@ process (clk) begin
         s3value <= s2value;
     end if;
 end process;
-        sHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
-        sHsl.green <= std_logic_vector(s3value);
-        sHsl.blue  <= std_logic_vector(v3value);
-        sHsl.valid <= valid3_rgb;
+
+sHsl.red   <= std_logic_vector(to_unsigned(h_value, 8));
+sHsl.green <= std_logic_vector(s3value);
+sHsl.blue  <= std_logic_vector(v3value);
+sHsl.valid <= valid3_rgb;
+
 l_ycc_inst  : rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,

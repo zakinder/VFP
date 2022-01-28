@@ -27,13 +27,26 @@ port (
     oHsl           : out channel);
 end hsl_c;
 architecture behavioral of hsl_c is
-    signal rgb_sync_1    : intChannel;
-    signal rgb_sync_2    : intChannel;
-    signal rgb_sync_3    : intChannel;
-    signal rgb_max       : natural;
-    signal rgb_min       : natural;
-    signal rgb_max_value : natural;
-    signal rgb_delta     : natural;
+    signal rgb_sync_1                : intChannel;
+    signal rgb_sync_2                : intChannel;
+    signal rgb_sync_3                : intChannel;
+    signal rgb_max                   : natural := zero;
+    signal rgb_min                   : natural := zero;
+    signal rgb_max_value             : natural := zero;
+    signal rgb_delta                 : natural := zero;
+    signal rgb_delta_1               : natural := zero;
+    signal rgb_delta_sum             : natural := zero;
+    signal rgb_delta_sum_1           : natural := zero;
+    signal rgb_delta_max_1           : natural := zero;
+    signal rgb_delta_max_2           : natural := zero;
+    signal rgb_delta_max             : natural := zero;
+    signal rgb_delta_sum_denominator : ufixed(17 downto 0)    :=(others => '0');
+    signal rgb_delta_numerator       : ufixed(8 downto 0)    :=(others => '0');
+    signal rgb_delta_numerator_1     : ufixed(8 downto 0)    :=(others => '0');
+    signal rgb_delta_quotient_1      : ufixed(17 downto -9)   :=(others => '0');
+    signal rgb_delta_quotient_2      : ufixed(8 downto -9)   :=(others => '0');
+    signal rgb_delta_quot_1          : ufixed(8 downto 0)    :=(others => '0');
+    signal rgb_delta_quot_2          : ufixed(8 downto 0)    :=(others => '0');
     --H
     signal hue_quotient       : ufixed(17 downto -9) :=(others => '0');
     signal hue_numerator      : natural := zero;
@@ -45,6 +58,7 @@ architecture behavioral of hsl_c is
     signal hue_quotient_value : natural := zero;
     signal hue_degree         : natural := zero;
     signal hue_degree_sync    : natural := zero;
+    signal hue_result         : natural := zero;
     signal hue                : natural := zero;
     --S
     signal saturate           : unsigned(7 downto 0);
@@ -115,9 +129,31 @@ end process pipRgbMaxUfD1P;
 -- RGB.∆ = RGB.max − RGB.min
 rgbDeltaP: process (clk) begin
     if rising_edge(clk) then
-        rgb_delta      <= rgb_max - rgb_min;
+        rgb_delta      <= (rgb_max - rgb_min);
+        rgb_delta_1    <= (2 - rgb_max - rgb_min);
+        rgb_delta_sum  <= (rgb_max + rgb_min);
     end if;
 end process rgbDeltaP;
+rgb_delta_sum_denominator   <= to_ufixed(rgb_delta_sum,uuFiXhueTop);
+rgb_delta_numerator         <= to_ufixed(rgb_delta,uuFiXhueBot);
+rgb_delta_numerator_1       <= to_ufixed(rgb_delta_1,uuFiXhueBot);
+rgb_delta_quotient_1        <= (rgb_delta_numerator / rgb_delta_sum_denominator);
+rgb_delta_quotient_2        <= (rgb_delta_numerator / rgb_delta_numerator_1);
+rgb_delta_quot_1            <= resize(rgb_delta_quotient_1,rgb_delta_quot_1);
+rgb_delta_quot_2            <= resize(rgb_delta_quotient_2,rgb_delta_quot_2);
+rgb_delta_max_1             <= to_integer(unsigned(rgb_delta_quot_1));
+rgb_delta_max_2             <= to_integer(unsigned(rgb_delta_quot_2));
+
+process(rgb_delta_max_1,rgb_delta_max_2)begin
+    if (rgb_delta_max_1 <= 255) then
+        rgb_delta_max     <= rgb_delta_max_2;
+    else
+        rgb_delta_max     <= rgb_delta_max_1;
+    end if;
+end process;
+
+
+-------------------------------------------------
 pipRgbD2P: process (clk) begin
     if rising_edge(clk) then
         rgb_sync_2 <= rgb_sync_1;
@@ -134,29 +170,33 @@ end process pipRgbD2P;
 hueP: process (clk) begin
   if rising_edge(clk) then
     if (rgb_sync_3.red  = rgb_max_value) then
-            hue_degree <= 0;
         if (rgb_sync_3.green >= rgb_sync_3.blue) then
-            hue_numerator        <= (rgb_sync_3.green - rgb_sync_3.blue) * 85;
+            hue_degree <= 0;
+            hue_numerator        <= (rgb_sync_3.green - rgb_sync_3.blue) * 44;
         else
+            hue_degree <= 0;
             hue_numerator        <= (rgb_sync_3.blue - rgb_sync_3.green) * 85;
         end if;
     elsif(rgb_sync_3.green = rgb_max_value)  then
-            hue_degree <= 86;
         if (rgb_sync_3.blue >= rgb_sync_3.red ) then
-            hue_numerator       <= (rgb_sync_3.blue - rgb_sync_3.red ) * 84;
+            hue_degree <= 129;
+            hue_numerator       <= (rgb_sync_3.blue - rgb_sync_3.red ) * 43;
         else
+            hue_degree <= 86;
             hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.blue) * 84;
         end if;
     elsif(rgb_sync_3.blue = rgb_max_value)  then
-            hue_degree <= 171;
         if (rgb_sync_3.red  >= rgb_sync_3.green) then
-            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.green) * 84;
+            hue_degree <= 212;
+            hue_numerator       <= (rgb_sync_3.red  - rgb_sync_3.green) * 43;
         else
+            hue_degree <= 171;
             hue_numerator       <= (rgb_sync_3.green - rgb_sync_3.red ) * 84;
         end if;
     end if;
   end if;
 end process hueP;
+
 -------------------------------------------------
 -- HUE
 -- RGB.∆ = RGB.max − RGB.min
@@ -186,21 +226,19 @@ hueDegreeP: process (clk) begin
 end process hueDegreeP;
 hueDividerResizeP: process (clk) begin
     if rising_edge(clk) then
-        hue_quotient_value <= uFiXhueQuot;
+        hue_quotient_value  <= uFiXhueQuot;
     end if;
 end process hueDividerResizeP;
-hueValueP: process (clk) begin
-    if rising_edge(clk) then
-        hue <= hue_quotient_value + hue_degree_sync;
-    end if;
-end process hueValueP;    
+
+hue  <= hue_quotient_value + hue_degree_sync;
+
 -------------------------------------------------
 -- SATURATE
 -------------------------------------------------     
 satValueP: process (clk) begin
     if rising_edge(clk) then
         if(rgb_max /= 0)then
-            saturate <= to_unsigned((rgb_delta),8);
+            saturate <= to_unsigned((rgb_delta_max),8);
         else
             saturate <= to_unsigned(0, 8);
         end if;

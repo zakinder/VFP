@@ -148,24 +148,27 @@ end process pipRgbD2P;
 hueP: process (clk) begin
   if rising_edge(clk) then
     if (uFs3Rgb.red  = maxValue) then
-            hueDeg <= 1;
         if (uFs3Rgb.green >= uFs3Rgb.blue) then
-            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 85;
+            hueDeg <= 0;
+            uFiXhueTop        <= (uFs3Rgb.green - uFs3Rgb.blue) * 44;
         else
+            hueDeg <= 0;
             uFiXhueTop        <= (uFs3Rgb.blue - uFs3Rgb.green) * 85;
         end if;
     elsif(uFs3Rgb.green = maxValue)  then
-            hueDeg <= 86;
         if (uFs3Rgb.blue >= uFs3Rgb.red ) then
-            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 84;
+            hueDeg <= 129;
+            uFiXhueTop       <= (uFs3Rgb.blue - uFs3Rgb.red ) * 43;
         else
+            hueDeg <= 86;
             uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.blue) * 84;
         end if;
     elsif(uFs3Rgb.blue = maxValue)  then
-            hueDeg <= 171;
         if (uFs3Rgb.red  >= uFs3Rgb.green) then
-            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 84;
+            hueDeg <= 212;
+            uFiXhueTop       <= (uFs3Rgb.red  - uFs3Rgb.green) * 43;
         else
+            hueDeg <= 171;
             uFiXhueTop       <= (uFs3Rgb.green - uFs3Rgb.red ) * 84;
         end if;
     end if;

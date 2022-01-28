@@ -72,6 +72,7 @@ architecture Behavioral of kernel is
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal kCoProd         : kCoefFiltFloat;
     signal colorhsl        : channel;
+    signal colorhsl_sync   : channel;
     signal ccmcolor        : channel;
     signal re1color        : channel;
     signal re2color        : channel;
@@ -1013,7 +1014,15 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
-    oRgb               => colorhsl);
+    oRgb               => colorhsl_sync);
+sync_color_hsl_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => colorhsl_sync,
+    oRgb                 => colorhsl);
 end generate RGBCOHSL_FRAME_ENABLE;
 oRgb.colorhsl <= colorhsl;
 F_RE1_FRAME_ENABLE: if (F_RE1_FRAME = true) generate begin

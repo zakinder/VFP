@@ -45,7 +45,7 @@ architecture behavioral of recolor_space_8 is
 -- 0E = +1.750    FE = -1.750
 -- 0F = +1.875    FF = -1.875
   signal point_five              : sfixed(4 downto -3) := to_sfixed(0.500,4,-3); -- Average detected pixels by 1/4
-  signal pixel_threshold_2       : sfixed(11 downto 0)  := to_sfixed(50.0,11,0);   -- [60% with 20] [70% with 40] 
+  signal pixel_threshold_2       : sfixed(11 downto 0)  := to_sfixed(20.0,11,0);   -- [60% with 20] [70% with 40] 
   signal pixel_threshold_zero    : sfixed(11 downto 0)  := to_sfixed(0.0,11,0);   -- [60% with 20] [70% with 40] 
   signal tpd1                    : k_3by3;
   signal tpd2                    : k_3by3;
