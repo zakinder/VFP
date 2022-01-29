@@ -102,9 +102,9 @@ architecture imp of rgb_ycbcr is
   constant C_1_PRE : unsigned(i_precision-1 downto 0) := to_unsigned(1, i_precision);
   -- Coefficients as 0.32 format 32-bit fixeds point numbers
   -- Each is computed as C*(2^32)+0.5, then rounded down.
-  signal C_I32_Y_R : unsigned(31 downto 0);
-  signal C_I32_Y_G : unsigned(31 downto 0);
-  signal C_I32_Y_B : unsigned(31 downto 0);
+  signal C_I32_Y_R  : unsigned(31 downto 0);
+  signal C_I32_Y_G  : unsigned(31 downto 0);
+  signal C_I32_Y_B  : unsigned(31 downto 0);
   signal C_I32_CB_R : unsigned(31 downto 0);
   signal C_I32_CB_G : unsigned(31 downto 0);
   signal C_I32_CB_B : unsigned(31 downto 0);
@@ -112,21 +112,21 @@ architecture imp of rgb_ycbcr is
   signal C_I32_CR_G : unsigned(31 downto 0);
   signal C_I32_CR_B : unsigned(31 downto 0);
   -- Coefficients in desired precision
-  signal C_I_Y_R : unsigned(i_precision-1 downto 0);
-  signal C_I_Y_G : unsigned(i_precision-1 downto 0);
-  signal C_I_Y_B : unsigned(i_precision-1 downto 0);
+  signal C_I_Y_R  : unsigned(i_precision-1 downto 0);
+  signal C_I_Y_G  : unsigned(i_precision-1 downto 0);
+  signal C_I_Y_B  : unsigned(i_precision-1 downto 0);
   signal C_I_CB_R : unsigned(i_precision-1 downto 0);
   signal C_I_CB_G : unsigned(i_precision-1 downto 0);
   signal C_I_CB_B : unsigned(i_precision-1 downto 0);
   signal C_I_CR_R : unsigned(i_precision-1 downto 0);
   signal C_I_CR_G : unsigned(i_precision-1 downto 0);
   signal C_I_CR_B : unsigned(i_precision-1 downto 0);
-  signal C_I_128 : unsigned(i_data_width-1 downto 0);
-  signal C_I_16  : unsigned(i_data_width-1 downto 0);
+  signal C_I_128  : unsigned(i_data_width-1 downto 0);
+  signal C_I_16   : unsigned(i_data_width-1 downto 0);
   -- Stage 0 signals
-  signal r_0 : unsigned(i_data_width-1 downto 0);
-  signal g_0 : unsigned(i_data_width-1 downto 0);
-  signal b_0 : unsigned(i_data_width-1 downto 0);
+  signal r_0  : unsigned(i_data_width-1 downto 0);
+  signal g_0  : unsigned(i_data_width-1 downto 0);
+  signal b_0  : unsigned(i_data_width-1 downto 0);
   signal en_0 : std_logic;
   -- Stage 1 signals
   signal y_r, y_g, y_b    : unsigned(i_precision-1 downto 0);
@@ -163,7 +163,7 @@ begin
     C_I32_CR_R <= x"82ec0725";
     C_I32_CR_G <= x"6da187a5";
     C_I32_CR_B <= x"154a7f80";
-    C_I_16 <= (others => '0');
+    C_I_16     <= (others => '0');
   end generate;
   -- Compute coefficients constants in desired precsion, with a bit of rounding
   C_I_Y_R <= C_I32_Y_R(31 downto 31-i_precision+1)
@@ -200,10 +200,10 @@ begin
   STAGE_0_PROC: process (clk, rst_l, iRgb.red, iRgb.green, iRgb.blue, iRgb.valid)
   begin
     if rst_l = '0' then
-      en_0 <= '0';
-      r_0  <= (others => '0');
-      g_0  <= (others => '0');
-      b_0  <= (others => '0');
+      en_0  <= '0';
+      r_0   <= (others => '0');
+      g_0   <= (others => '0');
+      b_0   <= (others => '0');
     elsif clk'event and clk = '1' then
       r_0  <= unsigned(iRgb.red);
       g_0  <= unsigned(iRgb.green);
@@ -219,9 +219,9 @@ begin
   begin
     if rst_l = '0' then
       en_1 <= '0';
-      y_r <= (others => '0');
-      y_g <= (others => '0');
-      y_b <= (others => '0');
+      y_r  <= (others => '0');
+      y_g  <= (others => '0');
+      y_b  <= (others => '0');
       cb_r <= (others => '0');
       cb_g <= (others => '0');
       cb_b <= (others => '0');

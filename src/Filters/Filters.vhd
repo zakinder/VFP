@@ -173,6 +173,8 @@ architecture Behavioral of filters is
     signal balance_ccm         : coefficient;
     signal rgb                 : channel;
     signal rgbYcbcr            : channel;
+    signal rgb1Ycbcr            : channel;
+    
 begin
     -- 60  =  7.50
     -- 24  =  3.00
@@ -305,6 +307,9 @@ port map(
     cb                   => rgbYcbcr.green,
     cr                   => rgbYcbcr.blue,
     oValid               => rgbYcbcr.valid);
+    
+
+
 HSV_L_ENABLE: if (HSV_L = true) generate begin
 hsv_hsvl_inst: hsvl
 generic map (
@@ -804,19 +809,29 @@ end generate L_SHP_ENABLE;
     fRgb.synSharp        <= rgbLocSynSFilt.sharp;
 L_YCC_ENABLE: if (L_YCC = true) generate
 begin
-l_ycc_inst  : rgb_ycbcr
+--l_ycc_inst  : rgb_ycbcr
+--generic map(
+--    i_data_width         => i_data_width,
+--    i_precision          => 12,
+--    i_full_range         => TRUE)
+--port map(
+--    clk                  => clk,
+--    rst_l                => rst_l,
+--    iRgb                 => rgb,
+--    y                    => rgbLocFilt.ycbcr.red,
+--    cb                   => rgbLocFilt.ycbcr.green,
+--    cr                   => rgbLocFilt.ycbcr.blue,
+--    oValid               => rgbLocFilt.ycbcr.valid);
+
+rgb_to_xyz_color_space_inst  : rgb_to_xyz_color_space
 generic map(
-    i_data_width         => i_data_width,
-    i_precision          => 12,
-    i_full_range         => TRUE)
+    i_data_width         => i_data_width)
 port map(
     clk                  => clk,
-    rst_l                => rst_l,
+    reset                => rst_l,
     iRgb                 => rgb,
-    y                    => rgbLocFilt.ycbcr.red,
-    cb                   => rgbLocFilt.ycbcr.green,
-    cr                   => rgbLocFilt.ycbcr.blue,
-    oValid               => rgbLocFilt.ycbcr.valid);
+    oRgb                 => rgbLocFilt.ycbcr);
+    
 yccSyncr_inst  : sync_frames
 generic map(
     pixelDelay           => 27)

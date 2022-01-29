@@ -5,8 +5,21 @@
 -- Author      : Zakinder
 --
 -- Description:
--- This file instantiation
---
+-- This module converts rgb color space to hsl color space. First logic 
+-- calculates maximum and minimum value of rgb values. Hue is calculated 
+-- first determining the hue fraction from greatest rgb channel value. 
+-- If current max channel is red than Hue numerator will be set to be green 
+-- subtract blue only if green is greater than blue else blue is subtracted 
+-- from green and Hue degree would be zero.  If current max channel is green 
+-- than Hue numerator will be set to be blue subtract red only if blue is greater 
+-- than red else red is subtracted from blue and Hue degree would be 129. 
+-- Similarly, if current channel is blue than Hue numerator will be set to be 
+-- red subtract green only if red is greater than green else green subtracted from 
+-- red and Hue degree would be 212. Hue denominator would be rgb delta. 
+-- Once Hue fraction values are calculated than fraction values would be added 
+-- to hue degree which would give final hue value as done logic.Saturate value 
+-- is calculated from difference between rgb max and min over rgb max whereas 
+-- Intensity value rgb max value.
 -------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -34,7 +47,7 @@ architecture behavioral of hsl_c is
     signal rgb_min                   : natural := zero;
     signal rgb_max_value             : natural := zero;
     signal rgb_delta                 : natural := zero;
-    signal rgb_delta_1               : natural := zero;
+    signal rgb_delta_1               : integer := zero;
     signal rgb_delta_sum             : natural := zero;
     signal rgb_delta_sum_1           : natural := zero;
     signal rgb_delta_max_1           : natural := zero;
@@ -229,9 +242,7 @@ hueDividerResizeP: process (clk) begin
         hue_quotient_value  <= uFiXhueQuot;
     end if;
 end process hueDividerResizeP;
-
 hue  <= hue_quotient_value + hue_degree_sync;
-
 -------------------------------------------------
 -- SATURATE
 -------------------------------------------------     

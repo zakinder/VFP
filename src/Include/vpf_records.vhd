@@ -747,6 +747,12 @@ type rgbToUfRecord is record
     green            : ufixed(7 downto 0);
     blue             : ufixed(7 downto 0);
 end record;
+type rgb_to_uf_record is record
+    valid            : std_logic;
+    red              : ufixed(0 downto -8);
+    green            : ufixed(0 downto -8);
+    blue             : ufixed(0 downto -8);
+end record;
 type rgbToUf1Record is record
     valid            : std_logic;
     red              : ufixed(8 downto 0);
@@ -1193,9 +1199,29 @@ type w_4_by_4_pixels is record
     k16 : unsigned(i_data_width downto 0);
 end record;
 
+type w_3_by_3_pixels is record
+    k1  : unsigned(23 downto 0);
+    k2  : unsigned(23 downto 0);
+    k3  : unsigned(23 downto 0);
+    k4  : unsigned(23 downto 0);
+    k5  : unsigned(23 downto 0);
+    k6  : unsigned(23 downto 0);
+    k7  : unsigned(23 downto 0);
+    k8  : unsigned(23 downto 0);
+    k9  : unsigned(23 downto 0);
+end record;
 
-
-
+type w_3_by_3_pixels_28_width is record
+    k1  : unsigned(31 downto 0);
+    k2  : unsigned(31 downto 0);
+    k3  : unsigned(31 downto 0);
+    k4  : unsigned(31 downto 0);
+    k5  : unsigned(31 downto 0);
+    k6  : unsigned(31 downto 0);
+    k7  : unsigned(31 downto 0);
+    k8  : unsigned(31 downto 0);
+    k9  : unsigned(31 downto 0);
+end record;
 
 type itaps is record
     iTap1  : unsigned(i_data_width downto 0);
