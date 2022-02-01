@@ -18,6 +18,31 @@ type ty1sf is record
     k8               : sfixed(4 downto -3);
     k9               : sfixed(4 downto -3);
 end record;
+
+type ty7sf is record
+    k1               : sfixed(16 downto -3);
+    k2               : sfixed(16 downto -3);
+    k3               : sfixed(16 downto -3);
+    k4               : sfixed(16 downto -3);
+    k5               : sfixed(16 downto -3);
+    k6               : sfixed(16 downto -3);
+    k7               : sfixed(16 downto -3);
+    k8               : sfixed(16 downto -3);
+    k9               : sfixed(16 downto -3);
+end record;
+
+type ty8sf is record
+    k1               : sfixed(26 downto -3);
+    k2               : sfixed(26 downto -3);
+    k3               : sfixed(26 downto -3);
+    k4               : sfixed(26 downto -3);
+    k5               : sfixed(26 downto -3);
+    k6               : sfixed(26 downto -3);
+    k7               : sfixed(26 downto -3);
+    k8               : sfixed(26 downto -3);
+    k9               : sfixed(26 downto -3);
+end record;
+
 type ty2sf is record
     k1               : sfixed(24 downto -3);
     k2               : sfixed(24 downto -3);
@@ -29,6 +54,19 @@ type ty2sf is record
     k8               : sfixed(24 downto -3);
     k9               : sfixed(24 downto -3);
 end record;
+
+type ty9sn is record
+    k1               : signed(21 downto 0);
+    k2               : signed(21 downto 0);
+    k3               : signed(21 downto 0);
+    k4               : signed(21 downto 0);
+    k5               : signed(21 downto 0);
+    k6               : signed(21 downto 0);
+    k7               : signed(21 downto 0);
+    k8               : signed(21 downto 0);
+    k9               : signed(21 downto 0);
+end record;
+
 type ty2sn is record
     k1               : signed(19 downto 0);
     k2               : signed(19 downto 0);
@@ -40,6 +78,8 @@ type ty2sn is record
     k8               : signed(19 downto 0);
     k9               : signed(19 downto 0);
 end record;
+
+
 type ty1sn is record
     k1               : signed(14 downto 0);
     k2               : signed(14 downto 0);
@@ -387,6 +427,10 @@ type rgbSnSumRecord is record
 end record;
 type ccRgbRecord is record
     rgbToSf          : rgbToSfRecord;
+    ccSf             : ty7sf;
+    ccProdSf         : ty8sf;
+    ccProdToSn       : ty9sn;
+    ccProdTrSn       : ty1sn;
     rgbSnSum         : rgbSnSumRecord;
     rgbSnSumTr       : rgbSnSumTrRecord;
 end record;
@@ -844,6 +888,19 @@ type colors is record
     inrgb          : channel;
     tPattern       : channel;
     colorTrm       : channel;
+    cmyk           : channel;
+    xyz            : channel;
+    lms            : channel;
+    ypbpr          : channel;
+    yuv            : channel;
+    cc1            : channel;
+    cc2            : channel;
+    cc3            : channel;
+    cc4            : channel;
+    cc5            : channel;
+    cc6            : channel;
+    cc7            : channel;
+    cc8            : channel;
     colorhsl       : channel;
     hsl1_range     : channel;
     hsl2_range     : channel;
@@ -903,6 +960,19 @@ type frameColors is record
     d1t               : channel;
     b1t               : channel;
     vhsv              : channel;
+    cmyk              : channel;
+    xyz               : channel;
+    lms               : channel;
+    ypbpr             : channel;
+    yuv               : channel;
+    cc1               : channel;
+    cc2               : channel;
+    cc3               : channel;
+    cc4               : channel;
+    cc5               : channel;
+    cc6               : channel;
+    cc7               : channel;
+    cc8               : channel;
     colorhsl          : channel;
     hsl1_range        : channel;
     hsl2_range        : channel;
@@ -1255,6 +1325,19 @@ type fcolors is record
     hsl               : channel;
     hsv               : channel;
     inrgb             : channel;
+    cmyk              : channel;
+    xyz               : channel;
+    lms               : channel;
+    ypbpr             : channel;
+    yuv               : channel;
+    cc1               : channel;
+    cc2               : channel;
+    cc3               : channel;
+    cc4               : channel;
+    cc5               : channel;
+    cc6               : channel;
+    cc7               : channel;
+    cc8               : channel;
     colorhsl          : channel;
     hsl1_range        : channel;
     hsl2_range        : channel;

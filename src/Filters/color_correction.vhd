@@ -60,9 +60,23 @@ syncValid_P: process (clk,rst_l)begin
       rgbSyncValid(5) <= rgbSyncValid(4);
       rgbSyncValid(6) <= rgbSyncValid(5);
       rgbSyncValid(7) <= rgbSyncValid(6);
-      oRgb.valid      <= rgbSyncValid(7);
     end if;
 end process syncValid_P;
+process (rgbSyncValid)begin
+    if (i_k_config_number=0) then
+        oRgb.valid      <= rgbSyncValid(4);
+      elsif(i_k_config_number=1)then
+        oRgb.valid      <= rgbSyncValid(7);
+      elsif(i_k_config_number=2)then
+        oRgb.valid      <= rgbSyncValid(7);
+      else
+        oRgb.valid      <= rgbSyncValid(4);
+    end if;
+end process;
+
+
+
+
 ccSfConfig_P: process (clk,rst_l)begin
     if rst_l = '0' then
         cc.ccSf.k1           <= to_sfixed(1.500,4,-3);  --  1.50

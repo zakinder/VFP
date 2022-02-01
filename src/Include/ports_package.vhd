@@ -25,6 +25,19 @@ generic (
     F_RE6                 : boolean := false;
     F_RE7                 : boolean := false;
     F_RE8                 : boolean := false;
+    FCMYK                 : boolean := false;
+    F_XYZ                 : boolean := false;
+    F_LMS                 : boolean := false;
+    YPBPR                 : boolean := false;
+    F_YUV                 : boolean := false;
+    F_CC1                 : boolean := false;
+    F_CC2                 : boolean := false;
+    F_CC3                 : boolean := false;
+    F_CC4                 : boolean := false;
+    F_CC5                 : boolean := false;
+    F_CC6                 : boolean := false;
+    F_CC7                 : boolean := false;
+    F_CC8                 : boolean := false;
     F_TES                 : boolean := false;
     F_LUM                 : boolean := false;
     F_TRM                 : boolean := false;
@@ -143,6 +156,19 @@ generic (
     F_RE6_FRAME        : boolean := false;
     F_RE7_FRAME        : boolean := false;
     F_RE8_FRAME        : boolean := false;
+    F_CC1_FRAME        : boolean := false;
+    F_CC2_FRAME        : boolean := false;
+    F_CC3_FRAME        : boolean := false;
+    F_CC4_FRAME        : boolean := false;
+    F_CC5_FRAME        : boolean := false;
+    F_CC6_FRAME        : boolean := false;
+    F_CC7_FRAME        : boolean := false;
+    F_CC8_FRAME        : boolean := false;
+    FCMYK_FRAME        : boolean := false;
+    F_XYZ_FRAME        : boolean := false;
+    F_LMS_FRAME        : boolean := false;
+    YPBPR_FRAME        : boolean := false;
+    F_YUV_FRAME        : boolean := false;
     inRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
     RGBTR_FRAME        : boolean := false;
@@ -218,7 +244,24 @@ port (
     iRgb           : in channel;
     oRgb           : out channel);
 end component rgb_histogram;
-
+component rgb_to_cmyk is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oRgb           : out channel);
+end component rgb_to_cmyk;
+component rgb_to_I1I2I3_ohta is
+generic (
+    i_data_width  : integer := 8);
+port (
+    clk            : in  std_logic;
+    reset          : in  std_logic;
+    iRgb           : in channel;
+    oRgb           : out channel);
+end component rgb_to_I1I2I3_ohta;
 component color_trim is
 generic (
     img_width     : integer := 1920;

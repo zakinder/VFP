@@ -143,7 +143,7 @@ end process pipRgbMaxUfD1P;
 rgbDeltaP: process (clk) begin
     if rising_edge(clk) then
         rgb_delta      <= (rgb_max - rgb_min);
-        rgb_delta_1    <= (2 - rgb_max - rgb_min);
+        rgb_delta_1    <= (rgb_max - rgb_min);
         rgb_delta_sum  <= (rgb_max + rgb_min);
     end if;
 end process rgbDeltaP;

@@ -32,6 +32,19 @@ generic (
     F_RE6_FRAME        : boolean := false;
     F_RE7_FRAME        : boolean := false;
     F_RE8_FRAME        : boolean := false;
+    FCMYK_FRAME        : boolean := false;
+    F_XYZ_FRAME        : boolean := false;
+    F_LMS_FRAME        : boolean := false;
+    YPBPR_FRAME        : boolean := false;
+    F_YUV_FRAME        : boolean := false;
+    F_CC1_FRAME        : boolean := false;
+    F_CC2_FRAME        : boolean := false;
+    F_CC3_FRAME        : boolean := false;
+    F_CC4_FRAME        : boolean := false;
+    F_CC5_FRAME        : boolean := false;
+    F_CC6_FRAME        : boolean := false;
+    F_CC7_FRAME        : boolean := false;
+    F_CC8_FRAME        : boolean := false;
     INRGB_FRAME        : boolean := false;
     RGBLP_FRAME        : boolean := false;
     RGBTR_FRAME        : boolean := false;
@@ -71,9 +84,35 @@ architecture Behavioral of kernel is
     signal rgbMac3         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal kCoProd         : kCoefFiltFloat;
+    signal cc1_sync        : channel;
+    signal cc2_sync        : channel;
+    signal cc3_sync        : channel;
+    signal cc4_sync        : channel;
+    signal cc5_sync        : channel;
+    signal cc6_sync        : channel;
+    signal cc7_sync        : channel;
+    signal cc8_sync        : channel;
+    signal cc1             : channel;
+    signal cc2             : channel;
+    signal cc3             : channel;
+    signal cc4             : channel;
+    signal cc5             : channel;
+    signal cc6             : channel;
+    signal cc7             : channel;
+    signal cc8             : channel;
     signal colorhsl        : channel;
     signal colorhsl_sync   : channel;
     signal ccmcolor        : channel;
+    signal cmyk_sync       : channel;
+    signal cmyk            : channel;
+    signal xyz_sync        : channel;
+    signal xyz             : channel;
+    signal lms_sync        : channel;
+    signal lms             : channel;
+    signal ypbpr_sync      : channel;
+    signal ypbpr           : channel;
+    signal yuv_sync        : channel;
+    signal yuv             : channel;
     signal re1color        : channel;
     signal re2color        : channel;
     signal re3color        : channel;
@@ -102,8 +141,6 @@ architecture Behavioral of kernel is
     signal hsll3_range     : channel;
     signal hsll4_range     : channel;
     signal rgb_invert      : channel;
-    
-    
 begin
 -----------------------------------------------------------------------------------------------
 --coef_mult
@@ -816,7 +853,6 @@ end generate HSV_1_FRAME_ENABLE;
 -- HSV  2 RANGE
 -------------------------------------------------------------
 HSV_2_FRAME_ENABLE: if (HSV_2_FRAME = true) generate begin
-
 rgb_inverted_inst: rgb_inverted
 generic map(
     i_data_width       => i_data_width)
@@ -989,7 +1025,6 @@ port map(
     iRgb       => hsll4_Syncr,
     oRgb       => oRgb.hsll4range);
 end generate HSVL4_FRAME_ENABLE;
-
 -----------------------------------------------------------------------------------------------
 --FILTERS: RGBTRIM
 -----------------------------------------------------------------------------------------------
@@ -1025,6 +1060,263 @@ port map(
     oRgb                 => colorhsl);
 end generate RGBCOHSL_FRAME_ENABLE;
 oRgb.colorhsl <= colorhsl;
+F_CC1_FRAME_ENABLE: if (F_CC1_FRAME = true) generate begin
+cc1_inst  : ccm
+generic map(
+    i_k_config_number   => 1)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc1_sync);
+sync_cc1_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc1_sync,
+    oRgb                 => cc1);
+end generate F_CC1_FRAME_ENABLE;
+oRgb.cc1 <= cc1;
+F_CC2_FRAME_ENABLE: if (F_CC2_FRAME = true) generate begin
+cc2_inst  : ccm
+generic map(
+    i_k_config_number   => 2)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc2_sync);
+sync_cc2_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc2_sync,
+    oRgb                 => cc2);
+end generate F_CC2_FRAME_ENABLE;
+oRgb.cc2 <= cc2;
+F_CC3_FRAME_ENABLE: if (F_CC3_FRAME = true) generate begin
+cc3_inst  : ccm
+generic map(
+    i_k_config_number   => 3)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc3_sync);
+sync_cc3_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc3_sync,
+    oRgb                 => cc3);
+end generate F_CC3_FRAME_ENABLE;
+oRgb.cc3 <= cc3;
+F_CC4_FRAME_ENABLE: if (F_CC4_FRAME = true) generate begin
+cc4_inst  : ccm
+generic map(
+    i_k_config_number   => 4)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc4_sync);
+sync_cc4_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc4_sync,
+    oRgb                 => cc4);
+end generate F_CC4_FRAME_ENABLE;
+oRgb.cc4 <= cc4;
+F_CC5_FRAME_ENABLE: if (F_CC5_FRAME = true) generate begin
+cc5_inst  : ccm
+generic map(
+    i_k_config_number   => 5)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc5_sync);
+sync_cc5_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc5_sync,
+    oRgb                 => cc5);
+end generate F_CC5_FRAME_ENABLE;
+oRgb.cc5 <= cc5;
+F_CC6_FRAME_ENABLE: if (F_CC6_FRAME = true) generate begin
+xyz_inst  : ccm
+generic map(
+    i_k_config_number   => 6)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc6_sync);
+sync_cc6_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc6_sync,
+    oRgb                 => cc6);
+end generate F_CC6_FRAME_ENABLE;
+oRgb.cc6 <= cc6;
+F_CC7_FRAME_ENABLE: if (F_CC7_FRAME = true) generate begin
+cc7_inst  : ccm
+generic map(
+    i_k_config_number   => 7)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc7_sync);
+sync_cc7_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc7_sync,
+    oRgb                 => cc7);
+end generate F_CC7_FRAME_ENABLE;
+oRgb.cc7 <= cc7;
+F_CC8_FRAME_ENABLE: if (F_CC8_FRAME = true) generate begin
+cc8_inst  : ccm
+generic map(
+    i_k_config_number   => 8)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cc8_sync);
+sync_cc8_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cc8_sync,
+    oRgb                 => cc8);
+end generate F_CC8_FRAME_ENABLE;
+oRgb.cc8 <= cc8;
+F_XYZ_FRAME_ENABLE: if (F_XYZ_FRAME = true) generate begin
+xyz_inst  : ccm
+generic map(
+    i_k_config_number   => 10)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => xyz_sync);
+sync_xyz_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => xyz_sync,
+    oRgb                 => xyz);
+end generate F_XYZ_FRAME_ENABLE;
+oRgb.xyz <= xyz;
+F_LMS_FRAME_ENABLE: if (F_LMS_FRAME = true) generate begin
+lms_inst  : ccm
+generic map(
+    i_k_config_number   => 11)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => xyz_sync,
+    oRgb                => lms_sync);
+sync_lms_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => lms_sync,
+    oRgb                 => lms);
+end generate F_LMS_FRAME_ENABLE;
+oRgb.lms <= lms;
+YPBPR_FRAME_ENABLE: if (YPBPR_FRAME = true) generate begin
+ypbpr_inst  : ccm
+generic map(
+    i_k_config_number   => 12)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => lms_sync,
+    oRgb                => ypbpr_sync);
+sync_ypbpr_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => ypbpr_sync,
+    oRgb                 => ypbpr);
+end generate YPBPR_FRAME_ENABLE;
+oRgb.ypbpr <= ypbpr;
+F_YUV_FRAME_ENABLE: if (F_YUV_FRAME = true) generate begin
+yuv_inst  : ccm
+generic map(
+    i_k_config_number   => 13)
+port map(
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => yuv_sync);
+sync_yuv_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => yuv_sync,
+    oRgb                 => yuv);
+end generate F_YUV_FRAME_ENABLE;
+oRgb.yuv <= yuv;
+FCMYK_FRAME_ENABLE: if (FCMYK_FRAME = true) generate begin
+
+--rgb_to_cmyk_inst  : rgb_to_I1I2I3_ohta
+--generic map(
+--    i_data_width   => 4)
+--port map(
+--    clk                 => clk,
+--    reset               => rst_l,
+--    iRgb                => iRgb,
+--    oRgb                => cmyk_sync);
+
+rgb_to_cmyk_inst  : rgb_to_cmyk
+generic map(
+    i_data_width   => 4)
+port map(
+    clk                 => clk,
+    reset               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => cmyk_sync);
+sync_color_hsl_inst  : sync_frames
+generic map(
+    pixelDelay           => 58)
+port map(
+    clk                  => clk,
+    reset                => rst_l,
+    iRgb                 => cmyk_sync,
+    oRgb                 => cmyk);
+end generate FCMYK_FRAME_ENABLE;
+oRgb.cmyk <= cmyk;
 F_RE1_FRAME_ENABLE: if (F_RE1_FRAME = true) generate begin
 ccm_inst  : ccm
 generic map(
@@ -1044,7 +1336,7 @@ port map(
     iRgb               => ccmcolor,
     oRgb               => re1color);
 end generate F_RE1_FRAME_ENABLE;
-oRgb.re1color <= re1color;
+oRgb.re1color <= ccmcolor;
 F_RE2_FRAME_ENABLE: if (F_RE2_FRAME = true) generate begin
 recolor_space_2_inst: recolor_space_2
 generic map(

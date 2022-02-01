@@ -75,7 +75,7 @@ architecture behavioral of hsvl_1range is
     signal valid7_rgb    : std_logic := '0';
     signal valid8_rgb    : std_logic := '0';
     signal sHsl          : channel;
-    signal rgb_ool4      : channel;
+    signal ycbcr_channel      : channel;
     signal rgb_colo      : rgbToSfRecord;
     signal rgb_oolo      : rgbToSfRecord;
     signal rgb_ool1      : rgbToSfRecord;
@@ -269,10 +269,10 @@ port map(
     clk        => clk,
     reset      => reset,
     iRgb       => ycbcr,
-    oRgb       => rgb_ool4);
+    oRgb       => ycbcr_channel);
 pipValidP: process (clk) begin
     if rising_edge(clk) then
-        valid1_rgb    <= rgb_ool4.valid;
+        valid1_rgb    <= ycbcr_channel.valid;
         valid2_rgb    <= valid1_rgb;
         valid3_rgb    <= valid2_rgb;
         valid4_rgb    <= valid3_rgb;
@@ -287,9 +287,9 @@ process (clk) begin
         rgb_colo.red    <= to_sfixed("00" & sHsl.red,rgb_colo.red);
         rgb_colo.green  <= to_sfixed("00" & sHsl.green,rgb_colo.green);
         rgb_colo.blue   <= to_sfixed("00" & sHsl.blue,rgb_colo.blue);
-        rgb_oolo.red    <= to_sfixed("00" & rgb_ool4.red,rgb_oolo.red);
-        rgb_oolo.green  <= to_sfixed("00" & rgb_ool4.green,rgb_oolo.green);
-        rgb_oolo.blue   <= to_sfixed("00" & rgb_ool4.blue,rgb_oolo.blue);
+        rgb_oolo.red    <= to_sfixed("00" & ycbcr_channel.red,rgb_oolo.red);
+        rgb_oolo.green  <= to_sfixed("00" & ycbcr_channel.green,rgb_oolo.green);
+        rgb_oolo.blue   <= to_sfixed("00" & ycbcr_channel.blue,rgb_oolo.blue);
     end if;
 end process;
 process (clk) begin

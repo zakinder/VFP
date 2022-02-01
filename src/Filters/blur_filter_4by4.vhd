@@ -465,7 +465,7 @@ blurRgb.blue <= std_logic_vector(pa_data_blu(i_data_width+3 downto 0));
     blur_rgb.valid <= iRgb.valid;
 blur_valid_inst: d_valid
 generic map (
-    pixelDelay   => 18)
+    pixelDelay   => 11)
 port map(
     clk      => clk,
     iRgb     => blur_rgb,

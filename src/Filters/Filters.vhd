@@ -67,6 +67,19 @@ generic (
     F_RE6                    : boolean := false;
     F_RE7                    : boolean := false;
     F_RE8                    : boolean := false;
+    FCMYK                    : boolean := false;
+    F_XYZ                    : boolean := false;
+    F_LMS                    : boolean := false;
+    YPBPR                    : boolean := false;
+    F_YUV                    : boolean := false;
+    F_CC1                    : boolean := false;
+    F_CC2                    : boolean := false;
+    F_CC3                    : boolean := false;
+    F_CC4                    : boolean := false;
+    F_CC5                    : boolean := false;
+    F_CC6                    : boolean := false;
+    F_CC7                    : boolean := false;
+    F_CC8                    : boolean := false;
     F_TES                    : boolean := false;
     F_LUM                    : boolean := false;
     F_TRM                    : boolean := false;
@@ -174,7 +187,6 @@ architecture Behavioral of filters is
     signal rgb                 : channel;
     signal rgbYcbcr            : channel;
     signal rgb1Ycbcr            : channel;
-    
 begin
     -- 60  =  7.50
     -- 24  =  3.00
@@ -248,6 +260,9 @@ begin
     blur_channels.ditRgb1vx <= ditRgb1vx;
     blur_channels.ditRgb2vx <= ditRgb2vx;
     blur_channels.ditRgb3vx <= ditRgb3vx;
+    blur_channels.blur1vx   <= blur21x;
+    blur_channels.blur2vx   <= blur31x;
+    blur_channels.blur3vx   <= blur3vx;
     fRgb.blur1vx            <= blur1vx;
     fRgb.blur2vx            <= blur2vx;
     fRgb.blur3vx            <= blur3vx;
@@ -291,9 +306,6 @@ port map (
     reset              => rst_l,
     iRgb               => iRgb,
     oRgb               => rgb);
-    
-    
-    
 hsvl_ycc_inst  : rgb_ycbcr
 generic map(
     i_data_width         => i_data_width,
@@ -307,9 +319,6 @@ port map(
     cb                   => rgbYcbcr.green,
     cr                   => rgbYcbcr.blue,
     oValid               => rgbYcbcr.valid);
-    
-
-
 HSV_L_ENABLE: if (HSV_L = true) generate begin
 hsv_hsvl_inst: hsvl
 generic map (
@@ -483,7 +492,7 @@ YcbcrIoP: process (clk) begin
 end process YcbcrIoP;
 F_BLUR_CHANNELS_ENABLE: if (F_BLUR_CHANNELS = true) generate
 begin
-filter_blur_1_inst  : blur_filter
+filter_blur_1_inst  : blur_filter_4by4
 generic map(
     iMSB                => blurMsb,
     iLSB                => blurLsb,
@@ -503,10 +512,10 @@ port map(
     clk                 => clk,
     iRgb                => blur11x,
     oRgb                => blur1vx);
-filter_blur_2_inst  : blur_filter
+filter_blur_2_inst  : blur_filter_4by4
 generic map(
-    iMSB                => blurMsb - 1,
-    iLSB                => blurLsb - 1,
+    iMSB                => blurMsb,
+    iLSB                => blurLsb,
     i_data_width        => i_data_width,
     img_width           => img_width,
     adwrWidth           => adwrWidth,
@@ -523,10 +532,10 @@ port map(
     clk                 => clk,
     iRgb                => blur21x,
     oRgb                => blur2vx);
-filter_blur_3_inst  : blur_filter
+filter_blur_3_inst  : blur_filter_4by4
 generic map(
-    iMSB                => blurMsb - 1,
-    iLSB                => blurLsb - 1,
+    iMSB                => blurMsb,
+    iLSB                => blurLsb,
     i_data_width        => i_data_width,
     img_width           => img_width,
     adwrWidth           => adwrWidth,
@@ -647,6 +656,19 @@ generic map(
     F_RE6_FRAME         => F_RE6,
     F_RE7_FRAME         => F_RE7,
     F_RE8_FRAME         => F_RE8,
+    FCMYK_FRAME         => FCMYK,
+    F_XYZ_FRAME         => F_XYZ,
+    F_LMS_FRAME         => F_LMS,
+    YPBPR_FRAME         => YPBPR,
+    F_YUV_FRAME         => F_YUV,
+    F_CC1_FRAME         => F_CC1,  
+    F_CC2_FRAME         => F_CC2,
+    F_CC3_FRAME         => F_CC3,
+    F_CC4_FRAME         => F_CC4,
+    F_CC5_FRAME         => F_CC5,
+    F_CC6_FRAME         => F_CC6,
+    F_CC7_FRAME         => F_CC7,
+    F_CC8_FRAME         => F_CC8,
     INRGB_FRAME         => F_RGB,
     RGBLP_FRAME         => F_LUM,
     RGBTR_FRAME         => F_TRM,
@@ -740,8 +762,6 @@ port map(
     iRgb                => rgbLocFilt.blur,
     oRgb                => rgbLocSynSFilt.blur);
 end generate L_BLU_ENABLE;
-
-
 L_CGA_ENABLE: if (L_CGA = true) generate
 signal ccm1_rgb   : channel;
 signal bbm1_rgb   : channel;
@@ -822,7 +842,6 @@ begin
 --    cb                   => rgbLocFilt.ycbcr.green,
 --    cr                   => rgbLocFilt.ycbcr.blue,
 --    oValid               => rgbLocFilt.ycbcr.valid);
-
 rgb_to_xyz_color_space_inst  : rgb_to_xyz_color_space
 generic map(
     i_data_width         => i_data_width)
@@ -831,7 +850,6 @@ port map(
     reset                => rst_l,
     iRgb                 => rgb,
     oRgb                 => rgbLocFilt.ycbcr);
-    
 yccSyncr_inst  : sync_frames
 generic map(
     pixelDelay           => 27)
@@ -1125,6 +1143,60 @@ port map(
     i2Rgb       => fRgb.space.ch4,
     oRgb        => fRgb.maskSobelBlu);
 end generate MASK_SOB_BLU_FRAME_ENABLE;
+
+
+
+
+
+F_CC1_FRAME_ENABLE: if (F_CC1 = true) generate
+    fRgb.cc1 <= rgbImageKernel.cc1;
+end generate F_CC1_FRAME_ENABLE;
+F_CC2_FRAME_ENABLE: if (F_CC2 = true) generate
+    fRgb.cc2 <= rgbImageKernel.cc2;
+end generate F_CC2_FRAME_ENABLE;
+F_CC3_FRAME_ENABLE: if (F_CC3 = true) generate
+    fRgb.cc3 <= rgbImageKernel.cc3;
+end generate F_CC3_FRAME_ENABLE;
+F_CC4_FRAME_ENABLE: if (F_CC4 = true) generate
+    fRgb.cc4 <= rgbImageKernel.cc4;
+end generate F_CC4_FRAME_ENABLE;
+F_CC5_FRAME_ENABLE: if (F_CC5 = true) generate
+    fRgb.cc5 <= rgbImageKernel.cc5;
+end generate F_CC5_FRAME_ENABLE;
+F_CC6_FRAME_ENABLE: if (F_CC6 = true) generate
+    fRgb.cc6 <= rgbImageKernel.cc6;
+end generate F_CC6_FRAME_ENABLE;
+F_CC7_FRAME_ENABLE: if (F_CC7 = true) generate
+    fRgb.cc7 <= rgbImageKernel.cc7;
+end generate F_CC7_FRAME_ENABLE;
+F_CC8_FRAME_ENABLE: if (F_CC8 = true) generate
+    fRgb.cc8 <= rgbImageKernel.cc8;
+end generate F_CC8_FRAME_ENABLE;
+
+
+
+
+
+
+
+
+
+
+CMYK_FRAME_ENABLE: if (FCMYK = true) generate
+    fRgb.cmyk <= rgbImageKernel.cmyk;
+end generate CMYK_FRAME_ENABLE;
+XYZ_FRAME_ENABLE: if (F_XYZ = true) generate
+    fRgb.xyz <= rgbImageKernel.xyz;
+end generate XYZ_FRAME_ENABLE;
+LMS_FRAME_ENABLE: if (F_LMS = true) generate
+    fRgb.lms <= rgbImageKernel.lms;
+end generate LMS_FRAME_ENABLE;
+YPBPR_FRAME_ENABLE: if (YPBPR = true) generate
+    fRgb.ypbpr <= rgbImageKernel.ypbpr;
+end generate YPBPR_FRAME_ENABLE;
+YUV_FRAME_ENABLE: if (F_YUV = true) generate
+    fRgb.yuv <= rgbImageKernel.yuv;
+end generate yuv_FRAME_ENABLE;
 INRGB_FRAME_ENABLE: if (F_RGB = true) generate
     fRgb.inrgb <= rgbImageKernel.inrgb;
 end generate INRGB_FRAME_ENABLE;
@@ -1203,6 +1275,21 @@ RE2_FRAME_ENABLE: if (F_RE2 = true) generate
     fRgb.re7color  <= rgbImageKernel.re7color;
     fRgb.re8color  <= rgbImageKernel.re8color;
 end generate RE2_FRAME_ENABLE;
+CMYK_FRAME_DISABLED: if (FCMYK = false) generate
+    fRgb.cmyk <= init_channel;
+end generate CMYK_FRAME_DISABLED;
+XYZ_FRAME_DISABLED: if (F_XYZ = false) generate
+    fRgb.xyz <= init_channel;
+end generate XYZ_FRAME_DISABLED;
+LMS_FRAME_DISABLED: if (F_LMS = false) generate
+    fRgb.lms <= init_channel;
+end generate LMS_FRAME_DISABLED;
+YPBPR_FRAME_DISABLED: if (YPBPR = false) generate
+    fRgb.ypbpr <= init_channel;
+end generate YPBPR_FRAME_DISABLED;
+YUV_FRAME_DISABLED: if (F_YUV = false) generate
+    fRgb.yuv <= init_channel;
+end generate YUV_FRAME_DISABLED;
 MASK_SOB_CGA_FRAME_DISABLED: if (M_SOB_CGA = false) generate
     fRgb.maskSobelCga  <= init_channel;
 end generate MASK_SOB_CGA_FRAME_DISABLED;
