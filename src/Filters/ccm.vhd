@@ -81,7 +81,20 @@ ccSfConfig_P: process (clk,rst_l)begin
         ccRgb.ccSf.k9           <= to_sfixed(1.900,16,-3);  
     elsif(i_k_config_number = 1)then
     oRgb.valid <= rgbSyncValid(7);
+    
+
+        --ccRgb.ccSf.k1           <= to_sfixed(3000.000,16,-3); 
+        --ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
+        --ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
         --
+        --ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k5           <= to_sfixed(3000.000,16,-3);
+        --ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3); 
+        --
+        --ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
+        --ccRgb.ccSf.k9           <= to_sfixed(3000.000,16,-3);
+
         ccRgb.ccSf.k1           <= to_sfixed(1900.000,16,-3); 
         ccRgb.ccSf.k2           <= to_sfixed(-400.000,16,-3);
         ccRgb.ccSf.k3           <= to_sfixed(-500.000,16,-3); 
@@ -91,20 +104,45 @@ ccSfConfig_P: process (clk,rst_l)begin
         ccRgb.ccSf.k7           <= to_sfixed(-400.000,16,-3); 
         ccRgb.ccSf.k8           <= to_sfixed(-500.000,16,-3);
         ccRgb.ccSf.k9           <= to_sfixed(1900.000,16,-3);
+        
     elsif(i_k_config_number = 2)then
     oRgb.valid <= rgbSyncValid(7);
+        ----image base matrix
+        --ccRgb.ccSf.k1           <= to_sfixed(3000.000,16,-3); 
+        --ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
+        --ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
+        ---- Green Get Extra Gain
+        --ccRgb.ccSf.k4           <= to_sfixed(-700.000,16,-3); 
+        --ccRgb.ccSf.k5           <= to_sfixed(3000.000,16,-3);
+        --ccRgb.ccSf.k6           <= to_sfixed(-800.000,16,-3); 
+        --
+        --ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
+        --ccRgb.ccSf.k9           <= to_sfixed(3000.000,16,-3);
+        
         -- This color-space select unique per rgb color range.
-        ccRgb.ccSf.k1           <= to_sfixed(300.000,16,-3); 
-        ccRgb.ccSf.k2           <= to_sfixed(600.000,16,-3);
-        ccRgb.ccSf.k3           <= to_sfixed(100.000,16,-3); 
-        ccRgb.ccSf.k4           <= to_sfixed(-1687.000,16,-3); 
-        ccRgb.ccSf.k5           <= to_sfixed(-3313.000,16,-3);
-        ccRgb.ccSf.k6           <= to_sfixed(5000.000,16,-3); 
-        ccRgb.ccSf.k7           <= to_sfixed(5000.000,16,-3); 
-        ccRgb.ccSf.k8           <= to_sfixed(-4187.000,16,-3);
-        ccRgb.ccSf.k9           <= to_sfixed(-0813.000,16,-3); 
+       ccRgb.ccSf.k1           <= to_sfixed(300.000,16,-3); 
+       ccRgb.ccSf.k2           <= to_sfixed(600.000,16,-3);
+       ccRgb.ccSf.k3           <= to_sfixed(100.000,16,-3); 
+       ccRgb.ccSf.k4           <= to_sfixed(-1687.000,16,-3); 
+       ccRgb.ccSf.k5           <= to_sfixed(-3313.000,16,-3);
+       ccRgb.ccSf.k6           <= to_sfixed(5000.000,16,-3); 
+       ccRgb.ccSf.k7           <= to_sfixed(5000.000,16,-3); 
+       ccRgb.ccSf.k8           <= to_sfixed(-4187.000,16,-3);
+       ccRgb.ccSf.k9           <= to_sfixed(-0813.000,16,-3); 
     elsif(i_k_config_number = 3)then
     oRgb.valid <= rgbSyncValid(7);
+        -- Contrast = 76,69,60 Exposer = 5
+        --ccRgb.ccSf.k1           <= to_sfixed(0400.000,16,-3); 
+        --ccRgb.ccSf.k2           <= to_sfixed(0350.000,16,-3);
+        --ccRgb.ccSf.k3           <= to_sfixed(0100.000,16,-3); 
+        --ccRgb.ccSf.k4           <= to_sfixed(0200.000,16,-3); 
+        --ccRgb.ccSf.k5           <= to_sfixed(0750.000,16,-3);
+        --ccRgb.ccSf.k6           <= to_sfixed(0100.000,16,-3); 
+        --ccRgb.ccSf.k7           <= to_sfixed(0050.000,16,-3); 
+        --ccRgb.ccSf.k8           <= to_sfixed(0100.000,16,-3);
+        --ccRgb.ccSf.k9           <= to_sfixed(0950.000,16,-3);
+      ----------------------------------------------------------
         -- This color-space select seperate red, green and blue channels.
         ccRgb.ccSf.k1           <= to_sfixed(-4851.000,16,-3); 
         ccRgb.ccSf.k2           <= to_sfixed(396.000,16,-3);
@@ -118,61 +156,131 @@ ccSfConfig_P: process (clk,rst_l)begin
     elsif(i_k_config_number = 4)then
     oRgb.valid <= rgbSyncValid(7);
         -- This color-space convert rgb to near gray scale.
-        ccRgb.ccSf.k1           <= to_sfixed(0412.000,16,-3); 
-        ccRgb.ccSf.k2           <= to_sfixed(0357.000,16,-3);
-        ccRgb.ccSf.k3           <= to_sfixed(0180.000,16,-3); 
-        ccRgb.ccSf.k4           <= to_sfixed(0212.000,16,-3); 
-        ccRgb.ccSf.k5           <= to_sfixed(0715.000,16,-3);
-        ccRgb.ccSf.k6           <= to_sfixed(0072.000,16,-3); 
-        ccRgb.ccSf.k7           <= to_sfixed(0019.000,16,-3); 
-        ccRgb.ccSf.k8           <= to_sfixed(0119.000,16,-3);
-        ccRgb.ccSf.k9           <= to_sfixed(0950.000,16,-3);
+        -- Contrast = 76,65,60 Exposer = 5
+        ccRgb.ccSf.k1           <= to_sfixed(0400.000,16,-3); 
+        ccRgb.ccSf.k2           <= to_sfixed(0350.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(0100.000,16,-3); 
+        ccRgb.ccSf.k4           <= to_sfixed(0200.000,16,-3); 
+        ccRgb.ccSf.k5           <= to_sfixed(0700.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(0100.000,16,-3); 
+        ccRgb.ccSf.k7           <= to_sfixed(0050.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(0100.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(0900.000,16,-3);
     elsif(i_k_config_number = 5)then
     oRgb.valid <= rgbSyncValid(7);
     -- Balance Colors
+        -- Contrast = 160,31,38 Exposer = 5
         ccRgb.ccSf.k1           <= to_sfixed(1500.000,16,-3); 
-        ccRgb.ccSf.k2           <= to_sfixed(-2500.000,16,-3);
-        ccRgb.ccSf.k3           <= to_sfixed(-2500.000,16,-3); 
-        ccRgb.ccSf.k4           <= to_sfixed(-2500.000,16,-3); 
-        ccRgb.ccSf.k5           <= to_sfixed(1500.000,16,-3);
-        ccRgb.ccSf.k6           <= to_sfixed(-2500.000,16,-3); 
-        ccRgb.ccSf.k7           <= to_sfixed(-2500.000,16,-3); 
-        ccRgb.ccSf.k8           <= to_sfixed(-2500.000,16,-3);
-        ccRgb.ccSf.k9           <= to_sfixed(1500.000,16,-3);
+        ccRgb.ccSf.k2           <= to_sfixed(-250.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(-250.000,16,-3);
+        
+        ccRgb.ccSf.k4           <= to_sfixed(-500.000,16,-3); 
+        ccRgb.ccSf.k5           <= to_sfixed(2500.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(-500.000,16,-3); 
+        
+        ccRgb.ccSf.k7           <= to_sfixed(-500.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(-500.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(2500.000,16,-3);
+      ----------------------------------------------------------
+        --Contrast = 160,31,38 Exposer = 5
+        --ccRgb.ccSf.k1           <= to_sfixed(1500.000,16,-3); 
+        --ccRgb.ccSf.k2           <= to_sfixed(-250.000,16,-3);
+        --ccRgb.ccSf.k3           <= to_sfixed(-250.000,16,-3); 
+        --ccRgb.ccSf.k4           <= to_sfixed(-250.000,16,-3); 
+        --ccRgb.ccSf.k5           <= to_sfixed(1500.000,16,-3);
+        --ccRgb.ccSf.k6           <= to_sfixed(-250.000,16,-3); 
+        --ccRgb.ccSf.k7           <= to_sfixed(-250.000,16,-3); 
+        --ccRgb.ccSf.k8           <= to_sfixed(-250.000,16,-3);
+        --ccRgb.ccSf.k9           <= to_sfixed(1500.000,16,-3);
     elsif(i_k_config_number = 6)then
     oRgb.valid <= rgbSyncValid(7);
-    -- High Exposer
-        ccRgb.ccSf.k1           <= to_sfixed(2500.000,16,-3); 
+        -- Contrast = 202,0,0 Exposer = 4
+        ccRgb.ccSf.k1           <= to_sfixed(3000.000,16,-3); 
         ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
-        ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k5           <= to_sfixed(2500.000,16,-3);
-        ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
-        ccRgb.ccSf.k9           <= to_sfixed(2500.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3);
+
+        ccRgb.ccSf.k4           <= to_sfixed(-1500.000,16,-3); 
+        ccRgb.ccSf.k5           <= to_sfixed(3000.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(-0500.000,16,-3);
+
+        ccRgb.ccSf.k7           <= to_sfixed(-0500.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(-1500.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(3000.000,16,-3);
+      ----------------------------------------------------------
+        --Contrast = 202,0,0 Exposer = 4
+        --ccRgb.ccSf.k1           <= to_sfixed(2500.000,16,-3); 
+        --ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
+        --ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k5           <= to_sfixed(2500.000,16,-3);
+        --ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
+        --ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
+        --ccRgb.ccSf.k9           <= to_sfixed(2500.000,16,-3);
     elsif(i_k_config_number = 7)then
     oRgb.valid <= rgbSyncValid(7);
+      -- Contrast = 230,0,0 Exposer = 6
         ccRgb.ccSf.k1           <= to_sfixed(2700.000,16,-3); 
-        ccRgb.ccSf.k2           <= to_sfixed(-1200.000,16,-3);
+        ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
         ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
+        
+        ccRgb.ccSf.k4           <= to_sfixed(-1200.000,16,-3); 
         ccRgb.ccSf.k5           <= to_sfixed(2700.000,16,-3);
-        ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3); 
+        ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3);
+        
         ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k8           <= to_sfixed(-1500.000,16,-3);
+        ccRgb.ccSf.k8           <= to_sfixed(-1200.000,16,-3);
         ccRgb.ccSf.k9           <= to_sfixed(2700.000,16,-3);
+      ----------------------------------------------------------
+      --Contrast = 230,0,0 Exposer = 6
+      --ccRgb.ccSf.k1           <= to_sfixed(2700.000,16,-3); 
+      --ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
+      --ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k5           <= to_sfixed(2700.000,16,-3);
+      --ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
+      --ccRgb.ccSf.k9           <= to_sfixed(2700.000,16,-3);
     elsif(i_k_config_number = 8)then
     oRgb.valid <= rgbSyncValid(7);
-        ccRgb.ccSf.k1           <= to_sfixed(0000.000,16,-3); 
-        ccRgb.ccSf.k2           <= to_sfixed(1000.000,16,-3);
-        ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
-        ccRgb.ccSf.k5           <= to_sfixed(0000.000,16,-3);
-        ccRgb.ccSf.k6           <= to_sfixed(1000.000,16,-3); 
-        ccRgb.ccSf.k7           <= to_sfixed(1000.000,16,-3); 
-        ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
-        ccRgb.ccSf.k9           <= to_sfixed(0000.000,16,-3);
+      -- Contrast = 240,0,0 Exposer = 6
+        ccRgb.ccSf.k1           <= to_sfixed(3000.000,16,-3); 
+        ccRgb.ccSf.k2           <= to_sfixed(-750.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(-750.000,16,-3); 
+
+        ccRgb.ccSf.k4           <= to_sfixed(-750.000,16,-3);
+        ccRgb.ccSf.k5           <= to_sfixed(3000.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(-750.000,16,-3);
+
+        ccRgb.ccSf.k7           <= to_sfixed(-750.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(-750.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(3000.000,16,-3);
+      ----------------------------------------------------------
+      --Contrast = 240,0,0 Exposer = 6
+      --ccRgb.ccSf.k1           <= to_sfixed(2800.000,16,-3); 
+      --ccRgb.ccSf.k2           <= to_sfixed(-1000.000,16,-3);
+      --ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k5           <= to_sfixed(2800.000,16,-3);
+      --ccRgb.ccSf.k6           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k7           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
+      --ccRgb.ccSf.k9           <= to_sfixed(2800.000,16,-3);
+      ----------------------------------------------------------
+      --assign red channel green values
+      --ccRgb.ccSf.k1           <= to_sfixed(0000.000,16,-3); 
+      --ccRgb.ccSf.k2           <= to_sfixed(1000.000,16,-3);
+      --ccRgb.ccSf.k3           <= to_sfixed(-1000.000,16,-3); 
+      --assign green channel blue values
+      --ccRgb.ccSf.k4           <= to_sfixed(-1000.000,16,-3); 
+      --ccRgb.ccSf.k5           <= to_sfixed(0000.000,16,-3);
+      --ccRgb.ccSf.k6           <= to_sfixed(1000.000,16,-3); 
+      --assign blue channel green values
+      --ccRgb.ccSf.k7           <= to_sfixed(1000.000,16,-3); 
+      --ccRgb.ccSf.k8           <= to_sfixed(-1000.000,16,-3);
+      --ccRgb.ccSf.k9           <= to_sfixed(0000.000,16,-3);
+      ----------------------------------------------------------
     elsif(i_k_config_number = 9) then
     oRgb.valid <= rgbSyncValid(7);
         ccRgb.ccSf.k1           <= to_sfixed(1.500,16,-3);  
@@ -232,6 +340,78 @@ ccSfConfig_P: process (clk,rst_l)begin
         ccRgb.ccSf.k7           <= to_sfixed(0615.000,16,-3); 
         ccRgb.ccSf.k8           <= to_sfixed(-0515.000,16,-3);
         ccRgb.ccSf.k9           <= to_sfixed(-00100.000,16,-3);
+    elsif(i_k_config_number = 101)then
+        --dark_ccm
+        --|--------|--------|--------|
+        --| +1.000 | -0.500 | -0.500 |
+        --|--------|--------|--------|
+        --| -0.500 | +1.000 | -0.500 |
+        --|--------|--------|--------|
+        --| -0.500 | -0.500 | +1.000 |
+        --|--------|--------|--------|
+        ccRgb.ccSf.k1           <= to_sfixed(400.000,16,-3); 
+        ccRgb.ccSf.k2           <= to_sfixed(-100.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(-100.000,16,-3); 
+        ccRgb.ccSf.k4           <= to_sfixed(-100.000,16,-3); 
+        ccRgb.ccSf.k5           <= to_sfixed(400.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(-100.000,16,-3); 
+        ccRgb.ccSf.k7           <= to_sfixed(-100.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(-100.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(400.000,16,-3);
+    oRgb.valid <= rgbSyncValid(7);
+    elsif(i_k_config_number = 102)then
+        --light_ccm
+        --|--------|--------|--------|
+        --| +5.000 | -3.000 | -1.000 |
+        --|--------|--------|--------|
+        --| -1.000 | +5.000 | -3.000 |
+        --|--------|--------|--------|
+        --| -3.000 | -1.000 | +5.000 | 
+        --|--------|--------|--------|
+        ccRgb.ccSf.k1           <= to_sfixed(3500.000,16,-3); 
+        ccRgb.ccSf.k2           <= to_sfixed(-500.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(-500.000,16,-3);
+        
+        ccRgb.ccSf.k4           <= to_sfixed(-500.000,16,-3); 
+        ccRgb.ccSf.k5           <= to_sfixed(3500.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(-500.000,16,-3); 
+        
+        ccRgb.ccSf.k7           <= to_sfixed(-500.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(-500.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(3500.000,16,-3);
+    oRgb.valid <= rgbSyncValid(7);
+    elsif(i_k_config_number = 103)then
+        --balance_ccm
+        --|--------|--------|--------|
+        --| +0.500 | +0.375 | +0.125 |
+        --|--------|--------|--------|
+        --| +0.250 | +0.500 | +0.125 |
+        --|--------|--------|--------|
+        --| +0.125 | +0.125 | +0.500 |
+        --|--------|--------|--------|
+        --ccRgb.ccSf.k1           <= to_sfixed(800.000,16,-3); 
+        --ccRgb.ccSf.k2           <= to_sfixed(400.000,16,-3);
+        --ccRgb.ccSf.k3           <= to_sfixed(400.000,16,-3); 
+        --
+        --ccRgb.ccSf.k4           <= to_sfixed(400.000,16,-3); 
+        --ccRgb.ccSf.k5           <= to_sfixed(800.000,16,-3);
+        --ccRgb.ccSf.k6           <= to_sfixed(400.000,16,-3); 
+        --
+        --ccRgb.ccSf.k7           <= to_sfixed(400.000,16,-3); 
+        --ccRgb.ccSf.k8           <= to_sfixed(400.000,16,-3);
+        --ccRgb.ccSf.k9           <= to_sfixed(800.000,16,-3);
+        
+        ccRgb.ccSf.k1           <= to_sfixed(800.000,16,-3); 
+        ccRgb.ccSf.k2           <= to_sfixed(350.000,16,-3);
+        ccRgb.ccSf.k3           <= to_sfixed(400.000,16,-3); 
+        ccRgb.ccSf.k4           <= to_sfixed(400.000,16,-3); 
+        ccRgb.ccSf.k5           <= to_sfixed(800.000,16,-3);
+        ccRgb.ccSf.k6           <= to_sfixed(350.000,16,-3); 
+        ccRgb.ccSf.k7           <= to_sfixed(350.000,16,-3); 
+        ccRgb.ccSf.k8           <= to_sfixed(400.000,16,-3);
+        ccRgb.ccSf.k9           <= to_sfixed(800.000,16,-3);
+        
+    oRgb.valid <= rgbSyncValid(7);
     end if;
     end if;
 end process ccSfConfig_P;

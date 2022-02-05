@@ -395,95 +395,17 @@ port (
     iRgb           : in channel;
     oRgb           : out channel);
 end component recolor_space_hsl;
-component recolor_space_1 is
+component recolor_space is
 generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
+    neighboring_pixel_threshold : integer := 1920;
+    img_width                   : integer := 1920;
+    i_data_width                : integer := 8);
 port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_1;
-component recolor_space_2 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_2;
-
-component recolor_space_3 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_3;
-
-component recolor_space_4 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_4;
-
-
-component recolor_space_5 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_5;
-
-component recolor_space_6 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_6;
-
-
-component recolor_space_7 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_7;
-
-component recolor_space_8 is
-generic (
-    img_width     : integer := 1920;
-    i_data_width  : integer := 8);
-port (
-    clk            : in  std_logic;
-    reset          : in  std_logic;
-    iRgb           : in channel;
-    oRgb           : out channel);
-end component recolor_space_8;
-
+    clk                         : in  std_logic;
+    reset                       : in  std_logic;
+    iRgb                        : in channel;
+    oRgb                        : out channel);
+end component recolor_space;
 component color_avg is
 generic (
     i_data_width  : integer := 8);
@@ -1048,6 +970,16 @@ port (
     als                         : in coefficient;
     oRgb                        : out channel);
 end component color_correction;
+component recolor_rgb is
+generic (
+    img_width                   : integer := 8;
+    i_k_config_number           : integer := 8);
+port (
+    clk                         : in std_logic;
+    rst_l                       : in std_logic;
+    iRgb                        : in channel;
+    oRgb                        : out channel);
+end component recolor_rgb;
 component ccm is
 generic (
     i_k_config_number           : integer := 8);

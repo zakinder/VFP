@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : recolor_space_1.vhd
+-- Filename    : recolor_space.vhd
 -- Create Date : 05062019 [05-06-2019]
 -- Author      : Zakinder
 --
@@ -17,7 +17,7 @@ use work.constants_package.all;
 use work.vpf_records.all;
 use work.vfp_pkg.all;
 use work.ports_package.all;
-entity recolor_space_1 is
+entity recolor_space is
 generic (
     neighboring_pixel_threshold : integer := 255;
     img_width                   : integer := 1920;
@@ -27,11 +27,11 @@ port (
     reset                       : in  std_logic;
     iRgb                        : in channel;
     oRgb                        : out channel);
-end recolor_space_1;
-architecture behavioral of recolor_space_1 is
+end recolor_space;
+architecture behavioral of recolor_space is
 ------------------------------------------------------------------------------
   signal point_five              : sfixed(4 downto -3)  := to_sfixed(0.500,4,-3); -- Average detected pixels by 1/4
-  signal pixel_threshold_2       : sfixed(11 downto 0)  := to_sfixed("0000" & neighboring_pixel_threshold,11,0);   -- [60% with 20] [70% with 40] 
+  signal pixel_threshold_2       : sfixed(11 downto 0)  := to_sfixed(neighboring_pixel_threshold,11,0);   -- [60% with 20] [70% with 40] 
   signal tpd1                    : k_3by3;
   signal tpd2                    : k_3by3;
   signal tpd3                    : k_3by3;
@@ -230,7 +230,7 @@ process (clk) begin
 end process;
 process (clk) begin
     if rising_edge(clk) then
-        if(rgbSyncValid(13) = hi)then
+--       if(rgbSyncValid(13) = hi)then
             syn6KernalData_red.k1  <= synbKernalData_red.k1;
             syn6KernalData_red.k2  <= synbKernalData_red.k2;
             syn6KernalData_red.k3  <= synbKernalData_red.k3;
@@ -281,62 +281,62 @@ process (clk) begin
             syn6KernalData_blu.k14 <= syn2KernalData_blu.k14;
             syn6KernalData_blu.k15 <= syn2KernalData_blu.k15;
             syn6KernalData_blu.k16 <= syn2KernalData_blu.k16;
-        else
-            syn6KernalData_red.k1  <= (others => '0');
-            syn6KernalData_red.k2  <= (others => '0');
-            syn6KernalData_red.k3  <= (others => '0');
-            syn6KernalData_red.k4  <= (others => '0');
-            syn6KernalData_red.k5  <= (others => '0');
-            syn6KernalData_red.k6  <= (others => '0');
-            syn6KernalData_red.k7  <= (others => '0');
-            syn6KernalData_red.k8  <= (others => '0');
-            syn6KernalData_red.k9  <= (others => '0');
-            syn6KernalData_red.k9  <= (others => '0');
-            syn6KernalData_red.k10 <= (others => '0');
-            syn6KernalData_red.k11 <= (others => '0');
-            syn6KernalData_red.k12 <= (others => '0');
-            syn6KernalData_red.k13 <= (others => '0');
-            syn6KernalData_red.k14 <= (others => '0');
-            syn6KernalData_red.k15 <= (others => '0');
-            syn6KernalData_red.k16 <= (others => '0');
-        --========================================================================================
-            syn6KernalData_gre.k1  <= (others => '0');
-            syn6KernalData_gre.k2  <= (others => '0');
-            syn6KernalData_gre.k3  <= (others => '0');
-            syn6KernalData_gre.k4  <= (others => '0');
-            syn6KernalData_gre.k5  <= (others => '0');
-            syn6KernalData_gre.k6  <= (others => '0');
-            syn6KernalData_gre.k7  <= (others => '0');
-            syn6KernalData_gre.k8  <= (others => '0');
-            syn6KernalData_gre.k9  <= (others => '0');
-            syn6KernalData_gre.k9  <= (others => '0');
-            syn6KernalData_gre.k10 <= (others => '0');
-            syn6KernalData_gre.k11 <= (others => '0');
-            syn6KernalData_gre.k12 <= (others => '0');
-            syn6KernalData_gre.k13 <= (others => '0');
-            syn6KernalData_gre.k14 <= (others => '0');
-            syn6KernalData_gre.k15 <= (others => '0');
-            syn6KernalData_gre.k16 <= (others => '0');
-        --========================================================================================
-            syn6KernalData_blu.k1  <= (others => '0');
-            syn6KernalData_blu.k2  <= (others => '0');
-            syn6KernalData_blu.k3  <= (others => '0');
-            syn6KernalData_blu.k4  <= (others => '0');
-            syn6KernalData_blu.k5  <= (others => '0');
-            syn6KernalData_blu.k6  <= (others => '0');
-            syn6KernalData_blu.k7  <= (others => '0');
-            syn6KernalData_blu.k8  <= (others => '0');
-            syn6KernalData_blu.k9  <= (others => '0');
-            syn6KernalData_blu.k9  <= (others => '0');
-            syn6KernalData_blu.k10 <= (others => '0');
-            syn6KernalData_blu.k11 <= (others => '0');
-            syn6KernalData_blu.k12 <= (others => '0');
-            syn6KernalData_blu.k13 <= (others => '0');
-            syn6KernalData_blu.k14 <= (others => '0');
-            syn6KernalData_blu.k15 <= (others => '0');
-            syn6KernalData_blu.k16 <= (others => '0');
-        --========================================================================================
-        end if;
+--        else
+--            syn6KernalData_red.k1  <= (others => '0');
+--            syn6KernalData_red.k2  <= (others => '0');
+--            syn6KernalData_red.k3  <= (others => '0');
+--            syn6KernalData_red.k4  <= (others => '0');
+--            syn6KernalData_red.k5  <= (others => '0');
+--            syn6KernalData_red.k6  <= (others => '0');
+--            syn6KernalData_red.k7  <= (others => '0');
+--            syn6KernalData_red.k8  <= (others => '0');
+--            syn6KernalData_red.k9  <= (others => '0');
+--            syn6KernalData_red.k9  <= (others => '0');
+--            syn6KernalData_red.k10 <= (others => '0');
+--            syn6KernalData_red.k11 <= (others => '0');
+--            syn6KernalData_red.k12 <= (others => '0');
+--            syn6KernalData_red.k13 <= (others => '0');
+--            syn6KernalData_red.k14 <= (others => '0');
+--            syn6KernalData_red.k15 <= (others => '0');
+--            syn6KernalData_red.k16 <= (others => '0');
+--        --========================================================================================
+--            syn6KernalData_gre.k1  <= (others => '0');
+--            syn6KernalData_gre.k2  <= (others => '0');
+--            syn6KernalData_gre.k3  <= (others => '0');
+--            syn6KernalData_gre.k4  <= (others => '0');
+--            syn6KernalData_gre.k5  <= (others => '0');
+--            syn6KernalData_gre.k6  <= (others => '0');
+--            syn6KernalData_gre.k7  <= (others => '0');
+--            syn6KernalData_gre.k8  <= (others => '0');
+--            syn6KernalData_gre.k9  <= (others => '0');
+--            syn6KernalData_gre.k9  <= (others => '0');
+--            syn6KernalData_gre.k10 <= (others => '0');
+--            syn6KernalData_gre.k11 <= (others => '0');
+--            syn6KernalData_gre.k12 <= (others => '0');
+--            syn6KernalData_gre.k13 <= (others => '0');
+--            syn6KernalData_gre.k14 <= (others => '0');
+--            syn6KernalData_gre.k15 <= (others => '0');
+--            syn6KernalData_gre.k16 <= (others => '0');
+--        --========================================================================================
+--            syn6KernalData_blu.k1  <= (others => '0');
+--            syn6KernalData_blu.k2  <= (others => '0');
+--            syn6KernalData_blu.k3  <= (others => '0');
+--            syn6KernalData_blu.k4  <= (others => '0');
+--            syn6KernalData_blu.k5  <= (others => '0');
+--            syn6KernalData_blu.k6  <= (others => '0');
+--            syn6KernalData_blu.k7  <= (others => '0');
+--            syn6KernalData_blu.k8  <= (others => '0');
+--            syn6KernalData_blu.k9  <= (others => '0');
+--            syn6KernalData_blu.k9  <= (others => '0');
+--            syn6KernalData_blu.k10 <= (others => '0');
+--            syn6KernalData_blu.k11 <= (others => '0');
+--            syn6KernalData_blu.k12 <= (others => '0');
+--            syn6KernalData_blu.k13 <= (others => '0');
+--            syn6KernalData_blu.k14 <= (others => '0');
+--            syn6KernalData_blu.k15 <= (others => '0');
+--            syn6KernalData_blu.k16 <= (others => '0');
+--        --========================================================================================
+--        end if;
     end if;
 end process;
 process (clk) begin
@@ -852,98 +852,98 @@ process (clk) begin
             gre_detect.k(3).n  <= 3;
         else
             gre_detect.k(3).n  <= 0;
-            gre_select.sumprod_2.k3       <= resize(gre_on.delta_sum_3.k3,gre_select.sumprod_2.k3);
+            gre_select.sumprod_2.k3  <= resize(gre_on.delta_sum_3.k3,gre_select.sumprod_2.k3);
         end if;
         if(gre_on.delta_2syn.k4 <= pixel_threshold_2) then
             gre_select.sumprod_2.k4  <= gre_on.delta_sum_prod_1.k4;
             gre_detect.k(4).n  <= 4;
         else
             gre_detect.k(4).n  <= 0;
-            gre_select.sumprod_2.k4       <= resize(gre_on.delta_sum_3.k4,gre_select.sumprod_2.k4);
+            gre_select.sumprod_2.k4  <= resize(gre_on.delta_sum_3.k4,gre_select.sumprod_2.k4);
         end if;
         if(gre_on.delta_2syn.k5 <= pixel_threshold_2) then
             gre_select.sumprod_2.k5  <= gre_on.delta_sum_prod_1.k5;
             gre_detect.k(5).n  <= 5;
         else
             gre_detect.k(5).n  <= 0;
-            gre_select.sumprod_2.k5       <= resize(gre_on.delta_sum_3.k5,gre_select.sumprod_2.k5);
+            gre_select.sumprod_2.k5  <= resize(gre_on.delta_sum_3.k5,gre_select.sumprod_2.k5);
         end if;
         if(gre_on.delta_2syn.k6 <= pixel_threshold_2) then
             gre_select.sumprod_2.k6  <= gre_on.delta_sum_prod_1.k6;
             gre_detect.k(6).n  <= 6;
         else
             gre_detect.k(6).n  <= 0;
-            gre_select.sumprod_2.k6       <= resize(gre_on.delta_sum_3.k6,gre_select.sumprod_2.k6);
+            gre_select.sumprod_2.k6  <= resize(gre_on.delta_sum_3.k6,gre_select.sumprod_2.k6);
         end if;
         if(gre_on.delta_2syn.k7 <= pixel_threshold_2) then
             gre_select.sumprod_2.k7  <= gre_on.delta_sum_prod_1.k7;
             gre_detect.k(7).n  <= 7;
         else
             gre_detect.k(7).n  <= 0;
-            gre_select.sumprod_2.k7       <= resize(gre_on.delta_sum_3.k7,gre_select.sumprod_2.k7);
+            gre_select.sumprod_2.k7  <= resize(gre_on.delta_sum_3.k7,gre_select.sumprod_2.k7);
         end if;
         if(gre_on.delta_2syn.k8 <= pixel_threshold_2) then
             gre_select.sumprod_2.k8  <= gre_on.delta_sum_prod_1.k8;
             gre_detect.k(8).n  <= 8;
         else
             gre_detect.k(8).n  <= 0;
-            gre_select.sumprod_2.k8       <= resize(gre_on.delta_sum_3.k8,gre_select.sumprod_2.k8);
+            gre_select.sumprod_2.k8  <= resize(gre_on.delta_sum_3.k8,gre_select.sumprod_2.k8);
         end if;
         if(gre_on.delta_2syn.k9 <= pixel_threshold_2) then
             gre_select.sumprod_2.k9  <= gre_on.delta_sum_prod_1.k9;
             gre_detect.k(9).n  <= 9;
         else
             gre_detect.k(9).n  <= 0;
-            gre_select.sumprod_2.k9       <= resize(gre_on.delta_sum_3.k9,gre_select.sumprod_2.k9);
+            gre_select.sumprod_2.k9  <= resize(gre_on.delta_sum_3.k9,gre_select.sumprod_2.k9);
         end if;
         if(gre_on.delta_2syn.k10 <= pixel_threshold_2) then
             gre_select.sumprod_2.k10  <= gre_on.delta_sum_prod_1.k10;
             gre_detect.k(10).n  <= 10;
         else
             gre_detect.k(10).n  <= 0;
-            gre_select.sumprod_2.k10       <= resize(gre_on.delta_sum_3.k10,gre_select.sumprod_2.k10);
+            gre_select.sumprod_2.k10  <= resize(gre_on.delta_sum_3.k10,gre_select.sumprod_2.k10);
         end if;
         if(gre_on.delta_2syn.k11 <= pixel_threshold_2) then
             gre_select.sumprod_2.k11  <= gre_on.delta_sum_prod_1.k11;
             gre_detect.k(11).n  <= 11;
         else
             gre_detect.k(11).n  <= 0;
-            gre_select.sumprod_2.k11       <= resize(gre_on.delta_sum_3.k11,gre_select.sumprod_2.k11);
+            gre_select.sumprod_2.k11  <= resize(gre_on.delta_sum_3.k11,gre_select.sumprod_2.k11);
         end if;
         if(gre_on.delta_2syn.k12 <= pixel_threshold_2) then
             gre_select.sumprod_2.k12  <= gre_on.delta_sum_prod_1.k12;
             gre_detect.k(12).n  <= 12;
         else
             gre_detect.k(12).n  <= 0;
-            gre_select.sumprod_2.k12       <= resize(gre_on.delta_sum_3.k12,gre_select.sumprod_2.k12);
+            gre_select.sumprod_2.k12  <= resize(gre_on.delta_sum_3.k12,gre_select.sumprod_2.k12);
         end if;
         if(gre_on.delta_2syn.k13 <= pixel_threshold_2) then
             gre_select.sumprod_2.k13  <= gre_on.delta_sum_prod_1.k13;
             gre_detect.k(13).n  <= 13;
         else
             gre_detect.k(13).n  <= 0;
-            gre_select.sumprod_2.k13       <= resize(gre_on.delta_sum_3.k13,gre_select.sumprod_2.k13);
+            gre_select.sumprod_2.k13  <= resize(gre_on.delta_sum_3.k13,gre_select.sumprod_2.k13);
         end if;
         if(gre_on.delta_2syn.k14 <= pixel_threshold_2) then
             gre_select.sumprod_2.k14  <= gre_on.delta_sum_prod_1.k14;
             gre_detect.k(14).n  <= 14;
         else
             gre_detect.k(14).n  <= 0;
-            gre_select.sumprod_2.k14       <= resize(gre_on.delta_sum_3.k14,gre_select.sumprod_2.k14);
+            gre_select.sumprod_2.k14  <= resize(gre_on.delta_sum_3.k14,gre_select.sumprod_2.k14);
         end if;
         if(gre_on.delta_2syn.k15 <= pixel_threshold_2) then
             gre_select.sumprod_2.k15  <= gre_on.delta_sum_prod_1.k15;
             gre_detect.k(15).n  <= 15;
         else
             gre_detect.k(15).n  <= 0;
-            gre_select.sumprod_2.k15       <= resize(gre_on.delta_sum_3.k15,gre_select.sumprod_2.k15);
+            gre_select.sumprod_2.k15  <= resize(gre_on.delta_sum_3.k15,gre_select.sumprod_2.k15);
         end if;
         if(gre_on.delta_2syn.k16 <= pixel_threshold_2) then
             gre_select.sumprod_2.k16  <= gre_on.delta_sum_prod_1.k16;
             gre_detect.k(16).n  <= 16;
         else
             gre_detect.k(16).n  <= 0;
-            gre_select.sumprod_2.k16       <= resize(gre_on.delta_sum_3.k16,gre_select.sumprod_2.k16);
+            gre_select.sumprod_2.k16  <= resize(gre_on.delta_sum_3.k16,gre_select.sumprod_2.k16);
         end if;
     end if;
 end process;
@@ -969,198 +969,166 @@ process (clk) begin
             blu_detect.k(3).n  <= 3;
         else
             blu_detect.k(3).n  <= 0;
-            blu_select.sumprod_2.k3       <= resize(blu_on.delta_sum_3.k3,blu_select.sumprod_2.k3);
+            blu_select.sumprod_2.k3  <= resize(blu_on.delta_sum_3.k3,blu_select.sumprod_2.k3);
         end if;
         if(blu_on.delta_2syn.k4 <= pixel_threshold_2) then
             blu_select.sumprod_2.k4  <= blu_on.delta_sum_prod_1.k4;
             blu_detect.k(4).n  <= 4;
         else
             blu_detect.k(4).n  <= 0;
-            blu_select.sumprod_2.k4       <= resize(blu_on.delta_sum_3.k4,blu_select.sumprod_2.k4);
+            blu_select.sumprod_2.k4  <= resize(blu_on.delta_sum_3.k4,blu_select.sumprod_2.k4);
         end if;
         if(blu_on.delta_2syn.k5 <= pixel_threshold_2) then
             blu_select.sumprod_2.k5  <= blu_on.delta_sum_prod_1.k5;
             blu_detect.k(5).n  <= 5;
         else
             blu_detect.k(5).n  <= 0;
-            blu_select.sumprod_2.k5       <= resize(blu_on.delta_sum_3.k5,blu_select.sumprod_2.k5);
+            blu_select.sumprod_2.k5  <= resize(blu_on.delta_sum_3.k5,blu_select.sumprod_2.k5);
         end if;
         if(blu_on.delta_2syn.k6 <= pixel_threshold_2) then
             blu_select.sumprod_2.k6  <= blu_on.delta_sum_prod_1.k6;
             blu_detect.k(6).n  <= 6;
         else
             blu_detect.k(6).n  <= 0;
-            blu_select.sumprod_2.k6       <= resize(blu_on.delta_sum_3.k6,blu_select.sumprod_2.k6);
+            blu_select.sumprod_2.k6  <= resize(blu_on.delta_sum_3.k6,blu_select.sumprod_2.k6);
         end if;
         if(blu_on.delta_2syn.k7 <= pixel_threshold_2) then
             blu_select.sumprod_2.k7  <= blu_on.delta_sum_prod_1.k7;
             blu_detect.k(7).n  <= 7;
         else
             blu_detect.k(7).n  <= 0;
-            blu_select.sumprod_2.k7       <= resize(blu_on.delta_sum_3.k7,blu_select.sumprod_2.k7);
+            blu_select.sumprod_2.k7  <= resize(blu_on.delta_sum_3.k7,blu_select.sumprod_2.k7);
         end if;
         if(blu_on.delta_2syn.k8 <= pixel_threshold_2) then
             blu_select.sumprod_2.k8  <= blu_on.delta_sum_prod_1.k8;
             blu_detect.k(8).n  <= 8;
         else
             blu_detect.k(8).n  <= 0;
-            blu_select.sumprod_2.k8       <= resize(blu_on.delta_sum_3.k8,blu_select.sumprod_2.k8);
+            blu_select.sumprod_2.k8  <= resize(blu_on.delta_sum_3.k8,blu_select.sumprod_2.k8);
         end if;
         if(blu_on.delta_2syn.k9 <= pixel_threshold_2) then
             blu_select.sumprod_2.k9  <= blu_on.delta_sum_prod_1.k9;
             blu_detect.k(9).n  <= 9;
         else
             blu_detect.k(9).n  <= 0;
-            blu_select.sumprod_2.k9       <= resize(blu_on.delta_sum_3.k9,blu_select.sumprod_2.k9);
+            blu_select.sumprod_2.k9  <= resize(blu_on.delta_sum_3.k9,blu_select.sumprod_2.k9);
         end if;
         if(blu_on.delta_2syn.k10 <= pixel_threshold_2) then
             blu_select.sumprod_2.k10  <= blu_on.delta_sum_prod_1.k10;
             blu_detect.k(10).n  <= 10;
         else
             blu_detect.k(10).n  <= 0;
-            blu_select.sumprod_2.k10       <= resize(blu_on.delta_sum_3.k10,blu_select.sumprod_2.k10);
+            blu_select.sumprod_2.k10  <= resize(blu_on.delta_sum_3.k10,blu_select.sumprod_2.k10);
         end if;
         if(blu_on.delta_2syn.k11 <= pixel_threshold_2) then
             blu_select.sumprod_2.k11  <= blu_on.delta_sum_prod_1.k11;
             blu_detect.k(11).n  <= 11;
         else
             blu_detect.k(11).n  <= 0;
-            blu_select.sumprod_2.k11       <= resize(blu_on.delta_sum_3.k11,blu_select.sumprod_2.k11);
+            blu_select.sumprod_2.k11  <= resize(blu_on.delta_sum_3.k11,blu_select.sumprod_2.k11);
         end if;
         if(blu_on.delta_2syn.k12 <= pixel_threshold_2) then
             blu_select.sumprod_2.k12  <= blu_on.delta_sum_prod_1.k12;
             blu_detect.k(12).n  <= 12;
         else
             blu_detect.k(12).n  <= 0;
-            blu_select.sumprod_2.k12       <= resize(blu_on.delta_sum_3.k12,blu_select.sumprod_2.k12);
+            blu_select.sumprod_2.k12  <= resize(blu_on.delta_sum_3.k12,blu_select.sumprod_2.k12);
         end if;
         if(blu_on.delta_2syn.k13 <= pixel_threshold_2) then
             blu_select.sumprod_2.k13  <= blu_on.delta_sum_prod_1.k13;
             blu_detect.k(13).n  <= 13;
         else
             blu_detect.k(13).n  <= 0;
-            blu_select.sumprod_2.k13       <= resize(blu_on.delta_sum_3.k13,blu_select.sumprod_2.k13);
+            blu_select.sumprod_2.k13  <= resize(blu_on.delta_sum_3.k13,blu_select.sumprod_2.k13);
         end if;
         if(blu_on.delta_2syn.k14 <= pixel_threshold_2) then
             blu_select.sumprod_2.k14  <= blu_on.delta_sum_prod_1.k14;
             blu_detect.k(14).n  <= 14;
         else
             blu_detect.k(14).n  <= 0;
-            blu_select.sumprod_2.k14       <= resize(blu_on.delta_sum_3.k14,blu_select.sumprod_2.k14);
+            blu_select.sumprod_2.k14  <= resize(blu_on.delta_sum_3.k14,blu_select.sumprod_2.k14);
         end if;
         if(blu_on.delta_2syn.k15 <= pixel_threshold_2) then
             blu_select.sumprod_2.k15  <= blu_on.delta_sum_prod_1.k15;
             blu_detect.k(15).n  <= 15;
         else
             blu_detect.k(15).n  <= 0;
-            blu_select.sumprod_2.k15       <= resize(blu_on.delta_sum_3.k15,blu_select.sumprod_2.k15);
+            blu_select.sumprod_2.k15  <= resize(blu_on.delta_sum_3.k15,blu_select.sumprod_2.k15);
         end if;
         if(blu_on.delta_2syn.k16 <= pixel_threshold_2) then
             blu_select.sumprod_2.k16  <= blu_on.delta_sum_prod_1.k16;
             blu_detect.k(16).n  <= 16;
         else
             blu_detect.k(16).n  <= 0;
-            blu_select.sumprod_2.k16       <= resize(blu_on.delta_sum_3.k16,blu_select.sumprod_2.k16);
+            blu_select.sumprod_2.k16  <= resize(blu_on.delta_sum_3.k16,blu_select.sumprod_2.k16);
         end if;
     end if;
 end process;
 --=================================================================================================
 process (clk) begin
     if rising_edge(clk) then
-            red_select.sumprod_2n       <= red_select.sumprod_2;
-            red_select.sumprod_3n       <= red_select.sumprod_2n;
-            red_select.sumprod_4n       <= red_select.sumprod_3n;
-            red_select.sumprod_5n       <= red_select.sumprod_4n;
-            red_select.sumprod_6n       <= red_select.sumprod_5n;
-            red_select.sumprod_7n       <= red_select.sumprod_6n;
-            red_select.sumprod_8n       <= red_select.sumprod_7n;
-            red_select.sumprod_9n       <= red_select.sumprod_8n;
-            red_select.sumprod_An.k1    <= to_integer(unsigned(red_select.sumprod_9n.k1)); 
-            red_select.sumprod_An.k2    <= to_integer(unsigned(red_select.sumprod_9n.k2)); 
-            red_select.sumprod_An.k3    <= to_integer(unsigned(red_select.sumprod_9n.k3)); 
-            red_select.sumprod_An.k4    <= to_integer(unsigned(red_select.sumprod_9n.k4)); 
-            red_select.sumprod_An.k5    <= to_integer(unsigned(red_select.sumprod_9n.k5)); 
-            red_select.sumprod_An.k6    <= to_integer(unsigned(red_select.sumprod_9n.k6)); 
-            red_select.sumprod_An.k7    <= to_integer(unsigned(red_select.sumprod_9n.k7)); 
-            red_select.sumprod_An.k8    <= to_integer(unsigned(red_select.sumprod_9n.k8)); 
-            red_select.sumprod_An.k9    <= to_integer(unsigned(red_select.sumprod_9n.k9)); 
-            red_select.sumprod_An.k10   <= to_integer(unsigned(red_select.sumprod_9n.k10));
-            red_select.sumprod_An.k11   <= to_integer(unsigned(red_select.sumprod_9n.k11));
-            red_select.sumprod_An.k12   <= to_integer(unsigned(red_select.sumprod_9n.k12));
-            red_select.sumprod_An.k13   <= to_integer(unsigned(red_select.sumprod_9n.k13));
-            red_select.sumprod_An.k14   <= to_integer(unsigned(red_select.sumprod_9n.k14));
-            red_select.sumprod_An.k15   <= to_integer(unsigned(red_select.sumprod_9n.k15));
-            red_select.sumprod_An.k16   <= to_integer(unsigned(red_select.sumprod_9n.k16));
-            red_select.sumprod_Bn       <= red_select.sumprod_An;
-            red_select.sumprod_Cn       <= red_select.sumprod_Bn;
-            
-            red_add.add_12345678  <= (red_select.sumprod_An.k1 + red_select.sumprod_An.k2 + red_select.sumprod_An.k3 + red_select.sumprod_An.k4 + red_select.sumprod_An.k5 + red_select.sumprod_An.k6 + red_select.sumprod_An.k7 + red_select.sumprod_An.k8) / 8;
-            red_add.add_9ABCDEFF  <= (red_select.sumprod_An.k9 + red_select.sumprod_An.k10 + red_select.sumprod_An.k11 + red_select.sumprod_An.k12 + red_select.sumprod_An.k13 + red_select.sumprod_An.k14 + red_select.sumprod_An.k15 + red_select.sumprod_An.k16) / 8;
-            red_add.add_123456789ABCDEFF  <= (red_add.add_12345678 + red_add.add_9ABCDEFF);
-            
-            --  1,2
-            red_add.add_12              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2) / 2;
-            --  1,5                        
-            red_add.add_15              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k5) / 2;
-            -- 1,2,5                       
-            red_add.add_125             <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5) / 3;
-            -- 1,2,5,6                     
-            red_add.add_1256            <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6) / 3;
-            -- 1,2,5,6,3,9                 
-            red_add.add_125639          <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9) / 3;
-            -- 1,2,5,6,3,9,4               
-            red_add.add_1256394         <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4) / 3;
-            -- 1,2,5,6,3,9,13              
-            red_add.add_125639_13       <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k13) / 3;
-            -- 1,2,5,6,3,9,4,13            
-            red_add.add_1256394_13      <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k13) / 3;
-            -- 1,2,5,6,3,9,4,13,7,10
-            red_add.add_12563947_13_10  <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k13 + red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k10) / 3;
-            --  1,6
-            red_add.add_16              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k6) / 2;
-            --  3,4                        
-            red_add.add_34              <= (red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k4) / 2;
-            --  5,6                        
-            red_add.add_56              <= (red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6) / 2;
-            --  7,8                        
-            red_add.add_78              <= (red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k8) / 2;
-            -- 1234                        
-            red_add.add_1234            <= (int_max_val(red_select.sumprod_Bn.k1,red_select.sumprod_Bn.k2,red_select.sumprod_Bn.k3,red_select.sumprod_Bn.k4) + int_max_val(red_select.sumprod_Bn.k5,red_select.sumprod_Bn.k6,red_select.sumprod_Bn.k7,red_select.sumprod_Bn.k8)) / 2;
-            -- 5678                        
-            red_add.add_5678            <= (int_max_val(red_select.sumprod_Bn.k9,red_select.sumprod_Bn.k10,red_select.sumprod_Bn.k11,red_select.sumprod_Bn.k12) + int_max_val(red_select.sumprod_Bn.k13,red_select.sumprod_Bn.k14,red_select.sumprod_Bn.k15,red_select.sumprod_Bn.k16)) / 2;
-            -- 12345678
-            --red_add.add_1_to_8   <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k8 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k10 + red_select.sumprod_Bn.k11 + red_select.sumprod_Bn.k12 + red_select.sumprod_Bn.k13 + red_select.sumprod_Bn.k14 + red_select.sumprod_Bn.k15 + red_select.sumprod_Bn.k16) / 16;
-            red_add.add_1_to_8   <= (red_add.add_1234 + red_add.add_5678) / 2;
-            --  45
-            red_add.add_45        <= (red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5) / 2;
-            --  14
-            red_add.add_14        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k4) / 2;
-            --  17
-            red_add.add_17        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k7) / 2;
-            --  13
-            red_add.add_13        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k3) / 2;
-            --  79
-            red_add.add_79        <= (red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k9) / 2;
-            --  1,13
-            red_add.add_113       <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k13) / 2;
-            --  1,16
-            red_add.add_116       <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k16) / 2;
-            --  13,16
-            red_add.add_1316      <= (red_select.sumprod_Bn.k13 + red_select.sumprod_Bn.k16) / 2;
-            --  1,4,13,16
-            red_add.add_141316    <= (red_add.add_s14 + red_add.add_s1316) / 2;
-            --1245
-            red_add.add_1245      <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5) / 4;
-            --1379
-            red_add.add_1379      <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k9) / 4;
-            --123
-            red_add.add_123        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k3) / 3;
-            --124
-            red_add.add_124        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k4) / 3;
-            -- 147
-            red_add.add_147        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k7) / 3;
-            -- 145
-            red_add.add_145        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5) / 3;
+            red_select.sumprod_2n         <= red_select.sumprod_2;
+            red_select.sumprod_3n         <= red_select.sumprod_2n;
+            red_select.sumprod_4n         <= red_select.sumprod_3n;
+            red_select.sumprod_5n         <= red_select.sumprod_4n;
+            red_select.sumprod_6n         <= red_select.sumprod_5n;
+            red_select.sumprod_7n         <= red_select.sumprod_6n;
+            red_select.sumprod_8n         <= red_select.sumprod_7n;
+            red_select.sumprod_9n         <= red_select.sumprod_8n;
+            red_select.sumprod_An.k1      <= to_integer(unsigned(red_select.sumprod_9n.k1)); 
+            red_select.sumprod_An.k2      <= to_integer(unsigned(red_select.sumprod_9n.k2)); 
+            red_select.sumprod_An.k3      <= to_integer(unsigned(red_select.sumprod_9n.k3)); 
+            red_select.sumprod_An.k4      <= to_integer(unsigned(red_select.sumprod_9n.k4)); 
+            red_select.sumprod_An.k5      <= to_integer(unsigned(red_select.sumprod_9n.k5)); 
+            red_select.sumprod_An.k6      <= to_integer(unsigned(red_select.sumprod_9n.k6)); 
+            red_select.sumprod_An.k7      <= to_integer(unsigned(red_select.sumprod_9n.k7)); 
+            red_select.sumprod_An.k8      <= to_integer(unsigned(red_select.sumprod_9n.k8)); 
+            red_select.sumprod_An.k9      <= to_integer(unsigned(red_select.sumprod_9n.k9)); 
+            red_select.sumprod_An.k10     <= to_integer(unsigned(red_select.sumprod_9n.k10));
+            red_select.sumprod_An.k11     <= to_integer(unsigned(red_select.sumprod_9n.k11));
+            red_select.sumprod_An.k12     <= to_integer(unsigned(red_select.sumprod_9n.k12));
+            red_select.sumprod_An.k13     <= to_integer(unsigned(red_select.sumprod_9n.k13));
+            red_select.sumprod_An.k14     <= to_integer(unsigned(red_select.sumprod_9n.k14));
+            red_select.sumprod_An.k15     <= to_integer(unsigned(red_select.sumprod_9n.k15));
+            red_select.sumprod_An.k16     <= to_integer(unsigned(red_select.sumprod_9n.k16));
+            red_select.sumprod_Bn         <= red_select.sumprod_An;
+            red_select.sumprod_Cn         <= red_select.sumprod_Bn;
+            red_add.add_12                <= red_select.sumprod_Bn.k2;                     
+            red_add.add_15                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k5) / 2;                     
+            red_add.add_125               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5) / 3;                   
+            red_add.add_1256              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6) / 4;
+
+            red_add.add_125639            <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9) / 6;          
+            red_add.add_1256394           <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4) / 7;          
+            red_add.add_125639_13         <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k13) / 7;         
+            red_add.add_1256394_13        <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k13) / 8;
+            red_add.add_12563947_13_10    <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k13 + red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k10) / 10;
+            red_add.add_16                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k6) / 2;                      
+            red_add.add_34                <= (red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k4) / 2;                   
+            red_add.add_56                <= (red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6) / 2;                       
+            red_add.add_78                <= (red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k8) / 2;  
+            red_add.add_1245              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5) / 4;
+            red_add.add_1379              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k9) / 4;
+            red_add.add_123               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k3) / 3;
+            red_add.add_124               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k4) / 3;
+            red_add.add_147               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k7) / 3;
+            red_add.add_145               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5) / 3;
+            red_add.add_45                <= (red_select.sumprod_Bn.k4 + red_select.sumprod_Bn.k5) / 2;
+            red_add.add_14                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k4) / 2;
+            red_add.add_17                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k7) / 2;
+            red_add.add_13                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k3) / 2;
+            red_add.add_79                <= (red_select.sumprod_Bn.k7 + red_select.sumprod_Bn.k9) / 2;
+            red_add.add_113               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k13) / 2;
+            red_add.add_116               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k16) / 2;
+            red_add.add_1316              <= (red_select.sumprod_Bn.k13 + red_select.sumprod_Bn.k16) / 2;
+            red_add.add_1234              <= (int_max_val(red_select.sumprod_Bn.k1,red_select.sumprod_Bn.k2,red_select.sumprod_Bn.k3,red_select.sumprod_Bn.k4) + int_max_val(red_select.sumprod_Bn.k5,red_select.sumprod_Bn.k6,red_select.sumprod_Bn.k7,red_select.sumprod_Bn.k8)) / 8;                     
+            red_add.add_5678              <= (int_max_val(red_select.sumprod_Bn.k9,red_select.sumprod_Bn.k10,red_select.sumprod_Bn.k11,red_select.sumprod_Bn.k12) + int_max_val(red_select.sumprod_Bn.k13,red_select.sumprod_Bn.k14,red_select.sumprod_Bn.k15,red_select.sumprod_Bn.k16)) / 8;
+            red_add.add_12345678          <= (red_select.sumprod_An.k1 + red_select.sumprod_An.k2 + red_select.sumprod_An.k3 + red_select.sumprod_An.k4 + red_select.sumprod_An.k5 + red_select.sumprod_An.k6 + red_select.sumprod_An.k7 + red_select.sumprod_An.k8) / 8;
+            red_add.add_9ABCDEFF          <= (red_select.sumprod_An.k9 + red_select.sumprod_An.k10 + red_select.sumprod_An.k11 + red_select.sumprod_An.k12 + red_select.sumprod_An.k13 + red_select.sumprod_An.k14 + red_select.sumprod_An.k15 + red_select.sumprod_An.k16) / 8;
+            red_add.add_123456789ABCDEFF  <= (red_add.add_12345678 + red_add.add_9ABCDEFF) / 2;
+            red_add.add_1_to_8            <= (red_add.add_1234 + red_add.add_5678) / 2;
+            red_add.add_141316            <= (red_add.add_s14 + red_add.add_s1316) / 2;
+ 
     end if;
 end process;
 --=================================================================================================
@@ -1179,48 +1147,45 @@ end process;
 --=================================================================================================
 process (clk) begin
     if rising_edge(clk) then
+        --if (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
+        --   and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=7  
+        --   and red_detect.k_syn_12(8).n=8 and red_detect.k_syn_12(9).n=9 and red_detect.k_syn_12(10).n=10 
+        --   and red_detect.k_syn_12(11).n=11 and red_detect.k_syn_12(12).n=12 and red_detect.k_syn_12(13).n=13  
+        --   and red_detect.k_syn_12(14).n=14 and red_detect.k_syn_12(15).n=15 and red_detect.k_syn_12(16).n=16) then
+        --    red_select.result   <= std_logic_vector(to_unsigned((red_add.add_123456789ABCDEFF), 14));
+        --elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
+        --   and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=7  
+        --   and red_detect.k_syn_12(9).n=9 and red_detect.k_syn_12(10).n=10   
+        --   and red_detect.k_syn_12(13).n=13) then
+        --    red_select.result   <= std_logic_vector(to_unsigned((red_add.add_12563947_13_10), 14));
+        --elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
+        --   and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
+        --   and red_detect.k_syn_12(9).n=9
+        --   and red_detect.k_syn_12(13).n=13) then
+        --    red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256394_13), 14));
+        --elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3
+        --    and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
+        --    and red_detect.k_syn_12(9).n=9 
+        --    and red_detect.k_syn_12(13).n=13) then
+        --     red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639_13), 14));
         if (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=7  
-           and red_detect.k_syn_12(8).n=8 and red_detect.k_syn_12(9).n=9 and red_detect.k_syn_12(10).n=10 
-           and red_detect.k_syn_12(11).n=11 and red_detect.k_syn_12(12).n=12 and red_detect.k_syn_12(13).n=13  
-           and red_detect.k_syn_12(14).n=14 and red_detect.k_syn_12(15).n=15 and red_detect.k_syn_12(16).n=16) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_123456789ABCDEFF), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=7  
-           and red_detect.k_syn_12(9).n=9 and red_detect.k_syn_12(10).n=10   
-           and red_detect.k_syn_12(13).n=13) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_12563947_13_10), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=0  
-           and red_detect.k_syn_12(9).n=9 and red_detect.k_syn_12(10).n=0   
-           and red_detect.k_syn_12(13).n=13) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256394_13), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=0 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=0  
-           and red_detect.k_syn_12(9).n=9 and red_detect.k_syn_12(10).n=0   
-           and red_detect.k_syn_12(13).n=13) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639_13), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=0  
-           and red_detect.k_syn_12(9).n=9) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256394), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=0 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6 and red_detect.k_syn_12(7).n=0  
-           and red_detect.k_syn_12(9).n=9) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=0 and red_detect.k_syn_12(4).n=0 
-           and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6) then
+            and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
+            and red_detect.k_syn_12(9).n=9) then
+             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256394), 14));
+        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3
+            and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
+            and red_detect.k_syn_12(9).n=9) then
+             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639), 14));
+        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6) then
             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=0 and red_detect.k_syn_12(4).n=0 
-           and red_detect.k_syn_12(5).n=5) then
+        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(5).n=5) then
             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125), 14));
-        elsif (red_detect.k_syn_12(2).n=0 and red_detect.k_syn_12(3).n=0 and red_detect.k_syn_12(4).n=0 
-           and red_detect.k_syn_12(5).n=5) then
+        elsif (red_detect.k_syn_12(5).n=5) then
             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_15), 14));
         elsif (red_detect.k_syn_12(2).n=2) then
             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_12), 14));
         else
-            red_select.result   <= std_logic_vector(to_unsigned((red_select.sumprod_Bn.k1), 14));
+            red_select.result   <= std_logic_vector(to_unsigned((red_select.sumprod_Cn.k1), 14));
         end if;
     end if;
 end process;
@@ -1253,75 +1218,75 @@ process (clk) begin
             gre_select.sumprod_An.k16   <= to_integer(unsigned(gre_select.sumprod_9n.k16));
             gre_select.sumprod_Bn       <= gre_select.sumprod_An;
             gre_select.sumprod_Cn       <= gre_select.sumprod_Bn;
-            
-            gre_add.add_12345678        <= (gre_select.sumprod_An.k1 + gre_select.sumprod_An.k2 + gre_select.sumprod_An.k3 + gre_select.sumprod_An.k4 + gre_select.sumprod_An.k5 + gre_select.sumprod_An.k6 + gre_select.sumprod_An.k7 + gre_select.sumprod_An.k8) / 8;
-            gre_add.add_9ABCDEFF        <= (gre_select.sumprod_An.k9 + gre_select.sumprod_An.k10 + gre_select.sumprod_An.k11 + gre_select.sumprod_An.k12 + gre_select.sumprod_An.k13 + gre_select.sumprod_An.k14 + gre_select.sumprod_An.k15 + gre_select.sumprod_An.k16) / 8;
-            gre_add.add_123456789ABCDEFF  <= (gre_add.add_12345678 + gre_add.add_9ABCDEFF);
+            gre_add.add_12345678        <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k4 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k7 + gre_select.sumprod_Bn.k8) / 8;
+            gre_add.add_9ABCDEFF        <= (gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k10 + gre_select.sumprod_Bn.k11 + gre_select.sumprod_Bn.k12 + gre_select.sumprod_Bn.k13 + gre_select.sumprod_Bn.k14 + gre_select.sumprod_Bn.k15 + gre_select.sumprod_Bn.k16) / 8;
+            gre_add.add_123456789ABCDEFF  <= (gre_add.add_12345678 + gre_add.add_9ABCDEFF) / 2;
             --  1,2
-            gre_add.add_12              <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k12) / 2;
+            gre_add.add_12              <= (gre_select.sumprod_Bn.k2);
             --  1,5                        
             gre_add.add_15              <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k5) / 2;
             -- 1,2,5                       
             gre_add.add_125             <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5) / 3;
             -- 1,2,5,6                     
-            gre_add.add_1256            <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6) / 3;
+            gre_add.add_1256            <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6) / 4;
             -- 1,2,5,6,3,9                 
-            gre_add.add_125639          <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9) / 3;
+            gre_add.add_125639          <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9) / 6;
             -- 1,2,5,6,3,9,4               
-            gre_add.add_1256394         <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k4) / 3;
+            gre_add.add_1256394         <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k4) / 7;
             -- 1,2,5,6,3,9,13              
-            gre_add.add_125639_13       <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k13) / 3;
+            gre_add.add_125639_13       <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k13) / 7;
             -- 1,2,5,6,3,9,4,13            
-            gre_add.add_1256394_13      <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k4 + gre_select.sumprod_Bn.k13) / 3;
+            gre_add.add_1256394_13      <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k4 + gre_select.sumprod_Bn.k13) / 7;
             -- 1,2,5,6,3,9,4,13,7,10
-            gre_add.add_12563947_13_10  <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k4 + gre_select.sumprod_Bn.k13 + gre_select.sumprod_Bn.k7 + gre_select.sumprod_Bn.k10) / 3;
+            gre_add.add_12563947_13_10  <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6 + gre_select.sumprod_Bn.k3 + gre_select.sumprod_Bn.k9 + gre_select.sumprod_Bn.k4 + gre_select.sumprod_Bn.k13 + gre_select.sumprod_Bn.k7 + gre_select.sumprod_Bn.k10) / 10;
     end if;
 end process;
 --=================================================================================================
 process (clk) begin
     if rising_edge(clk) then
+        --if (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
+        --   and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=7  
+        --   and gre_detect.k_syn_12(8).n=8 and gre_detect.k_syn_12(9).n=9 and gre_detect.k_syn_12(10).n=10 
+        --   and gre_detect.k_syn_12(11).n=11 and gre_detect.k_syn_12(12).n=12 and gre_detect.k_syn_12(13).n=13  
+        --   and gre_detect.k_syn_12(14).n=14 and gre_detect.k_syn_12(15).n=15 and gre_detect.k_syn_12(16).n=16) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_123456789ABCDEFF), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
+        --   and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=7  
+        --   and gre_detect.k_syn_12(9).n=9 and gre_detect.k_syn_12(10).n=10   
+        --   and gre_detect.k_syn_12(13).n=13) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_12563947_13_10), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
+        --   and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
+        --   and gre_detect.k_syn_12(9).n=9 
+        --   and gre_detect.k_syn_12(13).n=13) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256394_13), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3
+        --   and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
+        --   and gre_detect.k_syn_12(9).n=9
+        --   and gre_detect.k_syn_12(13).n=13) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125639_13), 14));
         if (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=7  
-           and gre_detect.k_syn_12(8).n=8 and gre_detect.k_syn_12(9).n=9 and gre_detect.k_syn_12(10).n=10 
-           and gre_detect.k_syn_12(11).n=11 and gre_detect.k_syn_12(12).n=12 and gre_detect.k_syn_12(13).n=13  
-           and gre_detect.k_syn_12(14).n=14 and gre_detect.k_syn_12(15).n=15 and gre_detect.k_syn_12(16).n=16) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_123456789ABCDEFF), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=7  
-           and gre_detect.k_syn_12(9).n=9 and gre_detect.k_syn_12(10).n=10   
-           and gre_detect.k_syn_12(13).n=13) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_12563947_13_10), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=0  
-           and gre_detect.k_syn_12(9).n=9 and gre_detect.k_syn_12(10).n=0   
-           and gre_detect.k_syn_12(13).n=13) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256394_13), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=0 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=0  
-           and gre_detect.k_syn_12(9).n=9 and gre_detect.k_syn_12(10).n=0   
-           and gre_detect.k_syn_12(13).n=13) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125639_13), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=0  
+           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
            and gre_detect.k_syn_12(9).n=9) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256394), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=0 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6 and gre_detect.k_syn_12(7).n=0  
+        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3
+           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
            and gre_detect.k_syn_12(9).n=9) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125639), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=0 and gre_detect.k_syn_12(4).n=0 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6) then
+        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=0 and gre_detect.k_syn_12(4).n=0 
-           and gre_detect.k_syn_12(5).n=5) then
+        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125), 14));
-        elsif (gre_detect.k_syn_12(2).n=0 and gre_detect.k_syn_12(3).n=0 and gre_detect.k_syn_12(4).n=0 
-           and gre_detect.k_syn_12(5).n=5) then
+        elsif (gre_detect.k_syn_12(5).n=5) then
+            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_15), 14));
+        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5) then
+            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125), 14));
+        elsif (gre_detect.k_syn_12(5).n=5) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_15), 14));
         elsif (gre_detect.k_syn_12(2).n=2) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_12), 14));
         else
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_select.sumprod_Bn.k1), 14));
+            gre_select.result   <= std_logic_vector(to_unsigned((gre_select.sumprod_Cn.k1), 14));
         end if;
     end if;
 end process;
@@ -1354,74 +1319,60 @@ process (clk) begin
             blu_select.sumprod_An.k16    <= to_integer(unsigned(blu_select.sumprod_9n.k16));
             blu_select.sumprod_Bn        <= blu_select.sumprod_An;
             blu_select.sumprod_Cn        <= blu_select.sumprod_Bn;
-            blu_add.add_12345678         <= (blu_select.sumprod_An.k1 + blu_select.sumprod_An.k2 + blu_select.sumprod_An.k3 + blu_select.sumprod_An.k4 + blu_select.sumprod_An.k5 + blu_select.sumprod_An.k6 + blu_select.sumprod_An.k7 + blu_select.sumprod_An.k8) / 8;
-            blu_add.add_9ABCDEFF         <= (blu_select.sumprod_An.k9 + blu_select.sumprod_An.k10 + blu_select.sumprod_An.k11 + blu_select.sumprod_An.k12 + blu_select.sumprod_An.k13 + blu_select.sumprod_An.k14 + blu_select.sumprod_An.k15 + blu_select.sumprod_An.k16) / 8;
-            blu_add.add_123456789ABCDEFF <= (blu_add.add_12345678 + blu_add.add_9ABCDEFF);
-            --  1,2
-            blu_add.add_12              <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k12) / 2;
-            --  1,5                        
-            blu_add.add_15              <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k5) / 2;
-            -- 1,2,5                       
-            blu_add.add_125             <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5) / 3;
-            -- 1,2,5,6                     
-            blu_add.add_1256            <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6) / 3;
-            -- 1,2,5,6,3,9                 
-            blu_add.add_125639          <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9) / 3;
-            -- 1,2,5,6,3,9,4               
-            blu_add.add_1256394         <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4) / 3;
-            -- 1,2,5,6,3,9,13              
-            blu_add.add_125639_13       <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k13) / 3;
-            -- 1,2,5,6,3,9,4,13            
-            blu_add.add_1256394_13      <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4 + blu_select.sumprod_Bn.k13) / 3;
-            -- 1,2,5,6,3,9,4,13,7,10
-            blu_add.add_12563947_13_10  <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4 + blu_select.sumprod_Bn.k13 + blu_select.sumprod_Bn.k7 + blu_select.sumprod_Bn.k10) / 3;
+            blu_add.add_12345678         <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k4 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k7 + blu_select.sumprod_Bn.k8) / 8;
+            blu_add.add_9ABCDEFF         <= (blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k10 + blu_select.sumprod_Bn.k11 + blu_select.sumprod_Bn.k12 + blu_select.sumprod_Bn.k13 + blu_select.sumprod_Bn.k14 + blu_select.sumprod_Bn.k15 + blu_select.sumprod_Bn.k16) / 8;
+            blu_add.add_123456789ABCDEFF <= (blu_add.add_12345678 + blu_add.add_9ABCDEFF) / 2;     
+            blu_add.add_12               <= blu_select.sumprod_Bn.k2;                    
+            blu_add.add_15               <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k5) / 2;                    
+            blu_add.add_125              <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5) / 3;                  
+            blu_add.add_1256             <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6) / 4;               
+            blu_add.add_125639           <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9) / 6;            
+            blu_add.add_1256394          <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4) / 7;             
+            blu_add.add_125639_13        <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k13) / 7;        
+            blu_add.add_1256394_13       <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4 + blu_select.sumprod_Bn.k13) / 8;
+            blu_add.add_12563947_13_10   <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4 + blu_select.sumprod_Bn.k13 + blu_select.sumprod_Bn.k7 + blu_select.sumprod_Bn.k10) / 10;
     end if;
 end process;
 --=================================================================================================
 process (clk) begin
     if rising_edge(clk) then
+        --if (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
+        --   and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=7  
+        --   and blu_detect.k_syn_12(8).n=8 and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(10).n=10 
+        --   and blu_detect.k_syn_12(11).n=11 and blu_detect.k_syn_12(12).n=12 and blu_detect.k_syn_12(13).n=13  
+        --   and blu_detect.k_syn_12(14).n=14 and blu_detect.k_syn_12(15).n=15 and blu_detect.k_syn_12(16).n=16) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_123456789ABCDEFF), 14));
+        --elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
+        --   and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=7  
+        --   and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(10).n=10   
+        --   and blu_detect.k_syn_12(13).n=13) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_12563947_13_10), 14));
+        --elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
+        --   and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6
+        --   and blu_detect.k_syn_12(9).n=9
+        --   and blu_detect.k_syn_12(13).n=13) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256394_13), 14));
+        --elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(5).n=5 
+        --and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(13).n=13) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125639_13), 14));
         if (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=7  
-           and blu_detect.k_syn_12(8).n=8 and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(10).n=10 
-           and blu_detect.k_syn_12(11).n=11 and blu_detect.k_syn_12(12).n=12 and blu_detect.k_syn_12(13).n=13  
-           and blu_detect.k_syn_12(14).n=14 and blu_detect.k_syn_12(15).n=15 and blu_detect.k_syn_12(16).n=16) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_123456789ABCDEFF), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=7  
-           and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(10).n=10   
-           and blu_detect.k_syn_12(13).n=13) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_12563947_13_10), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=0  
-           and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(10).n=0   
-           and blu_detect.k_syn_12(13).n=13) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256394_13), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=0 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=0  
-           and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(10).n=0   
-           and blu_detect.k_syn_12(13).n=13) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125639_13), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=0  
+           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6
            and blu_detect.k_syn_12(9).n=9) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256394), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=0 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(7).n=0  
+        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3
+           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 
            and blu_detect.k_syn_12(9).n=9) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125639), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=0 and blu_detect.k_syn_12(4).n=0 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6) then
+        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=0 and blu_detect.k_syn_12(4).n=0 
-           and blu_detect.k_syn_12(5).n=5) then
+        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(5).n=5) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125), 14));
-        elsif (blu_detect.k_syn_12(2).n=0 and blu_detect.k_syn_12(3).n=0 and blu_detect.k_syn_12(4).n=0 
-           and blu_detect.k_syn_12(5).n=5) then
+        elsif (blu_detect.k_syn_12(5).n=5) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_15), 14));
         elsif (blu_detect.k_syn_12(2).n=2) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_12), 14));
         else
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_select.sumprod_Bn.k1), 14));
+            blu_select.result   <= std_logic_vector(to_unsigned((blu_select.sumprod_Cn.k1), 14));
         end if;
     end if;
 end process;
@@ -1430,10 +1381,10 @@ end process;
     Rgb1.red     <= red_select.result(11 downto 4);
     Rgb1.green   <= gre_select.result(11 downto 4);
     Rgb1.blue    <= blu_select.result(11 downto 4);
-    Rgb1.valid   <= tpValid;
+    Rgb1.valid   <= rgbSyncValid(13);
 sharp_f_valid_inst : d_valid
 generic map (
-    pixelDelay   => 31)
+    pixelDelay   => 17)
 port map(
     clk      => clk,
     iRgb     => Rgb1,

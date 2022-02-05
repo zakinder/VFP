@@ -8,11 +8,9 @@
 -- This file instantiation axi4 components.
 --
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
@@ -25,16 +23,11 @@ port (
     iRgb           : in channel;
     oRgb           : out channel);
 end rgb_range;
-
 architecture Behavioral of rgb_range is
-
     signal i1Rgb       : intChannel;
     signal i2Rgb       : intChannel;
     signal i3Rgb       : intChannel;
-
-
 begin
-
 process (clk,reset)begin
     if (reset = lo) then
         i1Rgb.red    <= zero;
@@ -49,14 +42,15 @@ process (clk,reset)begin
         i3Rgb        <= i2Rgb;
     end if;
 end process;
-
 ---------------------------------------------------------------------------------
 -- i2Rgb.valid must be 2nd condition else valid value
 ---------------------------------------------------------------------------------
 videoOutP: process (clk) begin
     if rising_edge(clk) then
-        if (i1Rgb.red   >= 0 and i1Rgb.red   <= 19) then
+        if (i1Rgb.red   >= 0 and i1Rgb.red   <= 9) then
             i2Rgb.red           <= 0;
+        elsif (i1Rgb.red   >= 10 and i1Rgb.red    <= 19) then
+            i2Rgb.red           <= 10;
         elsif (i1Rgb.red   >= 20 and i1Rgb.red    <= 39) then
             i2Rgb.red           <= 20;
         elsif (i1Rgb.red   >= 40 and i1Rgb.red    <= 59) then
@@ -92,8 +86,10 @@ videoOutP: process (clk) begin
 end process videoOutP;
 process (clk) begin
     if rising_edge(clk) then
-        if (i1Rgb.green   >= 0 and i1Rgb.green   <= 19) then
+        if (i1Rgb.green   >= 0 and i1Rgb.green   <= 9) then
             i2Rgb.green           <= 0;
+        elsif (i1Rgb.green   >= 10 and i1Rgb.green    <= 19) then
+            i2Rgb.green           <= 10;
         elsif (i1Rgb.green   >= 20 and i1Rgb.green    <= 39) then
             i2Rgb.green           <= 20;
         elsif (i1Rgb.green   >= 40 and i1Rgb.green    <= 59) then
@@ -127,11 +123,12 @@ process (clk) begin
         end if;
     end if;
 end process;
-
 process (clk) begin
     if rising_edge(clk) then
-        if (i1Rgb.blue   >= 0 and i1Rgb.blue   <= 19) then
+        if (i1Rgb.blue   >= 0 and i1Rgb.blue   <= 9) then
             i2Rgb.blue           <= 0;
+        elsif (i1Rgb.blue   >= 10 and i1Rgb.blue    <= 19) then
+            i2Rgb.blue           <= 10;
         elsif (i1Rgb.blue   >= 20 and i1Rgb.blue    <= 39) then
             i2Rgb.blue           <= 20;
         elsif (i1Rgb.blue   >= 40 and i1Rgb.blue    <= 59) then
@@ -165,10 +162,8 @@ process (clk) begin
         end if;
     end if;
 end process;
-
- oRgb.red   <= std_logic_vector(to_unsigned(i1Rgb.red, 8));
- oRgb.green <= std_logic_vector(to_unsigned(i1Rgb.green, 8));
- oRgb.blue  <= std_logic_vector(to_unsigned(i1Rgb.blue, 8));
+ oRgb.red   <= std_logic_vector(to_unsigned(i2Rgb.red, 8));
+ oRgb.green <= std_logic_vector(to_unsigned(i2Rgb.green, 8));
+ oRgb.blue  <= std_logic_vector(to_unsigned(i2Rgb.blue, 8));
  oRgb.valid <= i1Rgb.valid;
- 
 end Behavioral;

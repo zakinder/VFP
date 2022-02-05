@@ -181,114 +181,44 @@ architecture Behavioral of filters is
     signal eObject             : channel;
     signal color_limits        : type_RgbArray(0 to 7);
     signal valid_vhs           : std_logic;
-    signal dark_ccm            : coefficient;
-    signal light_ccm           : coefficient;
-    signal balance_ccm         : coefficient;
     signal rgb                 : channel;
     signal rgbYcbcr            : channel;
-    signal rgb1Ycbcr            : channel;
+    signal rgb1Ycbcr           : channel;
 begin
-    -- 60  =  7.50
-    -- 24  =  3.00
-    -- 8   =  1.00
-    -- 248 = -1.00
-    -- 232 = -3.00
-    --     =  0.50
-    --    |--------|--------|--------|
-    --    | +0.375 | -0.250 | -0.250 |
-    --    |--------|--------|--------|
-    --    | -0.250 | +1.000 | -0.250 |
-    --    |--------|--------|--------|
-    --    | -0.500 | -0.250 | +1.250 |
-    --    |--------|--------|--------|
-    dark_ccm.config           <= 1;
-    dark_ccm.k1               <= std_logic_vector(to_unsigned(6,32));   --  1.000
-    dark_ccm.k2               <= std_logic_vector(to_unsigned(255,32)); -- -0.500
-    dark_ccm.k3               <= std_logic_vector(to_unsigned(255,32)); -- -0.250
-    dark_ccm.k4               <= std_logic_vector(to_unsigned(255,32));
-    dark_ccm.k5               <= std_logic_vector(to_unsigned(6,32));
-    dark_ccm.k6               <= std_logic_vector(to_unsigned(255,32));
-    dark_ccm.k7               <= std_logic_vector(to_unsigned(255,32));
-    dark_ccm.k8               <= std_logic_vector(to_unsigned(255,32));
-    dark_ccm.k9               <= std_logic_vector(to_unsigned(6,32));
-    -- 30  = 3.75
-    -- 35  = 4.75
-    -- 40  = 5.00
-    -- 45  = 5.625
-    -- 48  = 6.00
-    -- 255 = -0.125
-    -- 254 = -0.25
-    -- 248 = -1.00
-    -- 232 = -3.00
-    -- 224 = -4.00
-    --    |--------|--------|--------|
-    --    | +5.000 | -3.000 | -1.000 |
-    --    |--------|--------|--------|
-    --    | -1.000 | +5.000 | -3.000 |
-    --    |--------|--------|--------|
-    --    | -3.000 | -1.000 | +5.000 | 
-    --    |--------|--------|--------|
-    light_ccm.config           <= 2;
-    light_ccm.k1               <= std_logic_vector(to_unsigned(40,32));
-    light_ccm.k2               <= std_logic_vector(to_unsigned(232,32));
-    light_ccm.k3               <= std_logic_vector(to_unsigned(248,32));
-    light_ccm.k4               <= std_logic_vector(to_unsigned(248,32));
-    light_ccm.k5               <= std_logic_vector(to_unsigned(56,32));
-    light_ccm.k6               <= std_logic_vector(to_unsigned(232,32));
-    light_ccm.k7               <= std_logic_vector(to_unsigned(232,32));
-    light_ccm.k8               <= std_logic_vector(to_unsigned(248,32));
-    light_ccm.k9               <= std_logic_vector(to_unsigned(80,32));
-    --    |--------|--------|--------|
-    --    | +0.500 | +0.375 | +0.125 |
-    --    |--------|--------|--------|
-    --    | +0.250 | +0.625 | +0.125 |
-    --    |--------|--------|--------|
-    --    | +0.125 | +0.125 | +0.750 |
-    --    |--------|--------|--------|
-    balance_ccm.config         <= 3;
-    balance_ccm.k1             <= std_logic_vector(to_unsigned(4,32));
-    balance_ccm.k2             <= std_logic_vector(to_unsigned(3,32));
-    balance_ccm.k3             <= std_logic_vector(to_unsigned(80,32));
-    balance_ccm.k4             <= std_logic_vector(to_unsigned(2,32));
-    balance_ccm.k5             <= std_logic_vector(to_unsigned(80,32));
-    balance_ccm.k6             <= std_logic_vector(to_unsigned(1,32));
-    balance_ccm.k7             <= std_logic_vector(to_unsigned(80,32));
-    balance_ccm.k8             <= std_logic_vector(to_unsigned(3,32));
-    balance_ccm.k9             <= std_logic_vector(to_unsigned(232,32));
-    edgeValid               <= sEdgeValid;
-    oRgb                    <= fRgb;
-    blur_channels.ditRgb1vx <= ditRgb1vx;
-    blur_channels.ditRgb2vx <= ditRgb2vx;
-    blur_channels.ditRgb3vx <= ditRgb3vx;
-    blur_channels.blur1vx   <= blur21x;
-    blur_channels.blur2vx   <= blur31x;
-    blur_channels.blur3vx   <= blur3vx;
-    fRgb.blur1vx            <= blur1vx;
-    fRgb.blur2vx            <= blur2vx;
-    fRgb.blur3vx            <= blur3vx;
-    fRgb.cgainToYcbcr       <= fRgb1.ycbcr;--CgainToYcbcr
-    fRgb.cgainToShp         <= fRgb1.sharp;--CgainToSharp
-    fRgb.cgainToBlu         <= fRgb1.blur; --CgainToBlur
-    fRgb.cgainToCgain       <= fRgb1.cgain;--CgainToCgain
-    fRgb.shpToYcbcr         <= fRgb2.ycbcr;--SharpToYcbcr
-    fRgb.shpToShp           <= fRgb2.sharp;--SharpToSharp
-    fRgb.shpToBlu           <= fRgb2.blur; --SharpToBlur
-    fRgb.shpToCgain         <= fRgb2.cgain;--SharpToCgain
-    fRgb.bluToYcc           <= fRgb3.ycbcr;--BlurToYcbcr
-    fRgb.bluToShp           <= fRgb3.sharp;--BlurToSharp
-    fRgb.bluToBlu           <= fRgb3.blur; --BlurToBlur
-    fRgb.bluToCga           <= fRgb3.cgain;--BlurToCgain
-    fRgb.cgainToHsl         <= fRgb1.hsl;  --CgainToHsl  ,HslToCgain
-    fRgb.cgainToHsv         <= fRgb1.hsv;  --CgainToHsv  ,HsvToCgain
-    fRgb.shpToHsl           <= fRgb2.hsl;  --SharpToHsl  ,HslToSharp
-    fRgb.shpToHsv           <= fRgb2.hsv;  --SharpToHsv  ,HsvToSharp
-    fRgb.bluToHsl           <= fRgb3.hsl;  --BlurToHsl   ,HslToBlur
-    fRgb.bluToHsv           <= fRgb3.hsv;  --BlurToHsv   ,HsvToBlur
-    fRgb.synBlur            <= rgbLocSynSFilt.blur;
-    fRgb.vhsv               <= vhsv;
-    fRgb.hsvl               <= rgb_hsvl;
-    fRgb.histogram          <= rgb_histo;
-    fRgb.eObject            <= eObject;
+    edgeValid                 <= sEdgeValid;
+    oRgb                      <= fRgb;
+    blur_channels.ditRgb1vx   <= ditRgb1vx;
+    blur_channels.ditRgb2vx   <= ditRgb2vx;
+    blur_channels.ditRgb3vx   <= ditRgb3vx;
+    blur_channels.blur1vx     <= blur21x;
+    blur_channels.blur2vx     <= blur31x;
+    blur_channels.blur3vx     <= blur3vx;
+    fRgb.blur1vx              <= blur1vx;
+    fRgb.blur2vx              <= blur2vx;
+    fRgb.blur3vx              <= blur3vx;
+    fRgb.cgainToYcbcr         <= fRgb1.ycbcr;--CgainToYcbcr
+    fRgb.cgainToShp           <= fRgb1.sharp;--CgainToSharp
+    fRgb.cgainToBlu           <= fRgb1.blur; --CgainToBlur
+    fRgb.cgainToCgain         <= fRgb1.cgain;--CgainToCgain
+    fRgb.shpToYcbcr           <= fRgb2.ycbcr;--SharpToYcbcr
+    fRgb.shpToShp             <= fRgb2.sharp;--SharpToSharp
+    fRgb.shpToBlu             <= fRgb2.blur; --SharpToBlur
+    fRgb.shpToCgain           <= fRgb2.cgain;--SharpToCgain
+    fRgb.bluToYcc             <= fRgb3.ycbcr;--BlurToYcbcr
+    fRgb.bluToShp             <= fRgb3.sharp;--BlurToSharp
+    fRgb.bluToBlu             <= fRgb3.blur; --BlurToBlur
+    fRgb.bluToCga             <= fRgb3.cgain;--BlurToCgain
+    fRgb.cgainToHsl           <= fRgb1.hsl;  --CgainToHsl  ,HslToCgain
+    fRgb.cgainToHsv           <= fRgb1.hsv;  --CgainToHsv  ,HsvToCgain
+    fRgb.shpToHsl             <= fRgb2.hsl;  --SharpToHsl  ,HslToSharp
+    fRgb.shpToHsv             <= fRgb2.hsv;  --SharpToHsv  ,HsvToSharp
+    fRgb.bluToHsl             <= fRgb3.hsl;  --BlurToHsl   ,HslToBlur
+    fRgb.bluToHsv             <= fRgb3.hsv;  --BlurToHsv   ,HsvToBlur
+    fRgb.synBlur              <= rgbLocSynSFilt.blur;
+    fRgb.vhsv                 <= vhsv;
+    fRgb.hsvl                 <= rgb_hsvl;
+    fRgb.histogram            <= rgb_histo;
+    fRgb.eObject              <= eObject;
 lThSelectP: process (clk) begin
     if rising_edge(clk) then
         if (iLumTh >= 0)  then
@@ -763,44 +693,16 @@ port map(
     oRgb                => rgbLocSynSFilt.blur);
 end generate L_BLU_ENABLE;
 L_CGA_ENABLE: if (L_CGA = true) generate
-signal ccm1_rgb   : channel;
-signal bbm1_rgb   : channel;
 begin
-dark_ccm_inst  : color_correction
-generic map(
-    i_k_config_number   => 1)
-port map(
-    clk                 => clk,
-    rst_l               => rst_l,
-    iRgb                => rgb,
-    als                 => dark_ccm,
-    oRgb                => ccm1_rgb);
-light_ccm_inst  : color_correction
-generic map(
-    i_k_config_number   => 2)
-port map(
-    clk                 => clk,
-    rst_l               => rst_l,
-    iRgb                => ccm1_rgb,
-    als                 => light_ccm,
-    oRgb                => bbm1_rgb);
-balance_ccm_inst  : color_correction
-generic map(
-    i_k_config_number   => 0)
-port map(
-    clk                 => clk,
-    rst_l               => rst_l,
-    iRgb                => bbm1_rgb,
-    als                 => balance_ccm,
-    oRgb                => rgbLocFilt.cgain);
-blurSyncr_inst  : sync_frames
-generic map(
-    pixelDelay          => 27)
-port map(
-    clk                 => clk,
-    reset               => rst_l,
-    iRgb                => rgbLocFilt.cgain,
-    oRgb                => rgbLocSynSFilt.cgain);
+recolor_rgb_inst: recolor_rgb
+generic map (
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => rgb,
+    oRgb               => rgbLocSynSFilt.cgain);
 end generate L_CGA_ENABLE;
     fRgb.synCgain        <= rgbLocSynSFilt.cgain;
 L_SHP_ENABLE: if (L_SHP = true) generate
@@ -993,7 +895,7 @@ port map(
 end generate MASK_SOB_TRM_FRAME_ENABLE;
 MASK_SOB_HSL_FRAME_ENABLE: if (M_SOB_HSL = true) generate
     signal dSobHsl           : channel;
-    constant sobHslPiDelay   : integer := 1;
+    constant sobHslPiDelay   : integer := 12;
 begin
 sob_hsv_syncr_inst  : sync_frames
 generic map(
@@ -1001,7 +903,7 @@ generic map(
 port map(
     clk        => clk,
     reset      => rst_l,
-    iRgb       => rgbImageKernel.hsl,
+    iRgb       => rgbImageKernel.sobel,
     oRgb       => dSobHsl);
 frame_masking_inst  : frame_mask
 generic map (
@@ -1010,8 +912,8 @@ port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
-    i1Rgb       => rgbImageKernel.sobel,
-    i2Rgb       => dSobHsl,
+    i1Rgb       => dSobHsl,
+    i2Rgb       => rgbLocSynSFilt.cgain,
     oRgb        => fRgb.maskSobelHsl);
 end generate MASK_SOB_HSL_FRAME_ENABLE;
 MASK_SOB_HSV_FRAME_ENABLE: if (M_SOB_HSV = true) generate
@@ -1143,11 +1045,6 @@ port map(
     i2Rgb       => fRgb.space.ch4,
     oRgb        => fRgb.maskSobelBlu);
 end generate MASK_SOB_BLU_FRAME_ENABLE;
-
-
-
-
-
 F_CC1_FRAME_ENABLE: if (F_CC1 = true) generate
     fRgb.cc1 <= rgbImageKernel.cc1;
 end generate F_CC1_FRAME_ENABLE;
@@ -1172,16 +1069,6 @@ end generate F_CC7_FRAME_ENABLE;
 F_CC8_FRAME_ENABLE: if (F_CC8 = true) generate
     fRgb.cc8 <= rgbImageKernel.cc8;
 end generate F_CC8_FRAME_ENABLE;
-
-
-
-
-
-
-
-
-
-
 CMYK_FRAME_ENABLE: if (FCMYK = true) generate
     fRgb.cmyk <= rgbImageKernel.cmyk;
 end generate CMYK_FRAME_ENABLE;

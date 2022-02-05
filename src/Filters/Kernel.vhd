@@ -578,6 +578,7 @@ signal osobelY        : channel;
 signal sobel          : channel;
 signal sobel_rgb      : channel;
 signal sobel_hsl      : channel;
+signal ccm2rgb_range  : channel;
 signal kCoefXSobel    : kernelCoeDWord;
 signal kCoefYSobel    : kernelCoeDWord;
 signal mx             : unsigned(15 downto 0)         := (others => '0');
@@ -596,20 +597,20 @@ begin
 -- taps_controller
 -----------------------------------------------------------------------------------------------
 ----------------------------------------------------------
--- Used HSL 1 range color space for better edge detection.
+-- Used ccm color space for better edge detection.
 ----------------------------------------------------------
-sobel_hsl_1_range_Inst: hsl_1range
+sobel_ccm_inst  : ccm
 generic map(
-    i_data_width => i_data_width)
+    i_k_config_number   => 5)
 port map(
-    clk          => clk,
-    reset        => rst_l,
-    iRgb         => iRgb,
-    oHsl         => sobel_hsl);
-sobel_rgb.red    <= sobel_hsl.green;
-sobel_rgb.green  <= sobel_hsl.green;
-sobel_rgb.blue   <= sobel_hsl.green;
-sobel_rgb.valid  <= sobel_hsl.valid;
+    clk                 => clk,
+    rst_l               => rst_l,
+    iRgb                => iRgb,
+    oRgb                => ccm2rgb_range);
+    sobel_rgb.red       <= ccm2rgb_range.red;
+    sobel_rgb.green     <= ccm2rgb_range.red;
+    sobel_rgb.blue      <= ccm2rgb_range.red;
+    sobel_rgb.valid     <= ccm2rgb_range.valid;
 ----------------------------------------------------------
 TapsControllerInst: taps_controller
 generic map(
@@ -685,11 +686,13 @@ sobelDomainsValueP:process (clk) begin
         my  <= (unsigned(osobelY.red) * unsigned(osobelY.red));
     end if;
 end process sobelDomainsValueP;
+
 sumValueP:process (clk) begin
     if rising_edge(clk) then
         sxy <= (mx + my);
     end if;
 end process sumValueP;
+
 squareRootValueP:process (clk) begin
     if rising_edge(clk) then
         sqr <= std_logic_vector(resize(unsigned(sxy), sqr'length));
@@ -718,13 +721,15 @@ process (clk) begin
         rgbSyncValid(15) <= rgbSyncValid(14);
     end if;
 end process;
+--sqr(G) = (Gx2 + Gy2)
 squareRootTopInst: squareRootTop
 port map(
     clk        => clk,
-    ivalid     => rgbSyncValid(1),
+    ivalid     => rgbSyncValid(6),
     idata      => sqr,
     ovalid     => ovalid,
     odata      => sbof);
+--magnitude(G) = square_root(Gx2 + Gy2)
 sobelThreshold          <= to_integer(unsigned(sbof(15 downto 0)));
 sobelOutP:process (clk) begin
     if rising_edge(clk) then
@@ -928,7 +933,7 @@ signal ccm_hsvl_1_color : channel;
 begin
 ccm_hsvl_1_color_inst  : ccm
 generic map(
-    i_k_config_number   => 0)
+    i_k_config_number   => 6)
 port map(
     clk                 => clk,
     rst_l               => rst_l,
@@ -1061,7 +1066,7 @@ port map(
 end generate RGBCOHSL_FRAME_ENABLE;
 oRgb.colorhsl <= colorhsl;
 F_CC1_FRAME_ENABLE: if (F_CC1_FRAME = true) generate begin
-cc1_inst  : ccm
+f_cc1_frame_inst  : ccm
 generic map(
     i_k_config_number   => 1)
 port map(
@@ -1080,7 +1085,7 @@ port map(
 end generate F_CC1_FRAME_ENABLE;
 oRgb.cc1 <= cc1;
 F_CC2_FRAME_ENABLE: if (F_CC2_FRAME = true) generate begin
-cc2_inst  : ccm
+f_cc2_frame_inst  : ccm
 generic map(
     i_k_config_number   => 2)
 port map(
@@ -1099,7 +1104,7 @@ port map(
 end generate F_CC2_FRAME_ENABLE;
 oRgb.cc2 <= cc2;
 F_CC3_FRAME_ENABLE: if (F_CC3_FRAME = true) generate begin
-cc3_inst  : ccm
+f_cc3_frame_inst  : ccm
 generic map(
     i_k_config_number   => 3)
 port map(
@@ -1118,7 +1123,7 @@ port map(
 end generate F_CC3_FRAME_ENABLE;
 oRgb.cc3 <= cc3;
 F_CC4_FRAME_ENABLE: if (F_CC4_FRAME = true) generate begin
-cc4_inst  : ccm
+f_cc4_frame_inst  : ccm
 generic map(
     i_k_config_number   => 4)
 port map(
@@ -1137,7 +1142,7 @@ port map(
 end generate F_CC4_FRAME_ENABLE;
 oRgb.cc4 <= cc4;
 F_CC5_FRAME_ENABLE: if (F_CC5_FRAME = true) generate begin
-cc5_inst  : ccm
+f_cc5_frame_inst  : ccm
 generic map(
     i_k_config_number   => 5)
 port map(
@@ -1156,7 +1161,7 @@ port map(
 end generate F_CC5_FRAME_ENABLE;
 oRgb.cc5 <= cc5;
 F_CC6_FRAME_ENABLE: if (F_CC6_FRAME = true) generate begin
-xyz_inst  : ccm
+f_cc6_frame_inst  : ccm
 generic map(
     i_k_config_number   => 6)
 port map(
@@ -1318,28 +1323,22 @@ port map(
 end generate FCMYK_FRAME_ENABLE;
 oRgb.cmyk <= cmyk;
 F_RE1_FRAME_ENABLE: if (F_RE1_FRAME = true) generate begin
-ccm_inst  : ccm
+recolor_space_1_inst: recolor_space
 generic map(
-    i_k_config_number   => 4)
-port map(
-    clk                 => clk,
-    rst_l               => rst_l,
-    iRgb                => iRgb,
-    oRgb                => ccmcolor);
-recolor_space_1_inst: recolor_space_1
-generic map(
+    neighboring_pixel_threshold => 255,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
     clk                => clk,
     reset              => rst_l,
-    iRgb               => ccmcolor,
+    iRgb               => iRgb,
     oRgb               => re1color);
 end generate F_RE1_FRAME_ENABLE;
-oRgb.re1color <= ccmcolor;
+oRgb.re1color <= re1color;
 F_RE2_FRAME_ENABLE: if (F_RE2_FRAME = true) generate begin
-recolor_space_2_inst: recolor_space_2
+recolor_space_2_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 50,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
@@ -1349,8 +1348,9 @@ port map(
     oRgb               => re2color);
 end generate F_RE2_FRAME_ENABLE;
 F_RE3_FRAME_ENABLE: if (F_RE3_FRAME = true) generate begin
-recolor_space_3_inst: recolor_space_3
+recolor_space_3_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 25,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
@@ -1360,8 +1360,9 @@ port map(
     oRgb               => re3color);
 end generate F_RE3_FRAME_ENABLE;
 F_RE4_FRAME_ENABLE: if (F_RE4_FRAME = true) generate begin
-recolor_space_4_inst: recolor_space_4
+recolor_space_4_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 20,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
@@ -1371,8 +1372,9 @@ port map(
     oRgb               => re4color);
 end generate F_RE4_FRAME_ENABLE;
 F_RE5_FRAME_ENABLE: if (F_RE5_FRAME = true) generate begin
-recolor_space_5_inst: recolor_space_5
+recolor_space_5_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 15,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
@@ -1382,8 +1384,9 @@ port map(
     oRgb               => re5color);
 end generate F_RE5_FRAME_ENABLE;
 F_RE6_FRAME_ENABLE: if (F_RE6_FRAME = true) generate begin
-recolor_space_6_inst: recolor_space_6
+recolor_space_6_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 10,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
@@ -1393,8 +1396,9 @@ port map(
     oRgb               => re6color);
 end generate F_RE6_FRAME_ENABLE;
 F_RE7_FRAME_ENABLE: if (F_RE7_FRAME = true) generate begin
-recolor_space_7_inst: recolor_space_7
+recolor_space_7_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 5,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(
@@ -1404,8 +1408,9 @@ port map(
     oRgb               => re7color);
 end generate F_RE7_FRAME_ENABLE;
 F_RE8_FRAME_ENABLE: if (F_RE8_FRAME = true) generate begin
-recolor_space_8_inst: recolor_space_8
+recolor_space_8_inst: recolor_space
 generic map(
+    neighboring_pixel_threshold => 3,
     img_width         => img_width,
     i_data_width      => i_data_width)
 port map(

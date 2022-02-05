@@ -55,7 +55,7 @@ end process;
 
 SyncFrames32Inst: sync_frames
 generic map(
-    pixelDelay => 6) --LATENCY 32
+    pixelDelay => 0) --LATENCY 32
 port map(
     clk        => clk,
     reset      => reset,
@@ -80,7 +80,7 @@ end generate EBLACK_ENABLED;
 EBLACK_DISABLED: if (eBlack = false) generate
     process (clk) begin
         if rising_edge(clk) then
-            if (iEdgeValid = hi) then
+            if (rgbSyncValid(14) = hi) then
                 oRgb.red   <= black;
                 oRgb.green <= black;
                 oRgb.blue  <= black;

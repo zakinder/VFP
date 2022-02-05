@@ -155,9 +155,9 @@ process (clk,rst_l) begin
         tp3      <= (others => '0');
         tpValid  <= lo;
     elsif rising_edge(clk) then
-        if (tap_d0_valid = hi) then
+        --if (tap_d0_valid = hi) then
             tp3      <= d6RGB;
-        end if;
+        --end if;
         tp0      <= tap0_data;
         tp1      <= tap1_data;
         tp2      <= tap2_data;
