@@ -1094,10 +1094,21 @@ process (clk) begin
             red_select.sumprod_Bn         <= red_select.sumprod_An;
             red_select.sumprod_Cn         <= red_select.sumprod_Bn;
             red_add.add_12                <= red_select.sumprod_Bn.k2;                     
-            red_add.add_15                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k5) / 2;                     
-            red_add.add_125               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5) / 3;                   
-            red_add.add_1256              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6) / 4;
+            red_add.add_15                <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k5) / 2;
+            
+            if((red_select.sumprod_Bn.k1 - red_select.sumprod_Bn.k2) <=  10 and (red_select.sumprod_Bn.k1 - red_select.sumprod_Bn.k5) <=  10 )then
+                red_add.add_125               <= (red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5) / 2;
+            elsif((red_select.sumprod_Bn.k1 - red_select.sumprod_Bn.k2) <=  10)then
+                red_add.add_125               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2) / 2;
+            elsif((red_select.sumprod_Bn.k1 - red_select.sumprod_Bn.k5) <=  10)then
+                red_add.add_125               <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k5) / 2;
+            else
+                red_add.add_125               <= red_select.sumprod_Bn.k1;
+            end if;
+            
+            
 
+            red_add.add_1256              <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6) / 4;
             red_add.add_125639            <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9) / 6;          
             red_add.add_1256394           <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k4) / 7;          
             red_add.add_125639_13         <= (red_select.sumprod_Bn.k1 + red_select.sumprod_Bn.k2 + red_select.sumprod_Bn.k5 + red_select.sumprod_Bn.k6 + red_select.sumprod_Bn.k3 + red_select.sumprod_Bn.k9 + red_select.sumprod_Bn.k13) / 7;         
@@ -1168,22 +1179,22 @@ process (clk) begin
         --    and red_detect.k_syn_12(9).n=9 
         --    and red_detect.k_syn_12(13).n=13) then
         --     red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639_13), 14));
-        if (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
-            and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
-            and red_detect.k_syn_12(9).n=9) then
-             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256394), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3
-            and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
-            and red_detect.k_syn_12(9).n=9) then
-             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256), 14));
-        elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(5).n=5) then
+        --if (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3 and red_detect.k_syn_12(4).n=4 
+        --    and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
+        --    and red_detect.k_syn_12(9).n=9) then
+        --     red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256394), 14));
+        --elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(3).n=3
+        --    and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6
+        --    and red_detect.k_syn_12(9).n=9) then
+        --     red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125639), 14));
+        --elsif (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(5).n=5 and red_detect.k_syn_12(6).n=6) then
+        --    red_select.result   <= std_logic_vector(to_unsigned((red_add.add_1256), 14));
+        if (red_detect.k_syn_12(2).n=2 and red_detect.k_syn_12(5).n=5) then
             red_select.result   <= std_logic_vector(to_unsigned((red_add.add_125), 14));
-        elsif (red_detect.k_syn_12(5).n=5) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_15), 14));
-        elsif (red_detect.k_syn_12(2).n=2) then
-            red_select.result   <= std_logic_vector(to_unsigned((red_add.add_12), 14));
+        --elsif (red_detect.k_syn_12(5).n=5) then
+        --    red_select.result   <= std_logic_vector(to_unsigned((red_add.add_15), 14));
+        --elsif (red_detect.k_syn_12(2).n=2) then
+        --    red_select.result   <= std_logic_vector(to_unsigned((red_add.add_12), 14));
         else
             red_select.result   <= std_logic_vector(to_unsigned((red_select.sumprod_Cn.k1), 14));
         end if;
@@ -1226,7 +1237,15 @@ process (clk) begin
             --  1,5                        
             gre_add.add_15              <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k5) / 2;
             -- 1,2,5                       
-            gre_add.add_125             <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5) / 3;
+            if((gre_select.sumprod_Bn.k1 - gre_select.sumprod_Bn.k2) <=  10 and (gre_select.sumprod_Bn.k1 - gre_select.sumprod_Bn.k5) <=  10 )then
+                gre_add.add_125              <= (gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5) / 2;
+            elsif((gre_select.sumprod_Bn.k1 - gre_select.sumprod_Bn.k2) <=  10)then
+                gre_add.add_125               <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2) / 2;
+            elsif((gre_select.sumprod_Bn.k1 - gre_select.sumprod_Bn.k5) <=  10)then
+                gre_add.add_125               <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k5) / 2;
+            else
+                gre_add.add_125               <= gre_select.sumprod_Bn.k1;
+            end if;
             -- 1,2,5,6                     
             gre_add.add_1256            <= (gre_select.sumprod_Bn.k1 + gre_select.sumprod_Bn.k2 + gre_select.sumprod_Bn.k5 + gre_select.sumprod_Bn.k6) / 4;
             -- 1,2,5,6,3,9                 
@@ -1265,26 +1284,26 @@ process (clk) begin
         --   and gre_detect.k_syn_12(9).n=9
         --   and gre_detect.k_syn_12(13).n=13) then
         --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125639_13), 14));
-        if (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
-           and gre_detect.k_syn_12(9).n=9) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256394), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3
-           and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
-           and gre_detect.k_syn_12(9).n=9) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125639), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5) then
+        --if (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3 and gre_detect.k_syn_12(4).n=4 
+        --   and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
+        --   and gre_detect.k_syn_12(9).n=9) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256394), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(3).n=3
+        --   and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6
+        --   and gre_detect.k_syn_12(9).n=9) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125639), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5 and gre_detect.k_syn_12(6).n=6) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_1256), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125), 14));
+        --elsif (gre_detect.k_syn_12(5).n=5) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_15), 14));
+        if (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5) then
             gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125), 14));
-        elsif (gre_detect.k_syn_12(5).n=5) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_15), 14));
-        elsif (gre_detect.k_syn_12(2).n=2 and gre_detect.k_syn_12(5).n=5) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_125), 14));
-        elsif (gre_detect.k_syn_12(5).n=5) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_15), 14));
-        elsif (gre_detect.k_syn_12(2).n=2) then
-            gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_12), 14));
+        --elsif (gre_detect.k_syn_12(5).n=5) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_15), 14));
+        --elsif (gre_detect.k_syn_12(2).n=2) then
+        --    gre_select.result   <= std_logic_vector(to_unsigned((gre_add.add_12), 14));
         else
             gre_select.result   <= std_logic_vector(to_unsigned((gre_select.sumprod_Cn.k1), 14));
         end if;
@@ -1324,7 +1343,15 @@ process (clk) begin
             blu_add.add_123456789ABCDEFF <= (blu_add.add_12345678 + blu_add.add_9ABCDEFF) / 2;     
             blu_add.add_12               <= blu_select.sumprod_Bn.k2;                    
             blu_add.add_15               <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k5) / 2;                    
-            blu_add.add_125              <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5) / 3;                  
+            if((blu_select.sumprod_Bn.k1 - blu_select.sumprod_Bn.k2) <=  10 and (blu_select.sumprod_Bn.k1 - blu_select.sumprod_Bn.k5) <=  10 )then
+                blu_add.add_125              <= (blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5) / 2;
+            elsif((blu_select.sumprod_Bn.k1 - blu_select.sumprod_Bn.k2) <=  10)then
+                blu_add.add_125                <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2) / 2;
+            elsif((blu_select.sumprod_Bn.k1 - blu_select.sumprod_Bn.k5) <=  10)then
+                blu_add.add_125                <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k5) / 2;
+            else
+                blu_add.add_125               <= blu_select.sumprod_Bn.k1;
+            end if;                 
             blu_add.add_1256             <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6) / 4;               
             blu_add.add_125639           <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9) / 6;            
             blu_add.add_1256394          <= (blu_select.sumprod_Bn.k1 + blu_select.sumprod_Bn.k2 + blu_select.sumprod_Bn.k5 + blu_select.sumprod_Bn.k6 + blu_select.sumprod_Bn.k3 + blu_select.sumprod_Bn.k9 + blu_select.sumprod_Bn.k4) / 7;             
@@ -1355,22 +1382,22 @@ process (clk) begin
         --elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(5).n=5 
         --and blu_detect.k_syn_12(6).n=6 and blu_detect.k_syn_12(9).n=9 and blu_detect.k_syn_12(13).n=13) then
         --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125639_13), 14));
-        if (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6
-           and blu_detect.k_syn_12(9).n=9) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256394), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3
-           and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 
-           and blu_detect.k_syn_12(9).n=9) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125639), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256), 14));
-        elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(5).n=5) then
+        --if (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3 and blu_detect.k_syn_12(4).n=4 
+        --   and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6
+        --   and blu_detect.k_syn_12(9).n=9) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256394), 14));
+        --elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(3).n=3
+        --   and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6 
+        --   and blu_detect.k_syn_12(9).n=9) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125639), 14));
+        --elsif (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(5).n=5 and blu_detect.k_syn_12(6).n=6) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_1256), 14));
+        if (blu_detect.k_syn_12(2).n=2 and blu_detect.k_syn_12(5).n=5) then
             blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_125), 14));
-        elsif (blu_detect.k_syn_12(5).n=5) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_15), 14));
-        elsif (blu_detect.k_syn_12(2).n=2) then
-            blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_12), 14));
+        --elsif (blu_detect.k_syn_12(5).n=5) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_15), 14));
+        --elsif (blu_detect.k_syn_12(2).n=2) then
+        --    blu_select.result   <= std_logic_vector(to_unsigned((blu_add.add_12), 14));
         else
             blu_select.result   <= std_logic_vector(to_unsigned((blu_select.sumprod_Cn.k1), 14));
         end if;
@@ -1378,9 +1405,9 @@ process (clk) begin
 end process;
 --=================================================================================================
     -- auto detect shape delta values
-    Rgb1.red     <= red_select.result(11 downto 4);
-    Rgb1.green   <= gre_select.result(11 downto 4);
-    Rgb1.blue    <= blu_select.result(11 downto 4);
+    Rgb1.red     <= red_select.result(10 downto 3);
+    Rgb1.green   <= gre_select.result(10 downto 3);
+    Rgb1.blue    <= blu_select.result(10 downto 3);
     Rgb1.valid   <= rgbSyncValid(13);
 sharp_f_valid_inst : d_valid
 generic map (
@@ -1391,7 +1418,7 @@ port map(
     oRgb     => Rgb2);
 rgb5_syncr_inst  : sync_frames
 generic map(
-    pixelDelay => 46)
+    pixelDelay => 1)
 port map(
     clk        => clk,
     reset      => reset,

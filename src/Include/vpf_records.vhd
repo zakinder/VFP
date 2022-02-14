@@ -31,6 +31,20 @@ type ty7sf is record
     k9               : sfixed(16 downto -3);
 end record;
 
+type ty24sf_3 is record
+    k1               : sfixed(26 downto -3);
+    k2               : sfixed(26 downto -3);
+    k3               : sfixed(26 downto -3);
+    k4               : sfixed(26 downto -3);
+    k5               : sfixed(26 downto -3);
+    k6               : sfixed(26 downto -3);
+    k7               : sfixed(26 downto -3);
+    k8               : sfixed(26 downto -3);
+    k9               : sfixed(26 downto -3);
+end record;
+
+
+
 type ty8sf is record
     k1               : sfixed(26 downto -3);
     k2               : sfixed(26 downto -3);
@@ -42,6 +56,10 @@ type ty8sf is record
     k8               : sfixed(26 downto -3);
     k9               : sfixed(26 downto -3);
 end record;
+
+
+
+
 
 type ty2sf is record
     k1               : sfixed(24 downto -3);
@@ -405,11 +423,9 @@ type kkkCoeff is record
     k15              : std_logic_vector(7 downto 0);
     k16              : std_logic_vector(7 downto 0);
 end record;
-type rgbSnSumTrRecord is record
-    red              : signed(12 downto 0);
-    green            : signed(12 downto 0);
-    blue             : signed(12 downto 0);
-end record;
+
+
+
 type rgbToSfRecord is record
     red              : sfixed(9 downto 0);
     green            : sfixed(9 downto 0);
@@ -425,6 +441,36 @@ type rgbSnSumRecord is record
     green            : signed(ADD_RESULT_WIDTH-1 downto 0);
     blue             : signed(ADD_RESULT_WIDTH-1 downto 0);
 end record;
+type rgb_Sn_Sum_Record is record
+    red              : signed(ADD_RESULT_WIDTH-1 downto 0);
+    green            : signed(ADD_RESULT_WIDTH-1 downto 0);
+    blue             : signed(ADD_RESULT_WIDTH-1 downto 0);
+end record;
+
+type rgb_Sn_Sum_Tr_Record is record
+    red              : signed(13 downto 0);
+    green            : signed(13 downto 0);
+    blue             : signed(13 downto 0);
+end record;
+
+type rgbSnSumTrRecord is record
+    red              : signed(12 downto 0);
+    green            : signed(12 downto 0);
+    blue             : signed(12 downto 0);
+end record;
+type ty46sf_6 is record
+    k1               : sfixed(36 downto -6);
+    k2               : sfixed(36 downto -6);
+    k3               : sfixed(36 downto -6);
+    k4               : sfixed(36 downto -6);
+    k5               : sfixed(36 downto -6);
+    k6               : sfixed(36 downto -6);
+    k7               : sfixed(36 downto -6);
+    k8               : sfixed(36 downto -6);
+    k9               : sfixed(36 downto -6);
+end record;
+
+
 type ccRgbRecord is record
     rgbToSf          : rgbToSfRecord;
     ccSf             : ty7sf;
@@ -434,6 +480,18 @@ type ccRgbRecord is record
     rgbSnSum         : rgbSnSumRecord;
     rgbSnSumTr       : rgbSnSumTrRecord;
 end record;
+
+type cc_rgb_record is record
+    rgbToSf          : rgbToSfRecord;
+    ccSf             : ty7sf;
+    ccProdSf         : ty46sf_6;
+    ccProdToSn       : ty9sn;
+    ccProdTrSn       : ty1sn;
+    rgbSnSum         : rgbSnSumRecord;
+    rgbSnSumTr       : rgbSnSumTrRecord;
+end record;
+
+
 type rgbToFlRecord is record
     red              : float32;
     green            : float32;
@@ -893,6 +951,13 @@ type colors is record
     lms            : channel;
     ypbpr          : channel;
     yuv            : channel;
+    yc1c2          : channel;
+    ydrdb          : channel;
+    ipt            : channel;
+    yiq            : channel;
+    hed            : channel;
+    ohta           : channel;
+    micc           : channel;
     cc1            : channel;
     cc2            : channel;
     cc3            : channel;
@@ -965,6 +1030,13 @@ type frameColors is record
     lms               : channel;
     ypbpr             : channel;
     yuv               : channel;
+    yc1c2             : channel;
+    ydrdb             : channel;
+    ipt               : channel;
+    yiq               : channel;
+    hed               : channel;
+    ohta              : channel;
+    micc              : channel;
     cc1               : channel;
     cc2               : channel;
     cc3               : channel;
@@ -973,6 +1045,14 @@ type frameColors is record
     cc6               : channel;
     cc7               : channel;
     cc8               : channel;
+    ccc1              : channel;
+    ccc2              : channel;
+    ccc3              : channel;
+    ccc4              : channel;
+    ccc5              : channel;
+    ccc6              : channel;
+    ccc7              : channel;
+    ccc8              : channel;
     colorhsl          : channel;
     hsl1_range        : channel;
     hsl2_range        : channel;
@@ -1041,7 +1121,6 @@ type frameColors is record
     cgaGainBlu        : channel;
     synBlur           : channel;
     synSharp          : channel;
-    synCgain          : channel;
     synYcbcr          : channel;
     synLcobj          : channel;
     synRgbag          : channel;
@@ -1330,6 +1409,13 @@ type fcolors is record
     lms               : channel;
     ypbpr             : channel;
     yuv               : channel;
+    yc1c2             : channel;
+    ydrdb             : channel;
+    ipt               : channel;
+    yiq               : channel;
+    hed               : channel;
+    ohta              : channel;
+    micc              : channel;
     cc1               : channel;
     cc2               : channel;
     cc3               : channel;

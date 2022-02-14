@@ -25,9 +25,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.fixed_pkg.all;
-use work.float_pkg.all;
-
 use work.constants_package.all;
 use work.vfp_pkg.all;
 use work.vpf_records.all;

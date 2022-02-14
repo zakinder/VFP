@@ -57,23 +57,15 @@ videoOutP: process (clk) begin
             i2Rgb.red           <= 40;
         elsif (i1Rgb.red   >= 60 and i1Rgb.red    <= 79) then
             i2Rgb.red           <= 60;
-        elsif (i1Rgb.red   >= 80 and i1Rgb.red    <= 89) then
+        elsif (i1Rgb.red   >= 80 and i1Rgb.red    <= 99) then
             i2Rgb.red           <= 80;
-        elsif (i1Rgb.red   >= 90 and i1Rgb.red    <= 99) then
-            i2Rgb.red           <= 80;
-        elsif (i1Rgb.red   >= 100 and i1Rgb.red   <= 109) then
-            i2Rgb.red           <= 100;
-        elsif (i1Rgb.red   >= 110 and i1Rgb.red   <= 119) then
+        elsif (i1Rgb.red   >= 100 and i1Rgb.red   <= 119) then
             i2Rgb.red           <= 110;
         elsif (i1Rgb.red   >= 120 and i1Rgb.red   <= 139) then
             i2Rgb.red           <= 120;
-        elsif (i1Rgb.red   >= 140 and i1Rgb.red   <= 159) then
-            i2Rgb.red           <= 140;
-        elsif (i1Rgb.red   >= 160 and i1Rgb.red   <= 179) then
+        elsif (i1Rgb.red   >= 140 and i1Rgb.red   <= 179) then
             i2Rgb.red           <= 160;
-        elsif (i1Rgb.red   >= 180 and i1Rgb.red   <= 199) then
-            i2Rgb.red           <= 180;
-        elsif (i1Rgb.red   >= 200 and i1Rgb.red   <= 219) then
+        elsif (i1Rgb.red   >= 180 and i1Rgb.red   <= 219) then
             i2Rgb.red           <= 200;
         elsif (i1Rgb.red   >= 220 and i1Rgb.red   <= 239) then
             i2Rgb.red           <= 220;
@@ -96,23 +88,15 @@ process (clk) begin
             i2Rgb.green           <= 40;
         elsif (i1Rgb.green   >= 60 and i1Rgb.green    <= 79) then
             i2Rgb.green           <= 60;
-        elsif (i1Rgb.green   >= 80 and i1Rgb.green    <= 89) then
+        elsif (i1Rgb.green   >= 80 and i1Rgb.green    <= 99) then
             i2Rgb.green           <= 80;
-        elsif (i1Rgb.green   >= 90 and i1Rgb.green    <= 99) then
-            i2Rgb.green           <= 80;
-        elsif (i1Rgb.green   >= 100 and i1Rgb.green   <= 109) then
-            i2Rgb.green           <= 100;
-        elsif (i1Rgb.green   >= 110 and i1Rgb.green   <= 119) then
+        elsif (i1Rgb.green   >= 100 and i1Rgb.green   <= 119) then
             i2Rgb.green           <= 110;
         elsif (i1Rgb.green   >= 120 and i1Rgb.green   <= 139) then
             i2Rgb.green           <= 120;
-        elsif (i1Rgb.green   >= 140 and i1Rgb.green   <= 159) then
-            i2Rgb.green           <= 140;
-        elsif (i1Rgb.green   >= 160 and i1Rgb.green   <= 179) then
+        elsif (i1Rgb.green   >= 140 and i1Rgb.green   <= 179) then
             i2Rgb.green           <= 160;
-        elsif (i1Rgb.green   >= 180 and i1Rgb.green   <= 199) then
-            i2Rgb.green           <= 180;
-        elsif (i1Rgb.green   >= 200 and i1Rgb.green   <= 219) then
+        elsif (i1Rgb.green   >= 180 and i1Rgb.green   <= 219) then
             i2Rgb.green           <= 200;
         elsif (i1Rgb.green   >= 220 and i1Rgb.green   <= 239) then
             i2Rgb.green           <= 220;
@@ -135,23 +119,15 @@ process (clk) begin
             i2Rgb.blue           <= 40;
         elsif (i1Rgb.blue   >= 60 and i1Rgb.blue    <= 79) then
             i2Rgb.blue           <= 60;
-        elsif (i1Rgb.blue   >= 80 and i1Rgb.blue    <= 89) then
+        elsif (i1Rgb.blue   >= 80 and i1Rgb.blue    <= 99) then
             i2Rgb.blue           <= 80;
-        elsif (i1Rgb.blue   >= 90 and i1Rgb.blue    <= 99) then
-            i2Rgb.blue           <= 80;
-        elsif (i1Rgb.blue   >= 100 and i1Rgb.blue   <= 109) then
-            i2Rgb.blue           <= 100;
-        elsif (i1Rgb.blue   >= 110 and i1Rgb.blue   <= 119) then
+        elsif (i1Rgb.blue   >= 100 and i1Rgb.blue   <= 119) then
             i2Rgb.blue           <= 110;
         elsif (i1Rgb.blue   >= 120 and i1Rgb.blue   <= 139) then
             i2Rgb.blue           <= 120;
-        elsif (i1Rgb.blue   >= 140 and i1Rgb.blue   <= 159) then
-            i2Rgb.blue           <= 140;
-        elsif (i1Rgb.blue   >= 160 and i1Rgb.blue   <= 179) then
+        elsif (i1Rgb.blue   >= 140 and i1Rgb.blue   <= 179) then
             i2Rgb.blue           <= 160;
-        elsif (i1Rgb.blue   >= 180 and i1Rgb.blue   <= 199) then
-            i2Rgb.blue           <= 180;
-        elsif (i1Rgb.blue   >= 200 and i1Rgb.blue   <= 219) then
+        elsif (i1Rgb.blue   >= 180 and i1Rgb.blue   <= 219) then
             i2Rgb.blue           <= 200;
         elsif (i1Rgb.blue   >= 220 and i1Rgb.blue   <= 239) then
             i2Rgb.blue           <= 220;

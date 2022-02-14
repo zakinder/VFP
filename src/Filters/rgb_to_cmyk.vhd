@@ -44,31 +44,39 @@ architecture behavioral of rgb_to_cmyk is
     signal rgb_sync_1                : rgbToUfRecord;
     signal rgb_sync_2                : rgbToUfRecord;
     signal rgb_sync_3                : rgbToUfRecord;
-    signal rgb_max                   : ufixed(7 downto 0) :=(others => '0');
-
-    --CMYK
-    signal k_value                   : ufixed(7 downto 0)    :=(others => '0');
-
-    signal c_numerator               : ufixed(7 downto 0)   :=(others => '0');
-    signal c_denominator             : ufixed(7 downto 0)    :=(others => '0');
-    signal c_value                   : ufixed(8 downto 0)   :=(others => '0');
+    --signal rgb_max                   : ufixed(7 downto 0) :=(others => '0');
+    --
+    ----CMYK
+    --signal k_value                   : ufixed(7 downto 0)    :=(others => '0');
+    --
+    --signal c_numerator               : ufixed(7 downto 0)   :=(others => '0');
+    --signal c_denominator             : ufixed(7 downto 0)    :=(others => '0');
+    --signal c_value                   : ufixed(8 downto 0)   :=(others => '0');
+    --
+    --
+    --signal m_numerator               : ufixed(7 downto 0)    :=(others => '0');
+    --signal m_denominator             : ufixed(7 downto 0)    :=(others => '0');
+    --signal m_value                   : ufixed(8 downto 0)    :=(others => '0');
+    --
+    --
+    --
+    --signal y_numerator               : ufixed(7 downto 0)   :=(others => '0');
+    --signal y_denominator             : ufixed(7 downto 0)    :=(others => '0');
+    --signal y_value                   : ufixed(8 downto 0)    :=(others => '0');
 
     
-    signal m_numerator               : ufixed(7 downto 0)    :=(others => '0');
-    signal m_denominator             : ufixed(7 downto 0)    :=(others => '0');
-    signal m_value                   : ufixed(8 downto 0)    :=(others => '0');
+    signal cp                        : ufixed(7 downto 0)   :=(others => '0');
+    signal mp                        : ufixed(7 downto 0)   :=(others => '0');
+    signal yp                        : ufixed(7 downto 0)   :=(others => '0');
+    signal kp                        : ufixed(7 downto 0)   :=(others => '0');
     
     
+    signal tp                        : ufixed(7 downto 0)   :=(others => '0');
 
-    signal y_numerator               : ufixed(7 downto 0)   :=(others => '0');
-    signal y_denominator             : ufixed(7 downto 0)    :=(others => '0');
-    signal y_value                   : ufixed(8 downto 0)    :=(others => '0');
-
+    signal cmy_c                     : ufixed(17 downto -8)   :=(others => '0');
+    signal cmy_m                     : ufixed(17 downto -8)   :=(others => '0');
+    signal cmy_y                     : ufixed(17 downto -8)   :=(others => '0');
     
-    
-    
-
-
 begin
 
 rgbToUfP: process (clk)begin
@@ -93,35 +101,74 @@ process (clk) begin
 end process;
 
 -- RGB.max = max(R, G, B)
-rgbMaxP: process (clk) begin
+--rgbMaxP: process (clk) begin
+--    if rising_edge(clk) then
+--        if ((rgb_sync_1.red >= rgb_sync_1.green) and (rgb_sync_1.red >= rgb_sync_1.blue)) then
+--            rgb_max <= rgb_sync_1.red;
+--        elsif((rgb_sync_1.green >= rgb_sync_1.red) and (rgb_sync_1.green >= rgb_sync_1.blue))then
+--            rgb_max <= rgb_sync_1.green;
+--        else
+--            rgb_max <= rgb_sync_1.blue;
+--        end if;
+--    end if;
+--end process rgbMaxP;
+
+
+
+
+cp                 <= resize((to_ufixed(255,7,0)-rgb_sync_1.red),cp);
+mp                 <= resize((to_ufixed(255,7,0)-rgb_sync_1.green),mp);
+yp                 <= resize((to_ufixed(255,7,0)-rgb_sync_1.blue),yp);
+
+
+
+
+
+process (mp,cp,yp) begin
+    if ((cp <= mp) and (cp <= yp)) then
+        kp <= cp;
+    elsif((mp <= cp) and (mp <= yp)) then
+        kp <= mp;
+    else
+        kp <= yp;
+    end if;
+end process;
+
+tp <= resize(255-kp,tp);
+
+
+process (clk) begin
     if rising_edge(clk) then
-        if ((rgb_sync_1.red >= rgb_sync_1.green) and (rgb_sync_1.red >= rgb_sync_1.blue)) then
-            rgb_max <= rgb_sync_1.red;
-        elsif((rgb_sync_1.green >= rgb_sync_1.red) and (rgb_sync_1.green >= rgb_sync_1.blue))then
-            rgb_max <= rgb_sync_1.green;
+        if (tp = 0) then
+            cmy_c <= to_ufixed(0,17,-8);
+            cmy_m <= to_ufixed(0,17,-8);
+            cmy_y <= to_ufixed(0,17,-8);
         else
-            rgb_max <= rgb_sync_1.blue;
+            cmy_c <= ((cp-kp)/tp)*255;
+            cmy_m <= ((mp-kp)/tp)*255;
+            cmy_y <= ((yp-kp)/tp)*255;
         end if;
     end if;
-end process rgbMaxP;
+end process;
 
-k_value                 <= resize((to_ufixed(256,8,0)-rgb_max),k_value);
 
-c_numerator             <= resize((256 - rgb_max - rgb_sync_1.red),c_numerator);
-c_denominator           <= resize((256 - k_value),c_denominator);
-c_value                 <= resize((c_numerator/c_denominator),c_value);
+--k_value                 <= resize((to_ufixed(256,8,0)-rgb_max),k_value);
+--
+--c_numerator             <= resize((256 - rgb_max - rgb_sync_1.red),c_numerator);
+--c_denominator           <= resize((256 - k_value),c_denominator);
+--c_value                 <= resize((c_numerator/c_denominator),c_value);
+--
+--m_numerator             <= resize((256 - rgb_max - rgb_sync_1.green),m_numerator);
+--m_denominator           <= resize((256 - k_value),m_denominator);
+--m_value                 <= resize((m_numerator/m_denominator),m_value);
+--
+--y_numerator             <= resize((256 - rgb_max - rgb_sync_1.blue),y_numerator);
+--y_denominator           <= resize((256 - k_value),y_denominator);
+--y_value                 <= resize((y_numerator/y_denominator),y_value);
 
-m_numerator             <= resize((256 - rgb_max - rgb_sync_1.green),m_numerator);
-m_denominator           <= resize((256 - k_value),m_denominator);
-m_value                 <= resize((m_numerator/m_denominator),m_value);
-
-y_numerator             <= resize((256 - rgb_max - rgb_sync_1.blue),y_numerator);
-y_denominator           <= resize((256 - k_value),y_denominator);
-y_value                 <= resize((y_numerator/y_denominator),y_value);
-
-oRgb.red   <= std_logic_vector(c_value(4 downto 0)) & "000";
-oRgb.green <= std_logic_vector(m_value(4 downto 0)) & "000";
-oRgb.blue  <= std_logic_vector(y_value(4 downto 0)) & "000";
+oRgb.red   <= std_logic_vector(cmy_c(7 downto 0));
+oRgb.green <= std_logic_vector(cmy_m(7 downto 0));
+oRgb.blue  <= std_logic_vector(cmy_y(7 downto 0));
 oRgb.valid <= rgb_sync_3.valid;
         
 end behavioral;

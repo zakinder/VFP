@@ -279,6 +279,12 @@ generic map(
     F_LMS                 =>  F_LMS,
     YPBPR                 =>  YPBPR,
     F_YUV                 =>  F_YUV,
+    YC1C2                 =>  YC1C2,
+    F_IPT                 =>  F_IPT,
+    F_YIQ                 =>  F_YIQ,
+    F_HED                 =>  F_HED,
+    FOHTA                 =>  FOHTA,
+    FMICC                 =>  FMICC,
     F_CC1                 =>  F_CC1,
     F_CC2                 =>  F_CC2,
     F_CC3                 =>  F_CC3,
@@ -783,6 +789,84 @@ port map (
     pixclk                => clk,
     iRgb                  => rgbImageFilters.yuv);
 end generate F_YUV_ENABLED;
+F_YC1C2_ENABLED : if (YC1C2 = true) generate  
+yc1c2_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "yc1c2")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.yc1c2);
+end generate F_YC1C2_ENABLED;
+F_IPT_ENABLED : if (F_IPT = true) generate  
+ipt_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "ipt")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.ipt);
+end generate F_IPT_ENABLED;
+F_YIQ_ENABLED : if (F_YIQ = true) generate  
+yiq_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "yiq")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.yiq);
+end generate F_YIQ_ENABLED;
+F_HED_ENABLED : if (F_HED = true) generate  
+hed_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "hed")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.hed);
+end generate F_HED_ENABLED;
+FOHTA_ENABLED : if (FOHTA = true) generate  
+ohta_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "ohta")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.ohta);
+end generate FOHTA_ENABLED;
+FMICC_ENABLED : if (FMICC = true) generate  
+micc_image_inst: write_image
+generic map (
+    enImageText           => true,
+    enImageIndex          => true,
+    i_data_width          => i_data_width,
+    test                  => testFolder,
+    input_file            => readbmp,
+    output_file           => "micc")
+port map (                  
+    pixclk                => clk,
+    iRgb                  => rgbImageFilters.micc);
+end generate FMICC_ENABLED;
 F_CC1_ENABLED : if (F_CC1 = true) generate  
 cc1_image_inst: write_image
 generic map (

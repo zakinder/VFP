@@ -63,8 +63,16 @@ architecture behavioral of rgb_to_I1I2I3_micc is
     signal i3_denominator       : integer;
     signal i3_quotient          : integer;
     signal i3_value             : integer;
-    signal g2                   : integer;
 
+
+    signal red_gre              : integer;
+    signal gre_blu              : integer;
+    signal blu_red              : integer;
+    
+    signal red_gre_sqr          : integer;
+    signal gre_blu_sqr          : integer;
+    signal blu_red_sqr          : integer;
+    
 begin
 
 process (clk)begin
@@ -88,36 +96,73 @@ process (clk) begin
 end process;
 
 
+process (rgb_sync_1) begin
+    if (rgb_sync_1.red >= rgb_sync_1.green) then
+        red_gre <= rgb_sync_1.red - rgb_sync_1.green;
+    else
+        red_gre <= rgb_sync_1.green - rgb_sync_1.red;
+    end if;
+end process;
+
+process (rgb_sync_1) begin
+    if (rgb_sync_1.green >= rgb_sync_1.blue) then
+        gre_blu <= rgb_sync_1.green - rgb_sync_1.blue;
+    else
+        gre_blu <= rgb_sync_1.blue - rgb_sync_1.green;
+    end if;
+end process;
+
+process (rgb_sync_1) begin
+    if (rgb_sync_1.blue >= rgb_sync_1.red) then
+        blu_red <= rgb_sync_1.blue - rgb_sync_1.red;
+    else
+        blu_red <= rgb_sync_1.red - rgb_sync_1.blue;
+    end if;
+end process;
 
 
 
+process (clk) begin
+    if rising_edge(clk) then
+        red_gre_sqr <= red_gre * red_gre;
+        gre_blu_sqr <= gre_blu * gre_blu;
+        blu_red_sqr <= blu_red * blu_red;
+    end if;
+end process;
 
-i1_numerator        <= rgb_sync_1.red + rgb_sync_1.green + rgb_sync_1.blue;
-i1_denominator      <= 3;
-i1_quotient         <= ((i1_numerator/i1_denominator));
-i1_value            <= i1_quotient;
+process (clk) begin
+    if rising_edge(clk) then
+        i1_numerator        <= red_gre_sqr;
+        i1_denominator      <= red_gre_sqr + gre_blu_sqr + blu_red_sqr;
 
+    end if;
+end process;
+        i1_quotient         <= ((i1_numerator/i1_denominator)) when i1_denominator /= 0;
+        i1_value            <= i1_quotient;
 
+process (clk) begin
+    if rising_edge(clk) then
+        i2_numerator        <= blu_red_sqr;
+        i2_denominator      <= red_gre_sqr + gre_blu_sqr + blu_red_sqr;
 
-i2_numerator        <= rgb_sync_1.red - rgb_sync_1.blue;
-i2_denominator      <= 2;
-i2_quotient         <= ((i2_numerator/i2_denominator));
-i2_value            <= i2_quotient;
+    end if;
+end process;
+        i2_quotient         <= ((i2_numerator/i2_denominator)) when i2_denominator /= 0;
+        i2_value            <= i2_quotient;
 
+process (clk) begin
+    if rising_edge(clk) then
+        i3_numerator        <= gre_blu_sqr;
+        i3_denominator      <= red_gre_sqr + gre_blu_sqr + blu_red_sqr;
 
-g2                  <= 2 * rgb_sync_1.green;
-i3_numerator        <= g2 - rgb_sync_1.red - rgb_sync_1.blue;
-i3_denominator      <= 4;
-i3_quotient         <= ((i3_numerator/i3_denominator));
-i3_value            <= i3_quotient;
-
-
-
-
+    end if;
+end process;
+        i3_quotient         <= ((i3_numerator/i3_denominator)) when i3_denominator /= 0;
+        i3_value            <= i3_quotient;
 
 oRgb.red   <= std_logic_vector(to_unsigned(i1_value, 8));
 oRgb.green <= std_logic_vector(to_unsigned(i2_value, 8));
 oRgb.blue  <= std_logic_vector(to_unsigned(i3_value, 8));
-oRgb.valid <= rgb_sync_3.valid;
+oRgb.valid <= rgb_sync_2.valid;
 
 end behavioral;
