@@ -20,6 +20,9 @@ type ty1sf is record
 end record;
 
 type ty7sf is record
+    n1               : integer;
+    n2               : integer;
+    n3               : integer;
     k1               : sfixed(16 downto -3);
     k2               : sfixed(16 downto -3);
     k3               : sfixed(16 downto -3);
@@ -746,7 +749,7 @@ type rgb_add_range is record
   add_5678           : natural;
   add_s1234          : natural;
   add_s5678          : natural;
-  add_1_to_8         : natural;
+  add_1_to_8         : integer;
   add_s1_to_8        : natural;
   add_s9             : natural;
   add_1to8sp         : natural;

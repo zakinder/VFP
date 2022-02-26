@@ -29,8 +29,9 @@ port (
     oRgb           : out channel);
 end frame_mask;
 architecture behavioral of frame_mask is
-    signal d1Rgb           : channel;
-    signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
+    signal di1Rgb           : channel;
+    signal di2Rgb           : channel;
+    signal rgbSyncValid    : std_logic_vector(31 downto 0)  := x"00000000";
 begin
 process (clk) begin
     if rising_edge(clk) then
@@ -50,17 +51,37 @@ process (clk) begin
         rgbSyncValid(13) <= rgbSyncValid(12);
         rgbSyncValid(14) <= rgbSyncValid(13);
         rgbSyncValid(15) <= rgbSyncValid(14);
+        rgbSyncValid(16) <= rgbSyncValid(15);
+        rgbSyncValid(17) <= rgbSyncValid(16);
+        rgbSyncValid(18) <= rgbSyncValid(17);
+        rgbSyncValid(19) <= rgbSyncValid(18);
+        rgbSyncValid(20) <= rgbSyncValid(19);
+        rgbSyncValid(21) <= rgbSyncValid(20);
     end if;
 end process;
 
-SyncFrames32Inst: sync_frames
+
+SyncFrames1Inst: sync_frames
 generic map(
-    pixelDelay => 0) --LATENCY 32
+    pixelDelay => 0)
+port map(
+    clk        => clk,
+    reset      => reset,
+    iRgb       => i1Rgb,
+    oRgb       => di1Rgb);
+    
+    
+SyncFrames2Inst: sync_frames
+generic map(
+    pixelDelay => 0)
 port map(
     clk        => clk,
     reset      => reset,
     iRgb       => i2Rgb,
-    oRgb       => d1Rgb);
+    oRgb       => di2Rgb);
+    
+    
+    
 EBLACK_ENABLED: if (eBlack = true) generate
     process (clk) begin
         if rising_edge(clk) then
@@ -80,16 +101,16 @@ end generate EBLACK_ENABLED;
 EBLACK_DISABLED: if (eBlack = false) generate
     process (clk) begin
         if rising_edge(clk) then
-            if (rgbSyncValid(14) = hi) then
-                oRgb.red   <= black;
-                oRgb.green <= black;
-                oRgb.blue  <= black;
+            if (rgbSyncValid(19) = hi) then
+                oRgb.red   <= di1Rgb.red;
+                oRgb.green <= di1Rgb.green;
+                oRgb.blue  <= di1Rgb.blue;
             else
-                oRgb.red   <= d1Rgb.red;
-                oRgb.green <= d1Rgb.green;
-                oRgb.blue  <= d1Rgb.blue;
+                oRgb.red   <= di2Rgb.red;
+                oRgb.green <= di2Rgb.green;
+                oRgb.blue  <= di2Rgb.blue;
             end if;
-                oRgb.valid <= d1Rgb.valid;
+                oRgb.valid <= di2Rgb.valid;
         end if;
     end process;
 end generate EBLACK_DISABLED;

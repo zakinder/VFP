@@ -62,13 +62,15 @@ end process syncValid_P;
 -- red = alpha(red-128)+128+b
 process (clk)begin
     if rising_edge(clk) then
-
-        ccRgb.ccSf.k1           <= to_sfixed(1.20,16,-3);
+        ccRgb.ccSf.k1           <= to_sfixed(0.90,16,-3);
         ccRgb.ccSf.k2           <= to_sfixed(128.000,16,-3);
         ccRgb.ccSf.k3           <= to_sfixed(exposer_val,16,-3);
     end if;
 end process;
 
+
+
+-- aplha*(rgb_in-128) + 128 + gain
 ccRgb.ccProdSf.k1       <=  ((ccRgb.ccSf.k1  * ((ccRgb.rgbToSf.red)   - (ccRgb.ccSf.k2)))   + ccRgb.ccSf.k2 + ccRgb.ccSf.k3);
 ccRgb.ccProdSf.k5       <=  ((ccRgb.ccSf.k1  * ((ccRgb.rgbToSf.green) - (ccRgb.ccSf.k2)))   + ccRgb.ccSf.k2 + ccRgb.ccSf.k3);
 ccRgb.ccProdSf.k9       <=  ((ccRgb.ccSf.k1  * ((ccRgb.rgbToSf.blue)  - (ccRgb.ccSf.k2)))   + ccRgb.ccSf.k2 + ccRgb.ccSf.k3);

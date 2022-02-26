@@ -23,7 +23,9 @@ package vfp_pkg is
     function int_max_val(l, m : integer)                            return integer;
     function int_max_val(l, m, r: integer)                          return integer;
     function int_max_val(l, m, r, e: integer)                       return integer;
+    function int_min_val(l, m : integer)                            return integer;
     function int_min_val(l, m, r: integer)                          return integer;
+    function int_min_val(l, m, r, e: integer)                       return integer;
     function selframe(l, r: boolean)                                return boolean;
     function selframe(l, r, m: boolean)                             return boolean;
     function per_frame(l, r: integer)                               return boolean;
@@ -67,6 +69,8 @@ package body vfp_pkg is
            return 300;
        elsif bmp = "300_300" then
            return 300;
+       elsif bmp = "320_480" then
+           return 320;
        elsif bmp = "368_393" then
            return 368;
        elsif bmp = "385_289" then
@@ -76,6 +80,8 @@ package body vfp_pkg is
        elsif bmp = "500_26" then
            return 500;
        elsif bmp = "500_200" then
+           return 500;
+       elsif bmp = "500_191" then
            return 500;
        elsif bmp = "500_500" then
            return 500;
@@ -105,6 +111,8 @@ package body vfp_pkg is
            return 1200;
        elsif bmp = "1754_1006" then
            return 1754;
+       elsif bmp = "2638_1012" then
+           return 2638;
        elsif bmp = "3000_3000" then
            return 3000;
        end if;
@@ -138,6 +146,8 @@ package body vfp_pkg is
            return 200;
        elsif bmp = "300_300" then
            return 300;
+       elsif bmp = "320_480" then
+           return 480;
        elsif bmp = "385_289" then
            return 289;
        elsif bmp = "368_393" then
@@ -148,6 +158,8 @@ package body vfp_pkg is
            return 26;
        elsif bmp = "500_200" then
            return 200;
+       elsif bmp = "500_191" then
+           return 191;
        elsif bmp = "500_500" then
            return 500;
        elsif bmp = "600_600" then
@@ -176,6 +188,8 @@ package body vfp_pkg is
            return 1600;
        elsif bmp = "1754_1006" then
            return 1006;
+       elsif bmp = "2638_1012" then
+           return 1012;
        elsif bmp = "3000_3000" then
            return 3000;
        end if;
@@ -229,7 +243,7 @@ package body vfp_pkg is
     ----------------------------------------------------------------------------------------------------
     function int_max_val(l, m: integer) return integer is
     begin
-       if l > m then
+       if l >= m then
            return l;
        else
            return m;
@@ -260,6 +274,15 @@ package body vfp_pkg is
        end if;
     end;
     ----------------------------------------------------------------------------------------------------
+    function int_min_val(l, m: integer) return integer is
+    begin
+       if l <= m then
+           return l;
+       else
+           return m;
+       end if;
+    end;
+    ----------------------------------------------------------------------------------------------------
     function int_min_val(l, m, r: integer) return integer is
     begin
        if l <= r and l <= m then
@@ -268,6 +291,19 @@ package body vfp_pkg is
            return m;
        else
            return r;
+       end if;
+    end;
+    ----------------------------------------------------------------------------------------------------
+    function int_min_val(l, m, r, e : integer) return integer is
+    begin
+       if l <= r and l <= m and l <= e then
+           return l;
+       elsif m <= l and m <= r and m <= e then
+           return m;
+       elsif r <= l and r <= m and r <= e then
+           return r;
+       else
+           return e;
        end if;
     end;
     ----------------------------------------------------------------------------------------------------

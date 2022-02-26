@@ -622,16 +622,16 @@ begin
 ----------------------------------------------------------
 sobel_ccm_inst  : ccm
 generic map(
-    i_k_config_number   => 3)
+    i_k_config_number   => 1)
 port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
     oRgb                => ccm2rgb_range);
-    sobel_rgb.red       <= ccm2rgb_range.red;
-    sobel_rgb.green     <= ccm2rgb_range.red;
-    sobel_rgb.blue      <= ccm2rgb_range.red;
-    sobel_rgb.valid     <= ccm2rgb_range.valid;
+    sobel_rgb.red       <= iRgb.red;
+    sobel_rgb.green     <= iRgb.red;
+    sobel_rgb.blue      <= iRgb.red;
+    sobel_rgb.valid     <= iRgb.valid;
 ----------------------------------------------------------
 TapsControllerInst: taps_controller
 generic map(

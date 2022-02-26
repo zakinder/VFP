@@ -254,7 +254,7 @@ end process lThSelectP;
 
 rgb_contrast_brightness_inst: rgb_contrast_brightness
 generic map (
-    exposer_val  => 1)
+    exposer_val  => 0)
 port map (                  
     clk               => clk,
     rst_l             => rst_l,
@@ -708,6 +708,9 @@ port map(
     oRgb                => rgbLocSynSFilt.rgbag);
 end generate L_AVG_ENABLE;
     fRgb.synRgbag        <= rgbLocSynSFilt.rgbag;
+    
+    
+    
 L_BLU_ENABLE: if (L_BLU = true) generate
 begin
 l_blu_inst  : blur_filter
@@ -732,6 +735,9 @@ port map(
     iRgb                => rgbLocFilt.blur,
     oRgb                => rgbLocSynSFilt.blur);
 end generate L_BLU_ENABLE;
+
+
+
 L1CGA_ENABLE: if (L1CGA = true) generate
 begin
 l1cga_recolor_rgb_inst: recolor_rgb
@@ -749,7 +755,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc1);
 end generate L1CGA_ENABLE;
     fRgb.ccc1        <= ccc1;
@@ -770,7 +776,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc2);
 end generate L2CGA_ENABLE;
     fRgb.ccc2        <= ccc2;
@@ -791,7 +797,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc3);
 end generate L3CGA_ENABLE;
     fRgb.ccc3        <= ccc3;
@@ -812,7 +818,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc4);
 end generate L4CGA_ENABLE;
     fRgb.ccc4        <= ccc4;
@@ -834,7 +840,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc5);
 end generate L5CGA_ENABLE;
     fRgb.ccc5        <= ccc5;
@@ -855,7 +861,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc6);
 end generate L6CGA_ENABLE;
     fRgb.ccc6        <= ccc6;
@@ -876,7 +882,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc7);
 end generate L7CGA_ENABLE;
     fRgb.ccc7        <= ccc7;
@@ -897,7 +903,7 @@ generic map (
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
-    iRgb               => rgb,
+    iRgb               => iRgb,
     oRgb               => ccc8);
 end generate L8CGA_ENABLE;
     fRgb.ccc8        <= ccc8;
@@ -1089,18 +1095,11 @@ port map(
     i2Rgb       => rgbImageKernel.colorTrm,
     oRgb        => fRgb.maskSobelTrm);
 end generate MASK_SOB_TRM_FRAME_ENABLE;
+
+
+
 MASK_SOB_HSL_FRAME_ENABLE: if (M_SOB_HSL = true) generate
-    signal dSobHsl           : channel;
-    constant sobHslPiDelay   : integer := 12;
 begin
-sob_hsv_syncr_inst  : sync_frames
-generic map(
-    pixelDelay => sobHslPiDelay)
-port map(
-    clk        => clk,
-    reset      => rst_l,
-    iRgb       => rgbImageKernel.sobel,
-    oRgb       => dSobHsl);
 frame_masking_inst  : frame_mask
 generic map (
     eBlack       => false)
@@ -1108,22 +1107,15 @@ port map(
     clk         => clk,
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
-    i1Rgb       => dSobHsl,
+    i1Rgb       => ccc2,
     i2Rgb       => ccc1,
     oRgb        => fRgb.maskSobelHsl);
 end generate MASK_SOB_HSL_FRAME_ENABLE;
+
+
+
 MASK_SOB_HSV_FRAME_ENABLE: if (M_SOB_HSV = true) generate
-    signal dSobHsv           : channel;
-    constant sobHsvPiDelay   : integer := 18;
 begin
-sob_hsv_syncr_inst  : sync_frames
-generic map(
-    pixelDelay => sobHsvPiDelay)
-port map(
-    clk        => clk,
-    reset      => rst_l,
-    iRgb       => rgbImageKernel.hsv,
-    oRgb       => dSobHsv);
 frame_masking_inst  : frame_mask
 generic map (
     eBlack       => true)
@@ -1132,9 +1124,12 @@ port map(
     reset       => rst_l,
     iEdgeValid  => sEdgeValid,
     i1Rgb       => rgbImageKernel.sobel,
-    i2Rgb       => dSobHsv,
+    i2Rgb       => rgbImageKernel.hsv,
     oRgb        => fRgb.maskSobelHsv);
 end generate MASK_SOB_HSV_FRAME_ENABLE;
+
+
+
 MASK_SOB_YCC_FRAME_ENABLE: if (M_SOB_YCC = true) generate
 begin
 frame_masking_inst  : frame_mask

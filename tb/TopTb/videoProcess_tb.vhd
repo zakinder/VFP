@@ -245,8 +245,19 @@ port map (
     pixclk                => clk,
     oCord                 => tx1Cord,
     oRgb                  => rgb1Read);
+
 cordValues.x      <= to_integer((unsigned(tx1Cord.x)));
 cordValues.y      <= to_integer((unsigned(tx1Cord.y)));
+
+process(cordValues)begin
+if(cordValues.x = 0)then
+    report "--------------> cordValues.y " & integer'image(cordValues.y);
+end if;
+end process;
+
+
+
+
 sync_cord_inst: sync_cord
 generic map (
     cordDelay            => 34)

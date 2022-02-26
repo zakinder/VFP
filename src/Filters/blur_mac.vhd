@@ -36,7 +36,17 @@ architecture arch of blur_mac is
     signal tpd2        : itaps;
     signal tpd3        : itaps;
     signal pa_data     : unsigned(i_data_width+3 downto 0);
-
+    
+    constant blur_Mac_Kernel_1                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blur_Mac_Kernel_2                    : unsigned(i_data_width-1 downto 0)         :=x"02";
+    constant blur_Mac_Kernel_3                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blur_Mac_Kernel_4                    : unsigned(i_data_width-1 downto 0)         :=x"02";
+    constant blur_Mac_Kernel_5                    : unsigned(i_data_width-1 downto 0)         :=x"04";
+    constant blur_Mac_Kernel_6                    : unsigned(i_data_width-1 downto 0)         :=x"02";
+    constant blur_Mac_Kernel_7                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    constant blur_Mac_Kernel_8                    : unsigned(i_data_width-1 downto 0)         :=x"02";
+    constant blur_Mac_Kernel_9                    : unsigned(i_data_width-1 downto 0)         :=x"01";
+    
 begin
 
 -- Each input vTapn represent row of window which is delayed by clk cycle tpdn to make a 3x3 window.
@@ -82,9 +92,9 @@ end process window_3x3;
 -- Multiplier–accumulator MAC_X_A
 MAC_X_A: process (clk) begin
   if rising_edge(clk) then
-      mac1X.m1    <= (wind3x3.pix1 * blurMacKernel_9);
-      mac1X.m2    <= (wind3x3.pix2 * blurMacKernel_8);
-      mac1X.m3    <= (wind3x3.pix3 * blurMacKernel_7);
+      mac1X.m1    <= (wind3x3.pix1 * blur_Mac_Kernel_9);
+      mac1X.m2    <= (wind3x3.pix2 * blur_Mac_Kernel_8);
+      mac1X.m3    <= (wind3x3.pix3 * blur_Mac_Kernel_7);
       mac1X.mac   <= mac1X.m1(i_data_width+3 downto 0) + mac1X.m2(i_data_width+3 downto 0) + mac1X.m3(i_data_width+3 downto 0);
   end if;
 end process MAC_X_A;
@@ -94,9 +104,9 @@ end process MAC_X_A;
 -- Multiplier–accumulator MAC_X_B
 MAC_X_B: process (clk) begin
   if rising_edge(clk) then
-      mac2X.m1    <= (wind3x3.pix4 * blurMacKernel_6);
-      mac2X.m2    <= (wind3x3.pix5 * blurMacKernel_5);
-      mac2X.m3    <= (wind3x3.pix6 * blurMacKernel_4);
+      mac2X.m1    <= (wind3x3.pix4 * blur_Mac_Kernel_6);
+      mac2X.m2    <= (wind3x3.pix5 * blur_Mac_Kernel_5);
+      mac2X.m3    <= (wind3x3.pix6 * blur_Mac_Kernel_4);
       mac2X.mac   <= mac2X.m1(i_data_width+3 downto 0) + mac2X.m2(i_data_width+3 downto 0) + mac2X.m3(i_data_width+3 downto 0);
   end if;
 end process MAC_X_B;
@@ -106,9 +116,9 @@ end process MAC_X_B;
 -- Multiplier–accumulator MAC_X_C
 MAC_X_C: process (clk) begin
   if rising_edge(clk) then
-      mac3X.m1    <= (wind3x3.pix7 * blurMacKernel_3);
-      mac3X.m2    <= (wind3x3.pix8 * blurMacKernel_2);
-      mac3X.m3    <= (wind3x3.pix9 * blurMacKernel_1);
+      mac3X.m1    <= (wind3x3.pix7 * blur_Mac_Kernel_3);
+      mac3X.m2    <= (wind3x3.pix8 * blur_Mac_Kernel_2);
+      mac3X.m3    <= (wind3x3.pix9 * blur_Mac_Kernel_1);
       mac3X.mac   <= mac3X.m1(i_data_width+3 downto 0) + mac3X.m2(i_data_width+3 downto 0) + mac3X.m3(i_data_width+3 downto 0);
   end if;
 end process MAC_X_C;
