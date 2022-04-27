@@ -148,7 +148,7 @@ rgbDeltaP: process (clk) begin
     end if;
 end process rgbDeltaP;
 rgb_delta_sum_denominator   <= to_ufixed(rgb_delta_sum,uuFiXhueTop);
-rgb_delta_numerator         <= to_ufixed(rgb_delta,uuFiXhueBot);
+rgb_delta_numerator         <= to_ufixed(rgb_delta_sum,uuFiXhueBot);
 rgb_delta_numerator_1       <= to_ufixed(rgb_delta_1,uuFiXhueBot);
 rgb_delta_quotient_1        <= (rgb_delta_numerator / rgb_delta_sum_denominator);
 rgb_delta_quotient_2        <= (rgb_delta_numerator / rgb_delta_numerator_1);
@@ -157,11 +157,9 @@ rgb_delta_quot_2            <= resize(rgb_delta_quotient_2,rgb_delta_quot_2);
 rgb_delta_max_1             <= to_integer(unsigned(rgb_delta_quot_1));
 rgb_delta_max_2             <= to_integer(unsigned(rgb_delta_quot_2));
 
-process(rgb_delta_max_1,rgb_delta_max_2)begin
-    if (rgb_delta_max_1 <= 255) then
+process(rgb_delta_max_2)begin
+    if (rgb_delta_max_2 < 256) then
         rgb_delta_max     <= rgb_delta_max_2;
-    else
-        rgb_delta_max     <= rgb_delta_max_1;
     end if;
 end process;
 

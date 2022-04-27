@@ -73,17 +73,17 @@ architecture arch of blur_filter_4by4 is
     signal mac2X_red               : unsig_pixel_4by4mac;
     signal mac3X_red               : unsig_pixel_4by4mac;
     signal mac4X_red               : unsig_pixel_4by4mac;
-    signal pa_data_red             : unsigned(i_data_width+3 downto 0);
+    signal pa_data_red             : unsigned(i_data_width+5 downto 0);
     signal mac1X_gre               : unsig_pixel_4by4mac;
     signal mac2X_gre               : unsig_pixel_4by4mac;
     signal mac3X_gre               : unsig_pixel_4by4mac;
     signal mac4X_gre               : unsig_pixel_4by4mac;
-    signal pa_data_gre             : unsigned(i_data_width+3 downto 0);
+    signal pa_data_gre             : unsigned(i_data_width+5 downto 0);
     signal mac1X_blu               : unsig_pixel_4by4mac;
     signal mac2X_blu               : unsig_pixel_4by4mac;
     signal mac3X_blu               : unsig_pixel_4by4mac;
     signal mac4X_blu               : unsig_pixel_4by4mac;
-    signal pa_data_blu             : unsigned(i_data_width+3 downto 0);
+    signal pa_data_blu             : unsigned(i_data_width+5 downto 0);
 begin
 RGBInst: rgb_4taps
 generic map(
@@ -333,7 +333,7 @@ MAC_X_1_red: process (clk) begin
       mac1X_red.m2    <= (k_4_x_4_red.k2 * blurMacKernel_15);
       mac1X_red.m3    <= (k_4_x_4_red.k3 * blurMacKernel_14);
       mac1X_red.m4    <= (k_4_x_4_red.k4 * blurMacKernel_13);
-      mac1X_red.mac   <= mac1X_red.m1(i_data_width+3 downto 0) + mac1X_red.m2(i_data_width+3 downto 0) + mac1X_red.m3(i_data_width+3 downto 0) + mac1X_red.m4(i_data_width+3 downto 0);
+      mac1X_red.mac   <= mac1X_red.m1(i_data_width+5 downto 0) + mac1X_red.m2(i_data_width+5 downto 0) + mac1X_red.m3(i_data_width+5 downto 0) + mac1X_red.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_1_red;
 MAC_X_2_red: process (clk) begin
@@ -342,7 +342,7 @@ MAC_X_2_red: process (clk) begin
       mac2X_red.m2    <= (k_4_x_4_red.k6 * blurMacKernel_11);
       mac2X_red.m3    <= (k_4_x_4_red.k7 * blurMacKernel_10);
       mac2X_red.m4    <= (k_4_x_4_red.k8 * blurMacKernel_9);
-      mac2X_red.mac   <= mac2X_red.m1(i_data_width+3 downto 0) + mac2X_red.m2(i_data_width+3 downto 0) + mac2X_red.m3(i_data_width+3 downto 0) + mac2X_red.m4(i_data_width+3 downto 0);
+      mac2X_red.mac   <= mac2X_red.m1(i_data_width+5 downto 0) + mac2X_red.m2(i_data_width+5 downto 0) + mac2X_red.m3(i_data_width+5 downto 0) + mac2X_red.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_2_red;
 MAC_X_3_red: process (clk) begin
@@ -351,7 +351,7 @@ MAC_X_3_red: process (clk) begin
       mac3X_red.m2    <= (k_4_x_4_red.k10 * blurMacKernel_7);
       mac3X_red.m3    <= (k_4_x_4_red.k11 * blurMacKernel_6);
       mac3X_red.m4    <= (k_4_x_4_red.k12 * blurMacKernel_5);
-      mac3X_red.mac   <= mac3X_red.m1(i_data_width+3 downto 0) + mac3X_red.m2(i_data_width+3 downto 0) + mac3X_red.m3(i_data_width+3 downto 0) + mac3X_red.m4(i_data_width+3 downto 0);
+      mac3X_red.mac   <= mac3X_red.m1(i_data_width+5 downto 0) + mac3X_red.m2(i_data_width+5 downto 0) + mac3X_red.m3(i_data_width+5 downto 0) + mac3X_red.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_3_red;
 MAC_X_4_red: process (clk) begin
@@ -360,7 +360,7 @@ MAC_X_4_red: process (clk) begin
       mac4X_red.m2    <= (k_4_x_4_red.k14 * blurMacKernel_3);
       mac4X_red.m3    <= (k_4_x_4_red.k15 * blurMacKernel_2);
       mac4X_red.m4    <= (k_4_x_4_red.k16 * blurMacKernel_1);
-      mac4X_red.mac   <= mac4X_red.m1(i_data_width+3 downto 0) + mac4X_red.m2(i_data_width+3 downto 0) + mac4X_red.m3(i_data_width+3 downto 0) + mac4X_red.m4(i_data_width+3 downto 0);
+      mac4X_red.mac   <= mac4X_red.m1(i_data_width+5 downto 0) + mac4X_red.m2(i_data_width+5 downto 0) + mac4X_red.m3(i_data_width+5 downto 0) + mac4X_red.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_4_red;
 PA_X_red: process (clk, rst_l) begin
@@ -370,14 +370,14 @@ PA_X_red: process (clk, rst_l) begin
       pa_data_red <= mac1X_red.mac + mac2X_red.mac + mac3X_red.mac + mac4X_red.mac;
   end if;
 end process PA_X_red;
-blurRgb.red <= std_logic_vector(pa_data_red(i_data_width+3 downto 0));
+blurRgb.red <= std_logic_vector(pa_data_red(i_data_width+5 downto 2));
 MAC_X_1_gre: process (clk) begin
   if rising_edge(clk) then
       mac1X_gre.m1    <= (k_4_x_4_gre.k1 * blurMacKernel_16);
       mac1X_gre.m2    <= (k_4_x_4_gre.k2 * blurMacKernel_15);
       mac1X_gre.m3    <= (k_4_x_4_gre.k3 * blurMacKernel_14);
       mac1X_gre.m4    <= (k_4_x_4_gre.k4 * blurMacKernel_13);
-      mac1X_gre.mac   <= mac1X_gre.m1(i_data_width+3 downto 0) + mac1X_gre.m2(i_data_width+3 downto 0) + mac1X_gre.m3(i_data_width+3 downto 0) + mac1X_gre.m4(i_data_width+3 downto 0);
+      mac1X_gre.mac   <= mac1X_gre.m1(i_data_width+5 downto 0) + mac1X_gre.m2(i_data_width+5 downto 0) + mac1X_gre.m3(i_data_width+5 downto 0) + mac1X_gre.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_1_gre;
 MAC_X_2_gre: process (clk) begin
@@ -386,7 +386,7 @@ MAC_X_2_gre: process (clk) begin
       mac2X_gre.m2    <= (k_4_x_4_gre.k6 * blurMacKernel_11);
       mac2X_gre.m3    <= (k_4_x_4_gre.k7 * blurMacKernel_10);
       mac2X_gre.m4    <= (k_4_x_4_gre.k8 * blurMacKernel_9);
-      mac2X_gre.mac   <= mac2X_gre.m1(i_data_width+3 downto 0) + mac2X_gre.m2(i_data_width+3 downto 0) + mac2X_gre.m3(i_data_width+3 downto 0) + mac2X_gre.m4(i_data_width+3 downto 0);
+      mac2X_gre.mac   <= mac2X_gre.m1(i_data_width+5 downto 0) + mac2X_gre.m2(i_data_width+5 downto 0) + mac2X_gre.m3(i_data_width+5 downto 0) + mac2X_gre.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_2_gre;
 MAC_X_3_gre: process (clk) begin
@@ -395,7 +395,7 @@ MAC_X_3_gre: process (clk) begin
       mac3X_gre.m2    <= (k_4_x_4_gre.k10 * blurMacKernel_7);
       mac3X_gre.m3    <= (k_4_x_4_gre.k11 * blurMacKernel_6);
       mac3X_gre.m4    <= (k_4_x_4_gre.k12 * blurMacKernel_5);
-      mac3X_gre.mac   <= mac3X_gre.m1(i_data_width+3 downto 0) + mac3X_gre.m2(i_data_width+3 downto 0) + mac3X_gre.m3(i_data_width+3 downto 0) + mac3X_gre.m4(i_data_width+3 downto 0);
+      mac3X_gre.mac   <= mac3X_gre.m1(i_data_width+5 downto 0) + mac3X_gre.m2(i_data_width+5 downto 0) + mac3X_gre.m3(i_data_width+5 downto 0) + mac3X_gre.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_3_gre;
 MAC_X_4_gre: process (clk) begin
@@ -404,7 +404,7 @@ MAC_X_4_gre: process (clk) begin
       mac4X_gre.m2    <= (k_4_x_4_gre.k14 * blurMacKernel_3);
       mac4X_gre.m3    <= (k_4_x_4_gre.k15 * blurMacKernel_2);
       mac4X_gre.m4    <= (k_4_x_4_gre.k16 * blurMacKernel_1);
-      mac4X_gre.mac   <= mac4X_gre.m1(i_data_width+3 downto 0) + mac4X_gre.m2(i_data_width+3 downto 0) + mac4X_gre.m3(i_data_width+3 downto 0) + mac4X_gre.m4(i_data_width+3 downto 0);
+      mac4X_gre.mac   <= mac4X_gre.m1(i_data_width+5 downto 0) + mac4X_gre.m2(i_data_width+5 downto 0) + mac4X_gre.m3(i_data_width+5 downto 0) + mac4X_gre.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_4_gre;
 PA_X_gre: process (clk, rst_l) begin
@@ -414,14 +414,14 @@ PA_X_gre: process (clk, rst_l) begin
       pa_data_gre <= mac1X_gre.mac + mac2X_gre.mac + mac3X_gre.mac + mac4X_gre.mac;
   end if;
 end process PA_X_gre;
-blurRgb.green <= std_logic_vector(pa_data_gre(i_data_width+3 downto 0));
+blurRgb.green <= std_logic_vector(pa_data_gre(i_data_width+5 downto 2));
 MAC_X_1_blu: process (clk) begin
   if rising_edge(clk) then
       mac1X_blu.m1    <= (k_4_x_4_blu.k1 * blurMacKernel_16);
       mac1X_blu.m2    <= (k_4_x_4_blu.k2 * blurMacKernel_15);
       mac1X_blu.m3    <= (k_4_x_4_blu.k3 * blurMacKernel_14);
       mac1X_blu.m4    <= (k_4_x_4_blu.k4 * blurMacKernel_13);
-      mac1X_blu.mac   <= mac1X_blu.m1(i_data_width+3 downto 0) + mac1X_blu.m2(i_data_width+3 downto 0) + mac1X_blu.m3(i_data_width+3 downto 0) + mac1X_blu.m4(i_data_width+3 downto 0);
+      mac1X_blu.mac   <= mac1X_blu.m1(i_data_width+5 downto 0) + mac1X_blu.m2(i_data_width+5 downto 0) + mac1X_blu.m3(i_data_width+5 downto 0) + mac1X_blu.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_1_blu;
 MAC_X_2_blu: process (clk) begin
@@ -430,7 +430,7 @@ MAC_X_2_blu: process (clk) begin
       mac2X_blu.m2    <= (k_4_x_4_blu.k6 * blurMacKernel_11);
       mac2X_blu.m3    <= (k_4_x_4_blu.k7 * blurMacKernel_10);
       mac2X_blu.m4    <= (k_4_x_4_blu.k8 * blurMacKernel_9);
-      mac2X_blu.mac   <= mac2X_blu.m1(i_data_width+3 downto 0) + mac2X_blu.m2(i_data_width+3 downto 0) + mac2X_blu.m3(i_data_width+3 downto 0) + mac2X_blu.m4(i_data_width+3 downto 0);
+      mac2X_blu.mac   <= mac2X_blu.m1(i_data_width+5 downto 0) + mac2X_blu.m2(i_data_width+5 downto 0) + mac2X_blu.m3(i_data_width+5 downto 0) + mac2X_blu.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_2_blu;
 MAC_X_3_blu: process (clk) begin
@@ -439,7 +439,7 @@ MAC_X_3_blu: process (clk) begin
       mac3X_blu.m2    <= (k_4_x_4_blu.k10 * blurMacKernel_7);
       mac3X_blu.m3    <= (k_4_x_4_blu.k11 * blurMacKernel_6);
       mac3X_blu.m4    <= (k_4_x_4_blu.k12 * blurMacKernel_5);
-      mac3X_blu.mac   <= mac3X_blu.m1(i_data_width+3 downto 0) + mac3X_blu.m2(i_data_width+3 downto 0) + mac3X_blu.m3(i_data_width+3 downto 0) + mac3X_blu.m4(i_data_width+3 downto 0);
+      mac3X_blu.mac   <= mac3X_blu.m1(i_data_width+5 downto 0) + mac3X_blu.m2(i_data_width+5 downto 0) + mac3X_blu.m3(i_data_width+5 downto 0) + mac3X_blu.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_3_blu;
 MAC_X_4_blu: process (clk) begin
@@ -448,7 +448,7 @@ MAC_X_4_blu: process (clk) begin
       mac4X_blu.m2    <= (k_4_x_4_blu.k14 * blurMacKernel_3);
       mac4X_blu.m3    <= (k_4_x_4_blu.k15 * blurMacKernel_2);
       mac4X_blu.m4    <= (k_4_x_4_blu.k16 * blurMacKernel_1);
-      mac4X_blu.mac   <= mac4X_blu.m1(i_data_width+3 downto 0) + mac4X_blu.m2(i_data_width+3 downto 0) + mac4X_blu.m3(i_data_width+3 downto 0) + mac4X_blu.m4(i_data_width+3 downto 0);
+      mac4X_blu.mac   <= mac4X_blu.m1(i_data_width+5 downto 0) + mac4X_blu.m2(i_data_width+5 downto 0) + mac4X_blu.m3(i_data_width+5 downto 0) + mac4X_blu.m4(i_data_width+5 downto 0);
   end if;
 end process MAC_X_4_blu;
 PA_X_blu: process (clk, rst_l) begin
@@ -458,7 +458,7 @@ PA_X_blu: process (clk, rst_l) begin
       pa_data_blu <= mac1X_blu.mac + mac2X_blu.mac + mac3X_blu.mac + mac4X_blu.mac;
   end if;
 end process PA_X_blu;
-blurRgb.blue <= std_logic_vector(pa_data_blu(i_data_width+3 downto 0));
+blurRgb.blue <= std_logic_vector(pa_data_blu(i_data_width+5 downto 2));
     blur_rgb.red   <= blurRgb.red(iMSB downto iLSB);
     blur_rgb.green <= blurRgb.green(iMSB downto iLSB);
     blur_rgb.blue  <= blurRgb.blue(iMSB downto iLSB);

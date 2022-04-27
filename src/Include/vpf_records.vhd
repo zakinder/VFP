@@ -18,7 +18,6 @@ type ty1sf is record
     k8               : sfixed(4 downto -3);
     k9               : sfixed(4 downto -3);
 end record;
-
 type ty7sf is record
     n1               : integer;
     n2               : integer;
@@ -33,7 +32,6 @@ type ty7sf is record
     k8               : sfixed(16 downto -3);
     k9               : sfixed(16 downto -3);
 end record;
-
 type ty24sf_3 is record
     k1               : sfixed(26 downto -3);
     k2               : sfixed(26 downto -3);
@@ -45,9 +43,6 @@ type ty24sf_3 is record
     k8               : sfixed(26 downto -3);
     k9               : sfixed(26 downto -3);
 end record;
-
-
-
 type ty8sf is record
     k1               : sfixed(26 downto -3);
     k2               : sfixed(26 downto -3);
@@ -59,11 +54,6 @@ type ty8sf is record
     k8               : sfixed(26 downto -3);
     k9               : sfixed(26 downto -3);
 end record;
-
-
-
-
-
 type ty2sf is record
     k1               : sfixed(24 downto -3);
     k2               : sfixed(24 downto -3);
@@ -75,7 +65,6 @@ type ty2sf is record
     k8               : sfixed(24 downto -3);
     k9               : sfixed(24 downto -3);
 end record;
-
 type ty9sn is record
     k1               : signed(21 downto 0);
     k2               : signed(21 downto 0);
@@ -87,7 +76,6 @@ type ty9sn is record
     k8               : signed(21 downto 0);
     k9               : signed(21 downto 0);
 end record;
-
 type ty2sn is record
     k1               : signed(19 downto 0);
     k2               : signed(19 downto 0);
@@ -99,8 +87,6 @@ type ty2sn is record
     k8               : signed(19 downto 0);
     k9               : signed(19 downto 0);
 end record;
-
-
 type ty1sn is record
     k1               : signed(14 downto 0);
     k2               : signed(14 downto 0);
@@ -148,22 +134,31 @@ type t15b3kksn is record
     k16              : sfixed(15 downto -3);
 end record;
 type k16natrual is record
-    k1               : natural;
-    k2               : natural;
-    k3               : natural;
-    k4               : natural;
-    k5               : natural;
-    k6               : natural;
-    k7               : natural;
-    k8               : natural;
-    k9               : natural;
-    k10              : natural;
-    k11              : natural;
-    k12              : natural;
-    k13              : natural;
-    k14              : natural;
-    k15              : natural;
-    k16              : natural;
+  k1                : natural;
+  k2                : natural;
+  k3                : natural;
+  k4                : natural;
+  k5                : natural;
+  k6                : natural;
+  k7                : natural;
+  k8                : natural;
+  k9                : natural;
+  k10               : natural;
+  k11               : natural;
+  k12               : natural;
+  k13               : natural;
+  k14               : natural;
+  k15               : natural;
+  k16               : natural;
+  k17               : natural;
+  k18               : natural;
+  k19               : natural;
+  k20               : natural;
+  k21               : natural;
+  k22               : natural;
+  k23               : natural;
+  k24               : natural;
+  k25               : natural;
 end record;
 type t14b4ksn is record
     k1               : sfixed(16 downto -2);
@@ -374,6 +369,21 @@ type k_3by3 is record
     row_2    : std_logic_vector(23 downto 0);
     row_3    : std_logic_vector(23 downto 0);
     row_4    : std_logic_vector(23 downto 0);
+    row_5    : std_logic_vector(23 downto 0);
+    row_6    : std_logic_vector(23 downto 0);
+    row_7    : std_logic_vector(23 downto 0);
+    row_8    : std_logic_vector(23 downto 0);
+end record;
+type k_9by9 is record
+    pixel_1    : std_logic_vector(23 downto 0);
+    pixel_2    : std_logic_vector(23 downto 0);
+    pixel_3    : std_logic_vector(23 downto 0);
+    pixel_4    : std_logic_vector(23 downto 0);
+    pixel_5    : std_logic_vector(23 downto 0);
+    pixel_6    : std_logic_vector(23 downto 0);
+    pixel_7    : std_logic_vector(23 downto 0);
+    pixel_8    : std_logic_vector(23 downto 0);
+    pixel_9    : std_logic_vector(23 downto 0);
 end record;
 type ty2fl is record
     k1               : float32;
@@ -425,9 +435,172 @@ type kkkCoeff is record
     k14              : std_logic_vector(7 downto 0);
     k15              : std_logic_vector(7 downto 0);
     k16              : std_logic_vector(7 downto 0);
+    k17              : std_logic_vector(7 downto 0);
+    k18              : std_logic_vector(7 downto 0);
+    k19              : std_logic_vector(7 downto 0);
+    k20              : std_logic_vector(7 downto 0);
+    k21              : std_logic_vector(7 downto 0);
+    k22              : std_logic_vector(7 downto 0);
+    k23              : std_logic_vector(7 downto 0);
+    k24              : std_logic_vector(7 downto 0);
+    k25              : std_logic_vector(7 downto 0);
+    k26              : std_logic_vector(7 downto 0);
+    k27              : std_logic_vector(7 downto 0);
+    k28              : std_logic_vector(7 downto 0);
+    k29              : std_logic_vector(7 downto 0);
+    k30              : std_logic_vector(7 downto 0);
+    k31              : std_logic_vector(7 downto 0);
+    k32              : std_logic_vector(7 downto 0);
+    k33              : std_logic_vector(7 downto 0);
+    k34              : std_logic_vector(7 downto 0);
+    k35              : std_logic_vector(7 downto 0);
+    k36              : std_logic_vector(7 downto 0);
+    k37              : std_logic_vector(7 downto 0);
+    k38              : std_logic_vector(7 downto 0);
+    k39              : std_logic_vector(7 downto 0);
+    k40              : std_logic_vector(7 downto 0);
+    k41              : std_logic_vector(7 downto 0);
+    k42              : std_logic_vector(7 downto 0);
+    k43              : std_logic_vector(7 downto 0);
+    k44              : std_logic_vector(7 downto 0);
+    k45              : std_logic_vector(7 downto 0);
+    k46              : std_logic_vector(7 downto 0);
+    k47              : std_logic_vector(7 downto 0);
+    k48              : std_logic_vector(7 downto 0);
+    k49              : std_logic_vector(7 downto 0);
+    k50              : std_logic_vector(7 downto 0);
+    k51              : std_logic_vector(7 downto 0);
+    k52              : std_logic_vector(7 downto 0);
+    k53              : std_logic_vector(7 downto 0);
+    k54              : std_logic_vector(7 downto 0);
+    k55              : std_logic_vector(7 downto 0);
+    k56              : std_logic_vector(7 downto 0);
+    k57              : std_logic_vector(7 downto 0);
+    k58              : std_logic_vector(7 downto 0);
+    k59              : std_logic_vector(7 downto 0);
+    k60              : std_logic_vector(7 downto 0);
+    k61              : std_logic_vector(7 downto 0);
+    k62              : std_logic_vector(7 downto 0);
+    k63              : std_logic_vector(7 downto 0);
+    k64              : std_logic_vector(7 downto 0);
+    k65              : std_logic_vector(7 downto 0);
+    k66              : std_logic_vector(7 downto 0);
+    k67              : std_logic_vector(7 downto 0);
+    k68              : std_logic_vector(7 downto 0);
+    k69              : std_logic_vector(7 downto 0);
+    k70              : std_logic_vector(7 downto 0);
+    k71              : std_logic_vector(7 downto 0);
+    k72              : std_logic_vector(7 downto 0);
+    k73              : std_logic_vector(7 downto 0);
+    k74              : std_logic_vector(7 downto 0);
+    k75              : std_logic_vector(7 downto 0);
+    k76              : std_logic_vector(7 downto 0);
+    k77              : std_logic_vector(7 downto 0);
+    k78              : std_logic_vector(7 downto 0);
+    k79              : std_logic_vector(7 downto 0);
+    k80              : std_logic_vector(7 downto 0);
+    k81              : std_logic_vector(7 downto 0);
+end record;
+type k_9by9_rgb is record
+    red              : kkkCoeff;
+    green            : kkkCoeff;
+    blue             : kkkCoeff;
+end record;
+type k_9x9_rgb_values_integers is record
+    k1               : natural;
+    k2               : natural;
+    k3               : natural;
+    k4               : natural;
+    k5               : natural;
+    k6               : natural;
+    k7               : natural;
+    k8               : natural;
+    k9               : natural;
+    k10              : natural;
+    k11              : natural;
+    k12              : natural;
+    k13              : natural;
+    k14              : natural;
+    k15              : natural;
+    k16              : natural;
+    k17              : natural;
+    k18              : natural;
+    k19              : natural;
+    k20              : natural;
+    k21              : natural;
+    k22              : natural;
+    k23              : natural;
+    k24              : natural;
+    k25              : natural;
+    k26              : natural;
+    k27              : natural;
+    k28              : natural;
+    k29              : natural;
+    k30              : natural;
+    k31              : natural;
+    k32              : natural;
+    k33              : natural;
+    k34              : natural;
+    k35              : natural;
+    k36              : natural;
+    k37              : natural;
+    k38              : natural;
+    k39              : natural;
+    k40              : natural;
+    k41              : natural;
+    k42              : natural;
+    k43              : natural;
+    k44              : natural;
+    k45              : natural;
+    k46              : natural;
+    k47              : natural;
+    k48              : natural;
+    k49              : natural;
+    k50              : natural;
+    k51              : natural;
+    k52              : natural;
+    k53              : natural;
+    k54              : natural;
+    k55              : natural;
+    k56              : natural;
+    k57              : natural;
+    k58              : natural;
+    k59              : natural;
+    k60              : natural;
+    k61              : natural;
+    k62              : natural;
+    k63              : natural;
+    k64              : natural;
+    k65              : natural;
+    k66              : natural;
+    k67              : natural;
+    k68              : natural;
+    k69              : natural;
+    k70              : natural;
+    k71              : natural;
+    k72              : natural;
+    k73              : natural;
+    k74              : natural;
+    k75              : natural;
+    k76              : natural;
+    k77              : natural;
+    k78              : natural;
+    k79              : natural;
+    k80              : natural;
+    k81              : natural;
+end record;
+type k_9by9_rgb_integers is record
+    red              : k_9x9_rgb_values_integers;
+    green            : k_9x9_rgb_values_integers;
+    blue             : k_9x9_rgb_values_integers;
 end record;
 
-
+type filters_size_rgb_integers is record
+    filter_size_3x3  : k_9by9_rgb_integers;
+    filter_size_5x5  : k_9by9_rgb_integers;
+    filter_size_7x7  : k_9by9_rgb_integers;
+    filter_size_9x9  : k_9by9_rgb_integers;
+end record;
 
 type rgbToSfRecord is record
     red              : sfixed(9 downto 0);
@@ -449,13 +622,11 @@ type rgb_Sn_Sum_Record is record
     green            : signed(ADD_RESULT_WIDTH-1 downto 0);
     blue             : signed(ADD_RESULT_WIDTH-1 downto 0);
 end record;
-
 type rgb_Sn_Sum_Tr_Record is record
     red              : signed(13 downto 0);
     green            : signed(13 downto 0);
     blue             : signed(13 downto 0);
 end record;
-
 type rgbSnSumTrRecord is record
     red              : signed(12 downto 0);
     green            : signed(12 downto 0);
@@ -472,8 +643,6 @@ type ty46sf_6 is record
     k8               : sfixed(36 downto -6);
     k9               : sfixed(36 downto -6);
 end record;
-
-
 type ccRgbRecord is record
     rgbToSf          : rgbToSfRecord;
     ccSf             : ty7sf;
@@ -483,7 +652,6 @@ type ccRgbRecord is record
     rgbSnSum         : rgbSnSumRecord;
     rgbSnSumTr       : rgbSnSumTrRecord;
 end record;
-
 type cc_rgb_record is record
     rgbToSf          : rgbToSfRecord;
     ccSf             : ty7sf;
@@ -493,8 +661,6 @@ type cc_rgb_record is record
     rgbSnSum         : rgbSnSumRecord;
     rgbSnSumTr       : rgbSnSumTrRecord;
 end record;
-
-
 type rgbToFlRecord is record
     red              : float32;
     green            : float32;
@@ -544,15 +710,11 @@ type TapsRecord is record
     tpsd2            : tps;
     tpsd3            : tps;
 end record;
-
 type rgb_deltas is record
     delta               : t12ksn;
     delta_1syn          : t12ksn;
     delta_2syn          : t12ksn;
 end record;
-
-
-
 type rgb_delta is record
     delta               : t12ksn;
     delta_1syn          : t12ksn;
@@ -571,6 +733,22 @@ record
     n                : natural;
 end record;
 type type_valid_k is array(natural range <>) of type_valid_kn;
+type k_9by9_detect is record
+    k                 : type_valid_k(1 to 81);
+end record;
+type rgb_k_9by9_detect is record
+    red                 : k_9by9_detect;
+    green               : k_9by9_detect;
+    blue                : k_9by9_detect;
+end record;
+
+type filters_size_rgb_detect is record
+    filter_size_3x3  : rgb_k_9by9_detect;
+    filter_size_5x5  : rgb_k_9by9_detect;
+    filter_size_7x7  : rgb_k_9by9_detect;
+    filter_size_9x9  : rgb_k_9by9_detect;
+end record;
+
 type rgb_sumprod is record
   sumprod_2         : t14b4ksn;
   sumprod_2n        : t14b4ksn;
@@ -584,8 +762,6 @@ type rgb_sumprod is record
   sumprod_An        : t14b4ksn;
   sumprod_Bn        : t14b4ksn;
   sumprod_Cn        : t14b4ksn;
-  
-  
   add_12            : sfixed(17 downto -2);
   add_s12           : sfixed(17 downto -2);
   add_16            : sfixed(17 downto -2);
@@ -622,6 +798,9 @@ type rgb_sumprod is record
   add_s15           : sfixed(17 downto -2);
   add_125           : sfixed(18 downto -2);
   add_123           : sfixed(18 downto -2);
+  add_567           : sfixed(18 downto -2);
+  add_9_10_11       : sfixed(18 downto -2);
+  add_123_567_9_10_11 : sfixed(18 downto -2);
   add_124           : sfixed(18 downto -2);
   add_147           : sfixed(18 downto -2);
   add_145           : sfixed(18 downto -2);
@@ -680,133 +859,199 @@ type sf_bits is record
   k15               : sfixed(9 downto 0);
   k16               : sfixed(9 downto 0);
 end record;
+type rgbva is record
+  velocity                : t12kksn;
+  acceleration            : t12kksn;
+end record;
+type rgb_pixel_sum is record
+  pixels_01_02_03_04_05_06_07_08_09                : natural;
+  pixels_10_11_12_13_14_15_16_17_18                : natural;
+  pixels_19_20_21_22_23_24_25_26_27                : natural;
+  pixels_28_29_30_31_32_33_34_35_36                : natural;
+  pixels_37_38_39_40_41_42_43_44_45                : natural;
+  pixels_46_47_48_49_50_51_52_53_54                : natural;
+  pixels_55_56_57_58_59_60_61_62_63                : natural;
+  pixels_64_65_66_67_68_69_70_71_72                : natural;
+  pixels_73_74_75_76_77_78_79_80_81                : natural;
+  pixels_01_to_81                                  : natural;
+  pixels_01_02_03_3x3                              : natural;
+  pixels_10_11_12_3x3                              : natural;
+  pixels_19_20_21_3x3                              : natural;
+  pixels_01_to_21_3x3                              : natural;
+  pixels_01                                        : natural;
+  result                                           : std_logic_vector(7 downto 0);
+end record;
+
+type rgb_pixel_sum_values is record
+  red                : rgb_pixel_sum;
+  green              : rgb_pixel_sum;
+  blue               : rgb_pixel_sum;
+end record;
+
 type rgbSumProd is record
-  k1                : sfixed(9 downto 0);
-  k2                : sfixed(9 downto 0);
-  k3                : sfixed(9 downto 0);
-  k4                : sfixed(9 downto 0);
-  k5                : sfixed(9 downto 0);
-  k6                : sfixed(9 downto 0);
-  k7                : sfixed(9 downto 0);
-  k8                : sfixed(9 downto 0);
-  k9                : sfixed(9 downto 0);
-  k10               : sfixed(9 downto 0);
-  k11               : sfixed(9 downto 0);
-  k12               : sfixed(9 downto 0);
-  k13               : sfixed(9 downto 0);
-  k14               : sfixed(9 downto 0);
-  k15               : sfixed(9 downto 0);
-  k16               : sfixed(9 downto 0);
-  delta             : t12kksn;
-  delta_1syn        : t12kksn;
-  delta_2syn        : t12kksn;
-  delta_sum_0       : t11kksn;
-  delta_sum_1       : t11kksn;
-  delta_sum_2       : t11kksn;
-  delta_sum_3       : t11kksn;
-  delta_sum_prod_0  : t15b3kksn;
-  delta_sum_prod_1  : t15b3kksn;
+  k1                : natural;
+  k2                : natural;
+  k3                : natural;
+  k4                : natural;
+  k5                : natural;
+  k6                : natural;
+  k7                : natural;
+  k8                : natural;
+  k9                : natural;
+  k10               : natural;
+  k11               : natural;
+  k12               : natural;
+  k13               : natural;
+  k14               : natural;
+  k15               : natural;
+  k16               : natural;
+  k17               : natural;
+  k18               : natural;
+  k19               : natural;
+  k20               : natural;
+  k21               : natural;
+  k22               : natural;
+  k23               : natural;
+  k24               : natural;
+  k25               : natural;
+  delta             : k16natrual;
 end record;
 type rgb_sum_prod is record
-  sumprod_2         : t15b3kksn;
-  sumprod_2n        : t15b3kksn;
-  sumprod_3n        : t15b3kksn;
-  sumprod_4n        : t15b3kksn;
-  sumprod_5n        : t15b3kksn;
-  sumprod_6n        : t15b3kksn;
-  sumprod_7n        : t15b3kksn;
-  sumprod_8n        : t15b3kksn;
-  sumprod_9n        : t15b3kksn;
+  sumprod_2         : k16natrual;
+  sumprod_2n        : k16natrual;
+  sumprod_3n        : k16natrual;
+  sumprod_4n        : k16natrual;
+  sumprod_5n        : k16natrual;
+  sumprod_6n        : k16natrual;
+  sumprod_7n        : k16natrual;
+  sumprod_8n        : k16natrual;
+  sumprod_9n        : k16natrual;
   sumprod_An        : k16natrual;
   sumprod_Bn        : k16natrual;
   sumprod_Cn        : k16natrual;
   result            : std_logic_vector(13 downto 0);
 end record;
 type rgb_add_range is record
-  add_256            : natural;
-  add_16             : natural;
-  add_s16            : natural;
-  add_113            : natural;
-  add_s113           : natural;
-  add_116            : natural;
-  add_s116           : natural;
-  add_1316           : natural;
-  add_s1316          : natural;
-  add_141316         : natural;
-  add_s141316        : natural;
-  add_12345678       : natural;
-  add_9ABCDEFF       : natural;
-  add_123456789ABCDEFF : natural;
-  add_12             : natural;
-  add_34             : natural;
-  add_56             : natural;
-  add_78             : natural;
-  add_s12            : natural;
-  add_s34            : natural;
-  add_s56            : natural;
-  add_s78            : natural;
-  add_1234           : natural;
-  add_5678           : natural;
-  add_s1234          : natural;
-  add_s5678          : natural;
-  add_1_to_8         : integer;
-  add_s1_to_8        : natural;
-  add_s9             : natural;
-  add_1to8sp         : natural;
-  add_45             : natural;
-  add_s45            : natural;
-  add_14             : natural;
-  add_s14            : natural;
-  add_79             : natural;
-  add_s79            : natural;
-  add_17             : natural;
-  add_s17            : natural;
-  add_13             : natural;
-  add_s13            : natural;
-  add_15             : natural;
-  add_s15            : natural;
-  add_125            : natural;
-  add_123            : natural;
-  add_124            : natural;
-  add_147            : natural;
-  add_145            : natural;
-  add_1245           : natural;
-  add_s1245          : natural;
-  add_sp1245         : natural;
-  add_1379           : natural;
-  add_s1379          : natural;
-  add_sp1379         : natural;
-  add_s125           : natural;
-  add_sp125          : natural;
-  add_s123           : natural;
-  add_sp123          : natural;
-  add_s124           : natural;
-  add_sp124          : natural;
-  add_s147           : natural;
-  add_sp147          : natural;
-  add_s145           : natural;
-  add_sp145          : natural;
-  add_1256           : natural;
-  add_125639         : natural;
-  add_1256394        : natural;
-  add_125639_13      : natural;
-  add_1256394_13     : natural;
-  add_12563947_13_10 : natural;
+  add_12345             : natural;
+  add_6789_10           : natural;
+  add_11_12_13_14_15    : natural;
+  add_16_17_18_19_20    : natural;
+  add_21_22_23_24_25    : natural;
+  add_1_to_25           : natural;
+  add_256               : natural;
+  add_16                : natural;
+  add_s16               : natural;
+  add_113               : natural;
+  add_s113              : natural;
+  add_116               : natural;
+  add_s116              : natural;
+  add_1316              : natural;
+  add_s1316             : natural;
+  add_141316            : natural;
+  add_s141316           : natural;
+  add_12345678          : natural;
+  add_9ABCDEFF          : natural;
+  add_12345678_max      : natural;
+  add_9ABCDEFF_max      : natural;
+  add_123456789ABCDEFF  : natural;
+  add_12345678_max_new  : natural;
+  add_9ABCDEFF_max_new  : natural;
+  add_123456789ABCDEFF_new  : natural;
+  add_1                 : natural;
+  add_12                : natural;
+  add_34                : natural;
+  add_56                : natural;
+  add_78                : natural;
+  add_s12               : natural;
+  add_s34               : natural;
+  add_s56               : natural;
+  add_s78               : natural;
+  add_1234              : natural;
+  add_1234_max          : natural;
+  add_1234_min          : natural;
+  add_1234_sat          : natural;
+  add_5678              : natural;
+  add_s1234             : natural;
+  add_s5678             : natural;
+  add_1_to_8            : integer;
+  add_s1_to_8           : natural;
+  add_s9                : natural;
+  add_1to8sp            : natural;
+  add_45                : natural;
+  add_s45               : natural;
+  add_14                : natural;
+  add_s14               : natural;
+  add_79                : natural;
+  add_s79               : natural;
+  add_17                : natural;
+  add_s17               : natural;
+  add_13                : natural;
+  add_s13               : natural;
+  add_15                : natural;
+  add_s15               : natural;
+  add_125               : natural;
+  add_123               : natural;
+  add_567               : natural;
+  add_62                : natural;
+  add_65                : natural;
+  add_625               : natural;
+  add_6251              : natural;
+  add_61_11             : natural;
+  add_639               : natural;
+  add_657               : natural;
+  add_62_10             : natural;
+  add_6527_10           : integer;
+  add_9_10_11           : natural;
+  add_123_567_9_10_11   : natural;
+  add_678                : natural;
+  add_10_11_12           : natural;
+  add_14_15_16           : natural;
+  add_678_10_11_12_14_15_16   : natural;
+  row1                  : natural;
+  row2                  : natural;
+  row3                  : natural;
+  row4                  : natural;
+  row4x4                : natural;
+  add_124               : natural;
+  add_147               : natural;
+  add_145               : natural;
+  add_1245              : natural;
+  add_s1245             : natural;
+  add_sp1245            : natural;
+  add_1379              : natural;
+  add_s1379             : natural;
+  add_sp1379            : natural;
+  add_s125              : natural;
+  add_sp125             : natural;
+  add_s123              : natural;
+  add_sp123             : natural;
+  add_s124              : natural;
+  add_sp124             : natural;
+  add_s147              : natural;
+  add_sp147             : natural;
+  add_s145              : natural;
+  add_sp145             : natural;
+  add_1256              : natural;
+  add_125639            : natural;
+  add_1256394           : natural;
+  add_125639_13         : natural;
+  add_1256394_13        : natural;
+  add_12563947_13_10    : natural;
 end record;
 type rgb_detect_kernal is record
-    k                 : type_valid_k(0 to 16);
-    k_syn_1           : type_valid_k(0 to 16);
-    k_syn_2           : type_valid_k(0 to 16);
-    k_syn_3           : type_valid_k(0 to 16);
-    k_syn_4           : type_valid_k(0 to 16);
-    k_syn_5           : type_valid_k(0 to 16);
-    k_syn_6           : type_valid_k(0 to 16);
-    k_syn_7           : type_valid_k(0 to 16);
-    k_syn_8           : type_valid_k(0 to 16);
-    k_syn_9           : type_valid_k(0 to 16);
-    k_syn_10          : type_valid_k(0 to 16);
-    k_syn_11          : type_valid_k(0 to 16);
-    k_syn_12          : type_valid_k(0 to 16);
+    k                 : type_valid_k(0 to 25);
+    k_syn_1           : type_valid_k(0 to 25);
+    k_syn_2           : type_valid_k(0 to 25);
+    k_syn_3           : type_valid_k(0 to 25);
+    k_syn_4           : type_valid_k(0 to 25);
+    k_syn_5           : type_valid_k(0 to 25);
+    k_syn_6           : type_valid_k(0 to 25);
+    k_syn_7           : type_valid_k(0 to 25);
+    k_syn_8           : type_valid_k(0 to 25);
+    k_syn_9           : type_valid_k(0 to 25);
+    k_syn_10          : type_valid_k(0 to 25);
+    k_syn_11          : type_valid_k(0 to 25);
+    k_syn_12          : type_valid_k(0 to 25);
 end record;
 type snFixedResizeRecord is record
     fxToSnFxProd     : ty2std;
@@ -1056,6 +1301,14 @@ type frameColors is record
     ccc6              : channel;
     ccc7              : channel;
     ccc8              : channel;
+    ccm1              : channel;
+    ccm2              : channel;
+    ccm3              : channel;
+    ccm4              : channel;
+    ccm5              : channel;
+    ccm6              : channel;
+    ccm7              : channel;
+    ccm8              : channel;
     colorhsl          : channel;
     hsl1_range        : channel;
     hsl2_range        : channel;
@@ -1319,7 +1572,6 @@ type rTp is record
     taps             : tp;
     cord             : coord;
 end record;
-
 type w_pixels is record
     pix1 : unsigned(i_data_width downto 0);
     pix2 : unsigned(i_data_width downto 0);
@@ -1331,7 +1583,6 @@ type w_pixels is record
     pix8 : unsigned(i_data_width downto 0);
     pix9 : unsigned(i_data_width downto 0);
 end record;
-
 type w_4_by_4_pixels is record
     k1  : unsigned(i_data_width downto 0);
     k2  : unsigned(i_data_width downto 0);
@@ -1350,7 +1601,6 @@ type w_4_by_4_pixels is record
     k15 : unsigned(i_data_width downto 0);
     k16 : unsigned(i_data_width downto 0);
 end record;
-
 type w_3_by_3_pixels is record
     k1  : unsigned(23 downto 0);
     k2  : unsigned(23 downto 0);
@@ -1362,7 +1612,6 @@ type w_3_by_3_pixels is record
     k8  : unsigned(23 downto 0);
     k9  : unsigned(23 downto 0);
 end record;
-
 type w_3_by_3_pixels_28_width is record
     k1  : unsigned(31 downto 0);
     k2  : unsigned(31 downto 0);
@@ -1374,7 +1623,6 @@ type w_3_by_3_pixels_28_width is record
     k8  : unsigned(31 downto 0);
     k9  : unsigned(31 downto 0);
 end record;
-
 type itaps is record
     iTap1  : unsigned(i_data_width downto 0);
     iTap2  : unsigned(i_data_width downto 0);
@@ -1386,16 +1634,13 @@ type unsig_pixel_mac is record
     m3      : unsigned (16 downto 0);
     mac     : unsigned (i_data_width+3 downto 0);
 end record;
-
 type unsig_pixel_4by4mac is record
     m1      : unsigned (16 downto 0);
     m2      : unsigned (16 downto 0);
     m3      : unsigned (16 downto 0);
     m4      : unsigned (16 downto 0);
-    mac     : unsigned (i_data_width+3 downto 0);
+    mac     : unsigned (i_data_width+5 downto 0);
 end record;
-
-
 type fcolors is record
     sobel             : channel;
     embos             : channel;

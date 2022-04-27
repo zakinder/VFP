@@ -3,6 +3,8 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.fixed_pkg.all;
+use work.float_pkg.all;
 use work.constants_package.all;
 use work.vpf_records.all;
 package ports_package is
@@ -69,6 +71,14 @@ generic (
     L6CGA                    : boolean := false;
     L7CGA                    : boolean := false;
     L8CGA                    : boolean := false;
+    LCCM1                    : boolean := false;
+    LCCM2                    : boolean := false;
+    LCCM3                    : boolean := false;
+    LCCM4                    : boolean := false;
+    LCCM5                    : boolean := false;
+    LCCM6                    : boolean := false;
+    LCCM7                    : boolean := false;
+    LCCM8                    : boolean := false;
     L_YCC                    : boolean := false;
     L_SHP                    : boolean := false;
     L_D1T                    : boolean := false;
@@ -436,6 +446,31 @@ port (
     iRgb                        : in channel;
     oRgb                        : out channel);
 end component recolor_space;
+component pixel_localization is
+generic (
+    neighboring_pixel_threshold : integer := 1920;
+    img_width                   : integer := 1920;
+    i_data_width                : integer := 8);
+port (
+    clk                         : in  std_logic;
+    reset                       : in  std_logic;
+    iRgb                        : in channel;
+    txCord                      : in coord;
+    oRgb                        : out channel);
+end component pixel_localization;
+component recolor_space_cluster is
+generic (
+    neighboring_pixel_threshold : integer := 1920;
+    img_width                   : integer := 1920;
+    i_data_width                : integer := 8);
+port (
+    clk                         : in  std_logic;
+    reset                       : in  std_logic;
+    iRgb                        : in channel;
+    txCord                      : in coord;
+    oRgb                        : out channel);
+end component recolor_space_cluster;
+
 component color_avg is
 generic (
     i_data_width  : integer := 8);
@@ -643,6 +678,52 @@ port (
     tp2         : out std_logic_vector(tpDataWidth - 1 downto 0);
     tp3         : out std_logic_vector(tpDataWidth - 1 downto 0));
 end component rgb_4taps;
+component rgb_4_taps is
+generic (
+    img_width     : integer := 4096;
+    tpDataWidth   : integer := 8);
+port (
+    clk         : in std_logic;
+    iRgb        : in channel;
+    rst_l       : in std_logic;
+    tpValid     : out std_logic;
+    tap_1       : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tap_2       : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tap_3       : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tap_4       : out std_logic_vector(tpDataWidth - 1 downto 0));
+end component rgb_4_taps;
+component rgb_3_taps is
+generic (
+    img_width     : integer := 4096;
+    tpDataWidth   : integer := 8);
+port (
+    clk         : in std_logic;
+    iRgb        : in channel;
+    rst_l       : in std_logic;
+    tpValid     : out std_logic;
+    tap_1       : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tap_2       : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tap_3       : out std_logic_vector(tpDataWidth - 1 downto 0));
+end component rgb_3_taps;
+component rgb_8taps is
+generic (
+    img_width     : integer := 4096;
+    tpDataWidth   : integer := 8);
+port (
+    clk         : in std_logic;
+    iRgb        : in channel;
+    rst_l       : in std_logic;
+    tpValid     : out std_logic;
+    tp0         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp1         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp2         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp3         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp4         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp5         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp6         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp7         : out std_logic_vector(tpDataWidth - 1 downto 0);
+    tp8         : out std_logic_vector(tpDataWidth - 1 downto 0));
+end component rgb_8taps;
 component tapLine is
 generic (
     img_width    : integer := 4095;
@@ -1002,13 +1083,32 @@ port (
 end component color_correction;
 component rgb_contrast_brightness is
 generic (
-    exposer_val           : integer := 8);
+    exposer_val                 : integer := 8);
 port (
     clk                         : in std_logic;
     rst_l                       : in std_logic;
     iRgb                        : in channel;
     oRgb                        : out channel);
 end component rgb_contrast_brightness;
+component rgb_contrast_brightness_level_1 is
+generic (
+    contrast_val  : sfixed(16 downto -3) := to_sfixed(5.0,16,-3);
+    exposer_val                 : integer := 8);
+port (
+    clk                         : in std_logic;
+    rst_l                       : in std_logic;
+    iRgb                        : in channel;
+    oRgb                        : out channel);
+end component rgb_contrast_brightness_level_1;
+component rgb_contrast_brightness_level_2 is
+generic (
+    exposer_val                 : integer := 8);
+port (
+    clk                         : in std_logic;
+    rst_l                       : in std_logic;
+    iRgb                        : in channel;
+    oRgb                        : out channel);
+end component rgb_contrast_brightness_level_2;
 component recolor_rgb is
 generic (
     CCC1               : boolean := false;
@@ -1019,12 +1119,21 @@ generic (
     CCC6               : boolean := false;
     CCC7               : boolean := false;
     CCC8               : boolean := false;
+    CCM1               : boolean := false;
+    CCM2               : boolean := false;
+    CCM3               : boolean := false;
+    CCM4               : boolean := false;
+    CCM5               : boolean := false;
+    CCM6               : boolean := false;
+    CCM7               : boolean := false;
+    CCM8               : boolean := false;
     img_width          : integer := 8;
     i_k_config_number  : integer := 8);
 port (
     clk                         : in std_logic;
     rst_l                       : in std_logic;
     iRgb                        : in channel;
+    txCord                      : in coord;
     oRgb                        : out channel);
 end component recolor_rgb;
 component ccm is

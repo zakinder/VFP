@@ -111,6 +111,14 @@ generic (
     L6CGA                    : boolean := false;
     L7CGA                    : boolean := false;
     L8CGA                    : boolean := false;
+    LCCM1                    : boolean := false;
+    LCCM2                    : boolean := false;
+    LCCM3                    : boolean := false;
+    LCCM4                    : boolean := false;
+    LCCM5                    : boolean := false;
+    LCCM6                    : boolean := false;
+    LCCM7                    : boolean := false;
+    LCCM8                    : boolean := false;
     L_YCC                    : boolean := false;
     L_SHP                    : boolean := false;
     L_D1T                    : boolean := false;
@@ -206,6 +214,14 @@ architecture Behavioral of filters is
     signal ccc6                : channel;
     signal ccc7                : channel;
     signal ccc8                : channel;
+    signal ccm1                : channel;
+    signal ccm2                : channel;
+    signal ccm3                : channel;
+    signal ccm4                : channel;
+    signal ccm5                : channel;
+    signal ccm6                : channel;
+    signal ccm7                : channel;
+    signal ccm8                : channel;
     signal rgb_contrast_bright : channel;
 begin
     edgeValid                 <= sEdgeValid;
@@ -317,7 +333,7 @@ port map (
     clk                => clk,
     reset              => rst_l,
     txCord             => txCord,
-    iRgb               => rgb,
+    iRgb               => rgb_contrast_bright,
     oRgb               => rgb_histo);
 end generate L_HIS_ENABLE;
 L_SPC_ENABLE: if (L_SPC = true) generate
@@ -662,7 +678,7 @@ port map(
     txCord              => txCord,
     iLumTh              => iLumTh,
     iSobelTh            => iSobelTh,
-    iRgb                => rgb_contrast_bright,
+    iRgb                => iRgb,
     iKcoeff             => iKcoeff,
     iFilterId           => iFilterId,
     oKcoeff             => oKcoeff,
@@ -676,7 +692,7 @@ generic map (
 port map (                  
     clk                   => clk,
     rst_l                 => rst_l,
-    iRgb                  => rgb,
+    iRgb                  => rgb_contrast_bright,
     oRgbRemix             => rgbLocFilt.lcobj);
 objSyncr_inst  : sync_frames
 generic map(
@@ -742,7 +758,7 @@ L1CGA_ENABLE: if (L1CGA = true) generate
 begin
 l1cga_recolor_rgb_inst: recolor_rgb
 generic map (
-    CCC1               => true,
+    CCC1               => L1CGA,
     CCC2               => false,
     CCC3               => false,
     CCC4               => false,
@@ -750,12 +766,21 @@ generic map (
     CCC6               => false,
     CCC7               => false,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc1);
 end generate L1CGA_ENABLE;
     fRgb.ccc1        <= ccc1;
@@ -764,19 +789,28 @@ begin
 l2cga_recolor_rgb_inst: recolor_rgb
 generic map (
     CCC1               => false,
-    CCC2               => true,
+    CCC2               => L2CGA,
     CCC3               => false,
     CCC4               => false,
     CCC5               => false,
     CCC6               => false,
     CCC7               => false,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc2);
 end generate L2CGA_ENABLE;
     fRgb.ccc2        <= ccc2;
@@ -786,18 +820,27 @@ l3cga_recolor_rgb_inst: recolor_rgb
 generic map (
     CCC1               => false,
     CCC2               => false,
-    CCC3               => true,
+    CCC3               => L3CGA,
     CCC4               => false,
     CCC5               => false,
     CCC6               => false,
     CCC7               => false,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc3);
 end generate L3CGA_ENABLE;
     fRgb.ccc3        <= ccc3;
@@ -808,17 +851,26 @@ generic map (
     CCC1               => false,
     CCC2               => false,
     CCC3               => false,
-    CCC4               => true,
+    CCC4               => L4CGA,
     CCC5               => false,
     CCC6               => false,
     CCC7               => false,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc4);
 end generate L4CGA_ENABLE;
     fRgb.ccc4        <= ccc4;
@@ -831,16 +883,25 @@ generic map (
     CCC2               => false,
     CCC3               => false,
     CCC4               => false,
-    CCC5               => true,
+    CCC5               => L5CGA,
     CCC6               => false,
     CCC7               => false,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc5);
 end generate L5CGA_ENABLE;
     fRgb.ccc5        <= ccc5;
@@ -853,15 +914,24 @@ generic map (
     CCC3               => false,
     CCC4               => false,
     CCC5               => false,
-    CCC6               => true,
+    CCC6               => L6CGA,
     CCC7               => false,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc6);
 end generate L6CGA_ENABLE;
     fRgb.ccc6        <= ccc6;
@@ -875,14 +945,23 @@ generic map (
     CCC4               => false,
     CCC5               => false,
     CCC6               => false,
-    CCC7               => true,
+    CCC7               => L7CGA,
     CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc7);
 end generate L7CGA_ENABLE;
     fRgb.ccc7        <= ccc7;
@@ -897,16 +976,296 @@ generic map (
     CCC5               => false,
     CCC6               => false,
     CCC7               => false,
-    CCC8               => true,
+    CCC8               => L8CGA,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
     img_width          => img_width,
     i_k_config_number  => i_data_width)
 port map (                  
     clk                => clk,
     rst_l              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => ccc8);
 end generate L8CGA_ENABLE;
     fRgb.ccc8        <= ccc8;
+    
+
+    
+    
+    
+    
+    
+LCCM1_ENABLE: if (LCCM1 = true) generate
+begin
+lccm1_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => LCCM1,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm1);
+end generate LCCM1_ENABLE;
+    fRgb.ccm1        <= ccm1;
+    
+
+LCCM2_ENABLE: if (LCCM2 = true) generate
+begin
+lccm2_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => LCCM2,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm2);
+end generate LCCM2_ENABLE;
+    fRgb.ccm2        <= ccm2;
+    
+    
+    
+    
+LCCM3_ENABLE: if (LCCM3 = true) generate
+begin
+lccm3_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => LCCM3,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm3);
+end generate LCCM3_ENABLE;
+    fRgb.ccm3        <= ccm3;
+    
+    
+LCCM4_ENABLE: if (LCCM4 = true) generate
+begin
+lccm4_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => LCCM4,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm4);
+end generate LCCM4_ENABLE;
+    fRgb.ccm4        <= ccm4;
+    
+    
+LCCM5_ENABLE: if (LCCM5 = true) generate
+begin
+lccm5_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => LCCM5,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm5);
+end generate LCCM5_ENABLE;
+    fRgb.ccm5        <= ccm5;
+    
+LCCM6_ENABLE: if (LCCM6 = true) generate
+begin
+lccm6_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => LCCM6,
+    CCM7               => false,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm6);
+end generate LCCM6_ENABLE;
+    fRgb.ccm6        <= ccm6;
+    
+    
+    
+    
+LCCM7_ENABLE: if (LCCM7 = true) generate
+begin
+lccm7_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => LCCM7,
+    CCM8               => false,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm7);
+end generate LCCM7_ENABLE;
+    fRgb.ccm7        <= ccm7;
+    
+    
+    
+LCCM8_ENABLE: if (LCCM8 = true) generate
+begin
+lccm8_recolor_rgb_inst: recolor_rgb
+generic map (
+    CCC1               => false,
+    CCC2               => false,
+    CCC3               => false,
+    CCC4               => false,
+    CCC5               => false,
+    CCC6               => false,
+    CCC7               => false,
+    CCC8               => false,
+    CCM1               => false,
+    CCM2               => false,
+    CCM3               => false,
+    CCM4               => false,
+    CCM5               => false,
+    CCM6               => false,
+    CCM7               => false,
+    CCM8               => LCCM8,
+    img_width          => img_width,
+    i_k_config_number  => i_data_width)
+port map (                  
+    clk                => clk,
+    rst_l              => rst_l,
+    iRgb               => iRgb,
+    txCord             => txCord,
+    oRgb               => ccm8);
+end generate LCCM8_ENABLE;
+    fRgb.ccm8        <= ccm8;
+    
+    
+    
+    
+    
+    
 L_SHP_ENABLE: if (L_SHP = true) generate
 begin
 l_shp_inst  : sharp_filter
@@ -933,27 +1292,19 @@ end generate L_SHP_ENABLE;
     fRgb.synSharp        <= rgbLocSynSFilt.sharp;
 L_YCC_ENABLE: if (L_YCC = true) generate
 begin
---l_ycc_inst  : rgb_ycbcr
---generic map(
---    i_data_width         => i_data_width,
---    i_precision          => 12,
---    i_full_range         => TRUE)
---port map(
---    clk                  => clk,
---    rst_l                => rst_l,
---    iRgb                 => rgb,
---    y                    => rgbLocFilt.ycbcr.red,
---    cb                   => rgbLocFilt.ycbcr.green,
---    cr                   => rgbLocFilt.ycbcr.blue,
---    oValid               => rgbLocFilt.ycbcr.valid);
-rgb_to_xyz_color_space_inst  : rgb_to_xyz_color_space
+l_ycc_inst  : rgb_ycbcr
 generic map(
-    i_data_width         => i_data_width)
+    i_data_width         => i_data_width,
+    i_precision          => 12,
+    i_full_range         => TRUE)
 port map(
     clk                  => clk,
-    reset                => rst_l,
-    iRgb                 => rgb,
-    oRgb                 => rgbLocFilt.ycbcr);
+    rst_l                => rst_l,
+    iRgb                 => rgb_contrast_bright,
+    y                    => rgbLocFilt.ycbcr.red,
+    cb                   => rgbLocFilt.ycbcr.green,
+    cr                   => rgbLocFilt.ycbcr.blue,
+    oValid               => rgbLocFilt.ycbcr.valid);
 yccSyncr_inst  : sync_frames
 generic map(
     pixelDelay           => 27)

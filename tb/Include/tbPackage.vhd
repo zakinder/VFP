@@ -22,7 +22,7 @@ package tbPackage is
     --       [1012_606  = 622  us]
     --       [1000_500  = 622  us]
     --       [1024_1024 = 1060 us]
-    constant readbmp             : string  := "500_500";
+    constant readbmp             : string  := "255_255";
     constant Histrograms         : string  := "Histrograms";
     constant img_width           : integer := image_size_width(readbmp);
     constant img_height          : integer := image_size_height(readbmp);

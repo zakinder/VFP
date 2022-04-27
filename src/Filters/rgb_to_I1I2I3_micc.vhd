@@ -134,9 +134,9 @@ process (clk) begin
     if rising_edge(clk) then
         i1_numerator        <= red_gre_sqr;
         i1_denominator      <= red_gre_sqr + gre_blu_sqr + blu_red_sqr;
-
     end if;
 end process;
+
         i1_quotient         <= ((i1_numerator/i1_denominator)) when i1_denominator /= 0;
         i1_value            <= i1_quotient;
 
@@ -144,9 +144,9 @@ process (clk) begin
     if rising_edge(clk) then
         i2_numerator        <= blu_red_sqr;
         i2_denominator      <= red_gre_sqr + gre_blu_sqr + blu_red_sqr;
-
     end if;
 end process;
+
         i2_quotient         <= ((i2_numerator/i2_denominator)) when i2_denominator /= 0;
         i2_value            <= i2_quotient;
 
@@ -154,9 +154,9 @@ process (clk) begin
     if rising_edge(clk) then
         i3_numerator        <= gre_blu_sqr;
         i3_denominator      <= red_gre_sqr + gre_blu_sqr + blu_red_sqr;
-
     end if;
 end process;
+
         i3_quotient         <= ((i3_numerator/i3_denominator)) when i3_denominator /= 0;
         i3_value            <= i3_quotient;
 

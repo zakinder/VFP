@@ -91,14 +91,25 @@ architecture Behavioral of kernel is
     signal rgbMac3         : channel := (valid => lo, red => black, green => black, blue => black);
     signal rgbSyncValid    : std_logic_vector(15 downto 0)  := x"0000";
     signal kCoProd         : kCoefFiltFloat;
-    signal cc1_sync        : channel;
-    signal cc2_sync        : channel;
-    signal cc3_sync        : channel;
-    signal cc4_sync        : channel;
-    signal cc5_sync        : channel;
-    signal cc6_sync        : channel;
-    signal cc7_sync        : channel;
-    signal cc8_sync        : channel;
+    signal cc1_sync          : channel;
+    signal cc2_sync          : channel;
+    signal cc3_sync          : channel;
+    signal cc4_sync          : channel;
+    signal cc5_sync          : channel;
+    signal cc6_sync          : channel;
+    signal cc7_sync          : channel;
+    signal cc8_sync          : channel;
+    signal cc1_cluster_range : channel;
+    signal cc2_cluster_range : channel;
+    signal cc3_cluster_range : channel;
+    signal cc4_cluster_range : channel;
+    signal cc5_cluster_range : channel;
+    signal cc6_cluster_range : channel;
+    signal cc7_cluster_range : channel;
+    signal cc8_cluster_range : channel;
+    
+    
+    
     signal cc1             : channel;
     signal cc2             : channel;
     signal cc3             : channel;
@@ -622,7 +633,7 @@ begin
 ----------------------------------------------------------
 sobel_ccm_inst  : ccm
 generic map(
-    i_k_config_number   => 1)
+    i_k_config_number   => 8)
 port map(
     clk                 => clk,
     rst_l               => rst_l,
@@ -1092,7 +1103,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc1_sync);
+    oRgb                => cc1_cluster_range);
+recolor_space_1_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc1_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc1_sync);
 sync_cc1_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1111,7 +1133,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc2_sync);
+    oRgb                => cc2_cluster_range);
+recolor_space_2_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc2_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc2_sync);
 sync_cc2_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1130,7 +1163,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc3_sync);
+    oRgb                => cc3_cluster_range);
+recolor_space_3_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc3_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc3_sync);
 sync_cc3_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1149,7 +1193,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc4_sync);
+    oRgb                => cc4_cluster_range);
+recolor_space_4_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc4_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc4_sync);
 sync_cc4_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1168,7 +1223,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc5_sync);
+    oRgb                => cc5_cluster_range);
+recolor_space_5_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc5_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc5_sync);
 sync_cc5_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1187,7 +1253,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc6_sync);
+    oRgb                => cc6_cluster_range);
+recolor_space_6_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc6_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc6_sync);
 sync_cc6_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1206,7 +1283,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc7_sync);
+    oRgb                => cc7_cluster_range);
+recolor_space_7_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc7_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc7_sync);
 sync_cc7_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1225,7 +1313,18 @@ port map(
     clk                 => clk,
     rst_l               => rst_l,
     iRgb                => iRgb,
-    oRgb                => cc8_sync);
+    oRgb                => cc8_cluster_range);
+recolor_space_8_inst: recolor_space_cluster
+generic map(
+    neighboring_pixel_threshold => 10,
+    img_width         => img_width,
+    i_data_width      => i_data_width)
+port map(
+    clk                => clk,
+    reset              => rst_l,
+    iRgb               => cc8_cluster_range,
+    txCord             => txCord,
+    oRgb               => cc8_sync);
 sync_cc8_inst  : sync_frames
 generic map(
     pixelDelay           => 58)
@@ -1467,7 +1566,7 @@ port map(
 end generate FMICC_FRAME_ENABLE;
 oRgb.micc <= micc;
 F_RE1_FRAME_ENABLE: if (F_RE1_FRAME = true) generate begin
-recolor_space_1_inst: recolor_space
+recolor_space_1_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 255,
     img_width         => img_width,
@@ -1476,11 +1575,12 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re1color);
 end generate F_RE1_FRAME_ENABLE;
 oRgb.re1color <= re1color;
 F_RE2_FRAME_ENABLE: if (F_RE2_FRAME = true) generate begin
-recolor_space_2_inst: recolor_space
+recolor_space_2_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 50,
     img_width         => img_width,
@@ -1489,10 +1589,11 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re2color);
 end generate F_RE2_FRAME_ENABLE;
 F_RE3_FRAME_ENABLE: if (F_RE3_FRAME = true) generate begin
-recolor_space_3_inst: recolor_space
+recolor_space_3_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 25,
     img_width         => img_width,
@@ -1501,10 +1602,11 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re3color);
 end generate F_RE3_FRAME_ENABLE;
 F_RE4_FRAME_ENABLE: if (F_RE4_FRAME = true) generate begin
-recolor_space_4_inst: recolor_space
+recolor_space_4_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 20,
     img_width         => img_width,
@@ -1513,10 +1615,11 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re4color);
 end generate F_RE4_FRAME_ENABLE;
 F_RE5_FRAME_ENABLE: if (F_RE5_FRAME = true) generate begin
-recolor_space_5_inst: recolor_space
+recolor_space_5_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 15,
     img_width         => img_width,
@@ -1525,10 +1628,11 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re5color);
 end generate F_RE5_FRAME_ENABLE;
 F_RE6_FRAME_ENABLE: if (F_RE6_FRAME = true) generate begin
-recolor_space_6_inst: recolor_space
+recolor_space_6_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 10,
     img_width         => img_width,
@@ -1537,10 +1641,11 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re6color);
 end generate F_RE6_FRAME_ENABLE;
 F_RE7_FRAME_ENABLE: if (F_RE7_FRAME = true) generate begin
-recolor_space_7_inst: recolor_space
+recolor_space_7_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 5,
     img_width         => img_width,
@@ -1549,10 +1654,11 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re7color);
 end generate F_RE7_FRAME_ENABLE;
 F_RE8_FRAME_ENABLE: if (F_RE8_FRAME = true) generate begin
-recolor_space_8_inst: recolor_space
+recolor_space_8_inst: recolor_space_cluster
 generic map(
     neighboring_pixel_threshold => 3,
     img_width         => img_width,
@@ -1561,6 +1667,7 @@ port map(
     clk                => clk,
     reset              => rst_l,
     iRgb               => iRgb,
+    txCord             => txCord,
     oRgb               => re8color);
 end generate F_RE8_FRAME_ENABLE;
 oRgb.re2color   <= re2color;

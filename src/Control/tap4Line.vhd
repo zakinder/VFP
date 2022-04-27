@@ -25,6 +25,11 @@ architecture arch of tap4Line is
     signal write1s_enb   : std_logic;
     signal write2s_enb   : std_logic;
     signal write3s_enb   : std_logic;
+    
+    signal read_1s_enb   : std_logic;
+    signal read_2s_enb   : std_logic;
+    signal read_3s_enb   : std_logic;
+    
     signal rAddres1Cnt   : natural range 0 to (img_width-1) := zero;
     signal rAddres2Cnt   : natural range 0 to (img_width-1) := zero;
     signal rAddres3Cnt   : natural range 0 to (img_width-1) := zero;
@@ -50,9 +55,14 @@ process (clk,rst_l) begin
         else
             rAddres1Cnt  <= zero;
         end if;
-        rAddres2Cnt <= rAddres1Cnt;
+        rAddres2Cnt  <= rAddres1Cnt;
         rAddres3Cnt  <= rAddres2Cnt;
         rAddres4Cnt  <= rAddres3Cnt;
+        read_1s_enb  <= read_en;
+        read_2s_enb  <= read_1s_enb;
+        read_3s_enb  <= read_2s_enb;
+        
+        
     end if;
 end process;
 
@@ -97,7 +107,7 @@ process (clk,rst_l) begin
     if (rst_l = lo) then
         oregister  <= (others => '0');
     elsif rising_edge(clk) then
-        if (read_en = hi) then
+        if (read_3s_enb = hi) then
             oregister <= rowbuffer(rAddres4Cnt);
         end if;    
     end if;

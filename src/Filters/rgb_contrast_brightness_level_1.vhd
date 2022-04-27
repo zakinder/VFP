@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 --
--- Filename    : rgb_contrast_brightness.vhd
+-- Filename    : rgb_contrast_brightness_level_1.vhd
 -- Create Date : 05022019 [05-02-2019]
 -- Author      : Zakinder
 --
@@ -16,22 +16,23 @@ use work.float_pkg.all;
 use work.constants_package.all;
 use work.vpf_records.all;
 use work.ports_package.all;
-entity rgb_contrast_brightness is
+entity rgb_contrast_brightness_level_1 is
   generic (
-    exposer_val  : integer := 8);
+    contrast_val  : sfixed(16 downto -3) := to_sfixed(5.0,16,-3);
+    exposer_val   : integer := 8);
   port (
     clk       : in std_logic;
     rst_l     : in std_logic;
     iRgb      : in channel;
     oRgb      : out channel);
-end rgb_contrast_brightness;
-architecture Behavioral of rgb_contrast_brightness is
+end rgb_contrast_brightness_level_1;
+architecture Behavioral of rgb_contrast_brightness_level_1 is
   signal ccRgb                : cc_rgb_record;
   signal rgbSyncValid         : std_logic_vector(11 downto 0) := x"000";
   signal rgb_ccm              : channel;
 begin
 rgbToSf_P: process (clk,rst_l)begin
-    if rst_l = '0' then
+    if (rst_l = '0') then
         ccRgb.rgbToSf.red    <= (others => '0');
         ccRgb.rgbToSf.green  <= (others => '0');
         ccRgb.rgbToSf.blue   <= (others => '0');
@@ -60,7 +61,7 @@ end process syncValid_P;
 -- red = alpha(red-128)+128+b
 process (clk)begin
     if rising_edge(clk) then
-        ccRgb.ccSf.k1           <= to_sfixed(0.90,16,-3);
+        ccRgb.ccSf.k1           <= contrast_val;
         ccRgb.ccSf.k2           <= to_sfixed(128.000,16,-3);
         ccRgb.ccSf.k3           <= to_sfixed(exposer_val,16,-3);
     end if;

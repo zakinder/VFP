@@ -80,9 +80,9 @@ videoOutP: process (clk) begin
 end process videoOutP;
 
 
-charPosition <= (int_delta(grid.x,location.x)/FONT_WIDTH + 1) when (grid.x >= location.x);
-charCode     <= (character'pos(displayText(charPosition))) when (charPosition > zero and charPosition < displayText'LENGTH);
-fontAddress  <= (charCode*charCodeLen) + int_delta(grid.y,location.y);
+charPosition         <= (int_delta(grid.x,location.x)/FONT_WIDTH + 1) when (grid.x >= location.x);
+charCode             <= (character'pos(displayText(charPosition))) when (charPosition > zero and charPosition < displayText'LENGTH);
+fontAddress          <= (charCode*charCodeLen) + int_delta(grid.y,location.y);
 bit_position_enable  <= hi when (grid.x >= location.x - 1) else lo;
 
 dSyncP: process(clk) begin
